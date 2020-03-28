@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vestibule</title>
+    <link rel="stylesheet" href="https://use.typekit.net/gki7zvg.css">
+    <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/add_show.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{% static "js/add_show.js" %}"></script>
+</head>
+<body>
+
+    <div id="main-box">
+        <section id="search-panel">
+            <p>Add Show</p>
+            <input type="text" id="search-term" placeholder="by title" onkeyup="search_show()">
+        </section>
+
+        <section id="searchResults">
+            <div class="search-result">
+                <p class="show-title"></p>
+            </div>
+        </section>
+    </div>
+
+    <form id="new-show-form" method="post" hidden>{% csrf_token %}
+        <div id="inputName">{{ form.imdb_id }}</div>
+        <input id="submitScore" type="submit">
+    </form>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/show_details.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{% static "js/show_details.js" %}"></script>
+{% endblock %}
+
+{% block strip %}
+    <img id="strip-img" src="{{ show.poster_link }}">
+{% endblock strip %}
+
+{% block main_panel %}
+    <div class="show-header"><img src="{% static "images/bullet_icon.svg" %}">{{ show.title }}</div>
+
+    <p class="show-details">
+        <span>{{ show.year }}</span>
+        <span class="bullet">&#9679;</span>
+        <span>{{ show.runtime }}m</span>
+        <span class="bullet">&#9679;</span>
+        <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
+    </p>
+
+    <div id="torrents-panel">
+
+        <div id="torrents-panel-header">
+            <p class="torrents-header">Torrents</p>
+            <a id="find-torrents-button" href="{% url 'shows:find-torrents' title=show.slug %}">Find More</a>
+        </div>
+
+        {% if not show.torrents.all %}
+            <div class="message-wrap">
+                <p>No Torrents found yet</p>
+            </div>
+        {% endif %}
+        <div id="show-torrents">
+
+            {% for torrent in show.torrents.all %}
+                <div class="torrent-wrap">
+                    <a href="{{ torrent.link }}" class="torrent-title">{{ torrent.short_title }}</a>
+                    <p>
+                        <span class="torrent-feed-name torrent-tag">{{ torrent.feed }}</span>
+                        <span class="torrent-quality torrent-tag">{{ torrent.quality }}</span>
+                        <span class="torrent-publication-time torrent-tag">{{ torrent.publication_time }}</span>
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+
+.show-header {
+    font-size: 2.3em;
+    font-weight: 500;
+    margin-left: -20px;
+}
+
+.show-header img {
+    height: 16px;
+    margin: 0 11px 4px 0;
+}
+
+.show-details {
+    margin-top: 8px;
+}
+
+.bullet {
+    font-size: 0.65em;
+    margin: 0 7px;
+    display: inline-block;
+}
+
+#torrents-panel {
+    margin-top: 5rem;
+    max-height: 42rem;
+}
+
+.torrents-header {
+    font-size: 1.5em;
+}
+
+#show-torrents {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 39rem;
+}
+
+#torrents-panel-header {
+    display: flex;
+    align-items: center;
+}
+
+#find-torrents-button {
+    margin-left: 20px;
+    font-size: 0.9em;
+    transition: 0.3s;
+}
+
+#find-torrents-button:hover {
+    color: #757575;
+    transform: translate(3px, 0);
+}
+
+.torrent-wrap {
+    margin: 15px 0;
+    border: 3px solid;
+    width: 20rem;
+}
+
+.torrent-title {
+    font-size: 1.1em;
+    font-weight: 400;
+    background-color: #333;
+    color: #e3e4db;
+    display: block;
+    padding: 5px;
+    transition: 0.3s;
+}
+
+.torrent-title:hover {
+    color: #d2d3c7;
+    transform: translate(3px, 0);
+}
+
+
+.torrent-tag {
+    display: inline-block;
+    border-right: 3px solid #333;
+    padding: 0 6px 1px;
+}
+
+.torrent-tag:last-child {
+    border: none;
+}

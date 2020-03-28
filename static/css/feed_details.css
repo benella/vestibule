@@ -1,0 +1,19 @@
+
+.feed-header {
+    font-size: 2em;
+    font-weight: 500;
+    color: #3f9359;
+}
+
+.feed-item-data {
+    margin: 5px 0;
+}
+
+.feed-item-title:hover {
+    color: #3f9359;
+}
+
+.feed-item-publication-time {
+    font-size: 0.85em;
+    color: #999;
+}

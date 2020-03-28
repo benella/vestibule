@@ -1,0 +1,127 @@
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: halyard-display, sans-serif;
+    font-weight: 400;
+    color: #333333;
+}
+
+body {
+    background-color: #e3e4db;
+}
+
+a {
+    text-decoration: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+.fas {
+    font-size: 0.8em;
+}
+
+#main-box {
+    margin: auto;
+    display: flex;
+}
+
+#main-panel {
+    padding: 3rem;
+    margin: 3rem;
+    max-height: calc(100vh - 12rem);
+}
+
+#side-panel {
+    width: 20rem;
+    padding: 6rem 0 0 6rem;
+    background-color: #d2d3c7;
+    height: calc(100vh - 6rem);
+}
+
+#strip {
+    width: 14px;
+    opacity: 0.5;
+    margin-top: 11rem;
+    height: 69vh;
+    overflow: hidden;
+    position: relative;
+}
+
+#strip-img {
+    -webkit-filter: blur(7px);
+    -moz-filter: blur(7px);
+    -o-filter: blur(7px);
+    -ms-filter: blur(5px);
+    filter: blur(7px);
+    height: 106%;
+    width: 8rem;
+    position: absolute;
+    left: -3.5rem;
+    top: -20px;
+}
+
+.acier-title {
+    font-family: acier-bat-noir, sans-serif;
+    font-size: 3em;
+    margin: 1rem 0;
+}
+
+#subscription-list {
+    padding: 3rem 0 0 1rem;
+}
+
+.subscription {
+    font-size: 1.3em;
+    margin: 5px 0;
+    transition: 0.3s;
+    display: block;
+}
+
+.subscription:hover {
+    color: #757575;
+    transform: translate(4px, 0);
+}
+
+#actions {
+    position: absolute;
+    bottom: 15rem;
+    font-family: monospace;
+}
+
+.messages {
+    position: absolute;
+    bottom: 3rem;
+    left: 3rem;
+    width: 20rem;
+}
+
+.message-wrap {
+    border: solid 3px #333;
+    border-left: solid 13px;
+    padding: 10px;
+    width: calc(100% - 2rem);
+    margin: 10px 0;
+}
+
+.in-line-icon {
+    font-size: 1.2em;
+    color: inherit;
+}
+
+.subscriptions-action {
+    transition: 0.3s;
+    font-family: acier-bat-solid, sans-serif;
+    font-size: 1.3em;
+    display: block;
+}
+
+.subscriptions-action:hover {
+    color: #757575;
+    transform: translate(4px, 0);
+}

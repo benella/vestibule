@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vestibule</title>
+    <link rel="shortcut icon" href="{% static "images/favicon.png" %}" />
+    <link rel="stylesheet" href="https://use.typekit.net/gki7zvg.css">
+    <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
+    {% block head %}{% endblock head %}
+</head>
+<body>
+
+    <div id="main-box">
+        <section id="side-panel">
+            <section id="top-panel">
+                <a href="{% url 'home' %}" class="acier-title">VESTIBULE</a>
+            </section>
+
+            <section id="subscription-list">
+                {% for show in shows %}
+                    <a href="{% url 'shows:details' slug=show.slug %}" class="subscription">{{ show.title }}</a>
+                {% endfor %}
+            </section>
+
+            <section id="actions">
+                <a href="{% url 'shows:add-show' %}" class="subscriptions-action">Add Show</a>
+            </section>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message-wrap">
+                        <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        </section>
+
+        <div id="strip">
+            {% block strip %}
+                <img id="strip-img" src="{% static "images/default_strip.jpg" %}">
+            {% endblock strip %}
+        </div>
+
+        <section id="main-panel">
+            {% block main_panel %}
+            {% endblock main_panel %}
+        </section>
+
+    </div>
+
+</body>
+</html>
