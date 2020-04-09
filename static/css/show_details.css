@@ -54,7 +54,7 @@
 .torrent-wrap {
     margin: 15px 0;
     border: 3px solid;
-    width: 20rem;
+    width: 25rem;
 }
 
 .torrent-title {
@@ -67,11 +67,25 @@
     transition: 0.3s;
 }
 
+.torrent-title-wrap {
+    display: flex;
+    justify-content: space-between;
+}
+
+.torrent-title-text {
+    color: #e3e4db;
+}
+
+.torrent-download-status {
+    color: #5bbb5b;
+    font-weight: 200;
+    margin-right: 3px;
+}
+
 .torrent-title:hover {
     color: #d2d3c7;
     transform: translate(3px, 0);
 }
-
 
 .torrent-tag {
     display: inline-block;

@@ -37,7 +37,12 @@
 
             {% for torrent in show.torrents.all %}
                 <div class="torrent-wrap">
-                    <a href="{{ torrent.link }}" class="torrent-title">{{ torrent.short_title }}</a>
+                    <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}" class="torrent-title">
+                        <div class="torrent-title-wrap">
+                            <span class="torrent-title-text">{{ torrent.short_title }}</span>
+                            <span class="torrent-download-status">{{ torrent.download_status_display }}</span>
+                        </div>
+                    </a>
                     <p>
                         <span class="torrent-feed-name torrent-tag">{{ torrent.feed }}</span>
                         <span class="torrent-quality torrent-tag">{{ torrent.quality }}</span>

@@ -21,6 +21,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^shows/', include(('shows.urls', 'shows'), namespace='shows')),
+    url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
     url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
     url(r'^$', views.Home.as_view(), name='home'),
 ]

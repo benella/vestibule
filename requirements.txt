@@ -2,3 +2,4 @@ Django==3.0.4
 IMDbPY==6.8
 requests==2.23.0
 APScheduler==3.6.3
+transmission-clutch==2.0.3
