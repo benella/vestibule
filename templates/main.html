@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="{% static "images/favicon.png" %}" />
     <link rel="stylesheet" href="https://use.typekit.net/gki7zvg.css">
     <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     {% block head %}{% endblock head %}
 </head>
 <body>
@@ -27,6 +28,8 @@
             <section id="actions">
                 <a href="{% url 'shows:add-show' %}" class="subscriptions-action">Add Show</a>
             </section>
+
+            <section id="services-status-box"></section>
 
         {% if messages %}
             <div class="messages">
@@ -53,5 +56,6 @@
 
     </div>
 
+    <script src="{% static "js/services_status.js" %}"></script>
 </body>
 </html>

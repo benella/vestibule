@@ -1,0 +1,10 @@
+[
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 1,
+    "fields": {
+      "name": "Plex Token",
+      "value": "QqtfWLjz6Rb5o4yW6btS"
+    }
+  }
+]

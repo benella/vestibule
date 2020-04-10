@@ -1,7 +1,8 @@
 from .transmission_client import TransmissionClient
 
 
-def update_transmission():
+def update_torrents():
 
     with TransmissionClient() as transmission:
-        transmission.update_live_torrents()
+        if transmission.is_up:
+            transmission.update_live_torrents()

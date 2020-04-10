@@ -94,6 +94,28 @@ button:focus {
     font-family: monospace;
 }
 
+#services-status-box {
+    position: absolute;
+    bottom: 18rem;
+    left: 0;
+    height: 3.5rem;
+    width: 20rem;
+    padding-left: 6rem;
+    display: flex;
+    background-color: #C8C9C0;
+}
+
+.service-wrap {
+    margin: 0.7rem;
+    width: 2rem;
+}
+
+.service-icon {
+    display: block;
+    height: 100%;
+    margin: auto;
+}
+
 .messages {
     position: absolute;
     bottom: 3rem;

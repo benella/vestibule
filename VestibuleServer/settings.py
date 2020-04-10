@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'vestibule.apps.VestibuleConfig',
     'shows',
     'torrents.apps.TorrentsConfig',
-    'feeds.apps.FeedsConfig'
+    'feeds.apps.FeedsConfig',
+    'vestibule_configurations'
 ]
 
 MIDDLEWARE = [
