@@ -20,16 +20,20 @@ function add_service_status(service_name, service_status) {
     service_div.setAttribute("target", "_blank");
     service_div.classList.add("service-wrap");
 
-    let service_status_line = "";
-    let service_status_icon = "";
+    let service_status_bar = document.createElement("div");
+    service_status_bar.classList.add("service-status-bar");
+    service_div.appendChild(service_status_bar);
+
+    let service_status_line;
+    let service_status_icon = "/static/images/" + service_name + "_icon.svg";
 
     if (service_status["up"]) {
         service_div.classList.add("service-up");
         service_status_line = service_name + " is up";
-        service_status_icon = "/static/images/" + service_name + "_up_icon.svg"
+
     } else {
         service_div.classList.add("service-down");
-        service_status_icon = "/static/images/" + service_name + "_down_icon.svg"
+        service_status_line = service_name + " is down";
     }
 
     let service_name_div = document.createElement("img");
