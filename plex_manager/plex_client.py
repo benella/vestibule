@@ -8,11 +8,15 @@ class PlexClient:
 
     PLEX_BASE_URL = "http://{host}:32400"
 
-    def __init__(self, host="localhost"):
+    def __init__(self):
         try:
             plex_token = VestibuleConfiguration.objects.get(name="Plex Token").value
+            host = VestibuleConfiguration.objects.get(name="Host Address").value
+
         except VestibuleConfiguration.DoesNotExist:
             plex_token = None
+            host = "localhost"
+
         self._base_url = PlexClient.PLEX_BASE_URL.format(host=host)
         self._token = plex_token
 

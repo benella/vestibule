@@ -3,6 +3,7 @@ from clutch.client import Client
 from datetime import timedelta
 from requests.exceptions import ConnectionError
 
+from vestibule_configurations.models import VestibuleConfiguration
 from torrents.models import Torrent
 
 
@@ -18,7 +19,13 @@ class TransmissionClient:
     ACTION_SUCCESS = "success"
 
 
-    def __init__(self, host="localhost"):
+    def __init__(self):
+
+        try:
+            host = VestibuleConfiguration.objects.get(name="Host Address").value
+        except VestibuleConfiguration.DoesNotExist:
+            host = "localhost"
+
         self._api_address = TransmissionClient.TRANSMISSION_API_ADDRESS.format(host=host)
         self._web_address = TransmissionClient.TRANSMISSION_WEB_ADDRESS.format(host=host)
 

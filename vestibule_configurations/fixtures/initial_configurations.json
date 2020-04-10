@@ -6,5 +6,13 @@
       "name": "Plex Token",
       "value": "QqtfWLjz6Rb5o4yW6btS"
     }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 2,
+    "fields": {
+      "name": "Host Address",
+      "value": "192.168.0.15"
+    }
   }
 ]

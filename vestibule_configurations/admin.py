@@ -3,7 +3,7 @@ from .models import VestibuleConfiguration
 
 
 class VestibuleConfigurationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'value')
 
 
 admin.site.register(VestibuleConfiguration, VestibuleConfigurationAdmin)
