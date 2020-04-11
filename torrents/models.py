@@ -35,11 +35,12 @@ class Torrent(models.Model):
         ordering = ('show', '-season', '-episode', 'feed')
 
     def __str__(self):
-        return "{show}{season}{episode}{quality}".format(
+        return "{show}{season}{episode}{quality} ({feed})".format(
             show=self.show.title,
             season=" S{}".format(self.season),
             episode="E{}".format(self.episode) if self.episode else "",
-            quality=" ({})".format(self.quality)
+            quality=" ({})".format(self.quality),
+            feed=self.feed.name
         )
 
     @property

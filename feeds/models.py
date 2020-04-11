@@ -1,12 +1,13 @@
+import logging
 import requests
 import datetime
 import xml.etree.ElementTree as ET
-from collections import namedtuple
+from dataclasses import dataclass
 
 from django.utils.text import slugify
 from django.db import models
 
-FeedItem = namedtuple("FeedItem", "raw_title link publication_time feed")
+logger = logging.getLogger(__name__)
 
 
 class Feed(models.Model):
@@ -35,6 +36,7 @@ class Feed(models.Model):
         root = ET.fromstring(feed.text)
         feed_items = list()
 
+        print(f"Reading {self.name} feed")
         for item in root[0].findall("item"):
 
             feed_item = FeedItem(
@@ -44,14 +46,12 @@ class Feed(models.Model):
                 feed=self
             )
 
-            print("Found show {title} ({time})".format(
-                title=feed_item.raw_title,
-                time=feed_item.publication_time
-            ))
-            feed_items.append(feed_item)
+            if not feed_item.has_expected_keys():
+                logger.warning(f"- Skipping item {feed_item.raw_title} ({feed_item.publication_time})")
+                continue
 
-        self.last_read = datetime.datetime.now()
-        self.save()
+            logger.info(f"+ Found item {feed_item.raw_title} ({feed_item.publication_time})")
+            feed_items.append(feed_item)
 
         return feed_items
 
@@ -63,16 +63,22 @@ class Feed(models.Model):
         to_datetime = datetime.datetime.strptime(raw_publication_time, self.feed_time_format)
         return to_datetime.strftime("%d.%m.%Y %H:%M")
 
-    def find_items_for_subscribed_show(self, show_name):
-        """
-        :type show_name: str
-        :rtype: list of FeedItem
-        """
-        lookup_name = show_name.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", ".")
-        relevant_items = list()
 
-        for item in self.read_feed():
-            if lookup_name in item.raw_title:
-                relevant_items.append(item)
+@dataclass
+class FeedItem:
 
-        return relevant_items
+    EXPECTED_QUALITY_KEYS = ["1080p", "720p", "2160p"]
+    EXPECTED_SOURCE_KEYS = ["web", "nf", "hdtv", "amzn", "bluray"]
+
+    raw_title: str
+    link: str
+    publication_time: str
+    feed: Feed
+
+    def has_expected_keys(self):
+        title = self.raw_title.lower()
+        for expected_value in FeedItem.EXPECTED_QUALITY_KEYS:
+            if expected_value in title:
+                return True
+
+        return False

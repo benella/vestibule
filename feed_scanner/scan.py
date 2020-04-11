@@ -9,5 +9,5 @@ def start():
     scheduler.start()
     scheduler.add_job(scan_torrents, 'interval', minutes=minutes_interval)
 
-    print("[{time}] Scheduled Feed Scan started with {inter}m interval".format(
+    print("[{time}] Scheduled Feed Scan routine started with {inter}m interval".format(
         time=datetime.now().strftime("%d/%b/%Y %H:%M:%S"), inter=minutes_interval))

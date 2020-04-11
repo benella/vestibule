@@ -56,16 +56,24 @@ class Show(models.Model):
     def _show_torrents_titles(self):
         return [torrent.title for torrent in self.torrents.all()]
 
-    def find_show_torrents(self, request=None):
-        torrents = list()
+    def find_show_torrents(self, request=None, torrents: list = None):
 
-        for feed in Feed.objects.all():
-            torrents += feed.find_items_for_subscribed_show(self.title)
+        if torrents is None:
+            torrents = list()
+            for feed in Feed.objects.all():
+                torrents += feed.read_feed()
+
+        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", ".")
+        relevant_items = list()
+
+        for item in torrents:
+            if lookup_name in item.raw_title:
+                relevant_items.append(item)
 
         print("[{}] Found {} torrents for show {}".format(
-            datetime.now().strftime("%d/%b/%Y %H:%M:%S"), len(torrents), self.title))
+            datetime.now().strftime("%d/%b/%Y %H:%M:%S"), len(relevant_items), self.title))
 
-        self.add_torrents_from_feed(torrents, request)
+        self.add_torrents_from_feed(relevant_items, request)
 
     def add_torrents_from_feed(self, feed_list, request=None):
         """
