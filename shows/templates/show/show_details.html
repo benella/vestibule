@@ -11,45 +11,68 @@
 {% endblock strip %}
 
 {% block main_panel %}
-    <div class="show-header">{{ show.title }}</div>
 
-    <p class="show-details">
-        <span>{{ show.year }}</span>
-        <span class="bullet">&#9679;</span>
-        <span>{{ show.runtime }}m</span>
-        <span class="bullet">&#9679;</span>
-        <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
-    </p>
+    <div id="show-top-panel">
+        <div class="show-header">{{ show.title }}</div>
+
+        <p class="show-details">
+            <span>{{ show.year }}</span>
+            <span class="bullet">&#9679;</span>
+            <span>{{ show.runtime }}m</span>
+            <span class="bullet">&#9679;</span>
+            <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
+        </p>
+    </div>
+
+    <div id="show-actions-panel">
+        <a class="show-action" href="{% url 'shows:find-torrents' title=show.slug %}">Find New Torrents</a>
+    </div>
 
     <div id="torrents-panel">
 
-        <div id="torrents-panel-header">
-            <p class="torrents-header">Torrents</p>
-            <a id="find-torrents-button" href="{% url 'shows:find-torrents' title=show.slug %}">Find More</a>
-        </div>
-
-        {% if not show.torrents.all %}
+        {% if not show.seasons %}
             <div class="message-wrap">
                 <p>No Torrents found yet</p>
             </div>
         {% endif %}
-        <div id="show-torrents">
 
-            {% for torrent in show.torrents.all %}
-                <div class="torrent-wrap">
-                    <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}" class="torrent-title">
-                        <div class="torrent-title-wrap">
-                            <span class="torrent-title-text">{{ torrent.short_title }}</span>
-                            <span class="torrent-download-status">{{ torrent.download_status_display }}</span>
-                        </div>
-                    </a>
-                    <p>
-                        <span class="torrent-feed-name torrent-tag">{{ torrent.feed }}</span>
-                        <span class="torrent-quality torrent-tag">{{ torrent.quality }}</span>
-                        <span class="torrent-publication-time torrent-tag">{{ torrent.publication_time }}</span>
-                    </p>
+        <div>
+            <div class="seasons-bar">
+                <div class="seasons">
+                {% for season in show.seasons.keys %}
+                    <div class="season-bar {% if forloop.first %}chosen-season{% endif %}"
+                         data-season-number="{{ season }}"
+                         onclick="choose_season(this)">
+                        <p>Season {{ season }}</p>
+                    </div>
+                {% endfor %}
                 </div>
-            {% endfor %}
+                <div id="seasons-filler-bar"></div>
+            </div>
+
+            <div class="torrents-by-season">
+                {% for season, torrents in show.seasons.items %}
+                    <div class="season-torrents {% if forloop.first %}chosen-season-torrents{% endif %}" id="torrents-season-{{ season }}">
+                        {% for torrent in torrents %}
+                            <div class="torrent-wrap">
+                                <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}" class="torrent-title">
+                                    <div class="torrent-title-wrap">
+                                        <div class="torrent-data-warp">
+                                            <p class="torrent-title-text">{{ torrent.short_title }}</p>
+                                            <p class="torrent-title-full">{{ torrent.title }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <p>
+                                    <span class="torrent-feed-name torrent-tag">{{ torrent.feed }}</span>
+                                    <span class="torrent-quality torrent-tag">{{ torrent.quality }}</span>
+                                    <span class="torrent-publication-time torrent-tag">{{ torrent.publication_time }}</span>
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
 

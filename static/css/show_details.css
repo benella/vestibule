@@ -19,33 +19,74 @@
     display: inline-block;
 }
 
-#torrents-panel {
-    margin-top: 5rem;
-    max-height: 42rem;
+#show-actions-panel {
+    position: fixed;
+    top: 16rem;
+    right: 7rem;
+    border-left: 14px solid #C8C9C0;
 }
 
-.torrents-header {
-    font-size: 1.5em;
+.seasons-bar {
+    width: 100%;
+    position: relative;
 }
 
-#show-torrents {
-    overflow-x: hidden;
-    overflow-y: scroll;
-    max-height: 39rem;
-}
-
-#torrents-panel-header {
+.seasons {
+    width: 100%;
     display: flex;
-    align-items: center;
 }
 
-#find-torrents-button {
+.season-bar {
+    font-size: 1.18em;
+    color: #A4A5A0;
+    border-bottom: solid 3px #A4A5A0;
+    padding: 0 20px 8px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.season-bar p {
+    color: inherit;
+}
+
+#seasons-filler-bar {
+    width: 100%;
+    height: 3px;
+    background-color: #A4A5A0;
+    position: absolute;
+    bottom: 0;
+    z-index: -2;
+}
+
+.season-bar:hover {
+    color: #333333;
+}
+
+.chosen-season {
+    color: #333333;
+    border-bottom: solid 3px #333333;
+}
+
+.season-torrents {
+    display: none;
+}
+
+.chosen-season-torrents {
+    display: block;
+}
+
+#torrents-panel {
+    margin-top: 4rem;
+    width: 39rem;
+}
+
+.show-action {
     margin-left: 20px;
-    font-size: 0.9em;
+    font-size: 1.1em;
     transition: 0.3s;
 }
 
-#find-torrents-button:hover {
+.show-action:hover {
     color: #757575;
     transform: translate(3px, 0);
 }
@@ -53,7 +94,6 @@
 .torrent-wrap {
     margin: 15px 0;
     border: 3px solid;
-    width: 25rem;
 }
 
 .torrent-title {
@@ -62,28 +102,34 @@
     background-color: #333;
     color: #e3e4db;
     display: block;
-    padding: 5px;
+    padding: 6px;
     transition: 0.3s;
 }
 
 .torrent-title-wrap {
-    display: flex;
-    justify-content: space-between;
+    width: 60%;
+}
+
+.torrent-data-warp {
+    width: 100%;
+    min-height: 50px;
 }
 
 .torrent-title-text {
     color: #e3e4db;
 }
 
+.torrent-title-full {
+    color: #8E8E88;
+    font-weight: 100;
+    font-size: 0.65em;
+    margin-top: 2px;
+}
+
 .torrent-download-status {
     color: #5bbb5b;
     font-weight: 200;
     margin-right: 3px;
-}
-
-.torrent-title:hover {
-    color: #d2d3c7;
-    transform: translate(3px, 0);
 }
 
 .torrent-tag {

@@ -38,7 +38,7 @@ class Torrent(models.Model):
         return "{show}{season}{episode}{quality} ({feed})".format(
             show=self.show.title,
             season=" S{}".format(self.season),
-            episode="E{}".format(self.episode) if self.episode else "",
+            episode=" E{}".format(self.episode) if self.episode else "",
             quality=" ({})".format(self.quality),
             feed=self.feed.name
         )
@@ -54,7 +54,7 @@ class Torrent(models.Model):
         return "{show}{season}{episode}".format(
             show=self.show.title,
             season=" S{}".format(self.season),
-            episode="E{}".format(self.episode) if self.episode else ""
+            episode=" E{}".format(self.episode) if self.episode else ""
         )
 
     @staticmethod

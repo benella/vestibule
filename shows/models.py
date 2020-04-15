@@ -6,6 +6,7 @@ from torrents.models import Torrent
 from django.contrib import messages
 from notifications import pushover
 from datetime import datetime
+from collections import defaultdict
 
 
 class Show(models.Model):
@@ -50,6 +51,18 @@ class Show(models.Model):
 
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
+
+    @property
+    def seasons(self):
+        """
+        Get show's episode torrents grouped by season
+        :return:
+        """
+        seasons = defaultdict(list)
+        for torrent in self.torrents.all():
+            seasons[torrent.season].append(torrent)
+
+        return dict(seasons)
 
 
     @property

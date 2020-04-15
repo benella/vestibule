@@ -13,7 +13,6 @@
 </head>
 <body>
 
-    <div id="main-box">
         <section id="side-panel">
             <section id="top-panel">
                 <a href="{% url 'home' %}" class="acier-title">VESTIBULE</a>
@@ -48,6 +47,8 @@
                 <img id="strip-img" src="{% static "images/default_strip.jpg" %}">
             {% endblock strip %}
         </div>
+
+    <div id="main-box">
 
         <section id="main-panel">
             {% block main_panel %}

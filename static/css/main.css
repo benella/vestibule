@@ -27,30 +27,37 @@ button:focus {
 }
 
 #main-box {
-    margin: auto;
-    display: flex;
+    margin-left: 24rem;
+    width: calc(100vw - 24rem);
 }
 
 #main-panel {
     padding: 3rem;
-    margin: 3rem;
+    margin: 1rem 0 0 2rem;
     max-height: calc(100vh - 12rem);
+    position: relative;
+    min-width: 860px;
 }
 
 #side-panel {
     width: 20rem;
-    padding: 6rem 0 0 6rem;
+    padding: 4rem 0 0 4rem;
     background-color: #d2d3c7;
-    height: calc(100vh - 6rem);
+    height: calc(100vh - 4rem);
+    position: fixed;
+    left: 0;
+    top: 0;
 }
 
 #strip {
     width: 14px;
     opacity: 0.5;
-    margin-top: 11rem;
+    margin-top: 10%;
     height: 69vh;
     overflow: hidden;
-    position: relative;
+    position: fixed;
+    left: 24rem;
+    top: 0;
 }
 
 #strip-img {
@@ -99,7 +106,7 @@ button:focus {
     bottom: 0;
     left: 0;
     height: 4rem;
-    width: 26rem;
+    width: 24rem;
     display: flex;
     justify-content: center;
     background-color: #C8C9C0;
@@ -145,7 +152,7 @@ button:focus {
     position: absolute;
     bottom: 6rem;
     left: 3rem;
-    width: 20rem;
+    width: 19rem;
 }
 
 .message-wrap {
