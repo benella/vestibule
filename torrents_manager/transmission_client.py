@@ -78,8 +78,7 @@ class TransmissionClient:
             return False, f"Failed to download torrent {torrent}"
 
         torrent.transmission_torrent_id = response.arguments["torrent_added"]["id"]
-        torrent.download_status = Torrent.DOWNLOADING
-        torrent.save()
+        torrent.update_download_status(Torrent.DOWNLOADING)
 
         return True, f"Downloading {torrent}"
 
@@ -108,8 +107,7 @@ class TransmissionClient:
         can_delete = seeding_time >= TransmissionClient.DEFAULT_SHARE_TIME
 
         if is_ready and torrent.download_status != Torrent.READY:
-            torrent.download_status = Torrent.READY
-            torrent.save()
+            torrent.update_download_status(Torrent.READY)
             print(f"Download finished, copying files to library")
 
         if can_delete:

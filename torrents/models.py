@@ -1,4 +1,5 @@
 import re
+from django.utils import timezone
 from django.db import models
 
 SEASON_RE = re.compile("\.S(?P<season>\d+)")
@@ -17,6 +18,9 @@ class Torrent(models.Model):
         (DOWNLOADING, "Downloading"),
         (READY, "Ready"),
     ]
+
+    created = models.DateTimeField(editable=False, default=timezone.now)
+    modified = models.DateTimeField(default=timezone.now)
 
     link = models.CharField(default="", blank=True, max_length=500)
     title = models.CharField(max_length=2160, default="")
@@ -42,6 +46,17 @@ class Torrent(models.Model):
             quality=" ({})".format(self.quality),
             feed=self.feed.name
         )
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+
+        return super(Torrent, self).save(*args, **kwargs)
+
+    def update_download_status(self, new_status):
+        self.download_status = new_status
+        self.modified = timezone.now()
+        self.save()
 
     @property
     def download_status_display(self):

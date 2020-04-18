@@ -22,12 +22,18 @@ button:focus {
     outline: none;
 }
 
+.bullet {
+    font-family: -webkit-pictograph monospace;
+    display: inline-block;
+    margin: 0 4px;
+}
+
 .fas {
     font-size: 0.8em;
 }
 
 #main-box {
-    margin-left: 24rem;
+    margin-left: 23rem;
     width: calc(100vw - 24rem);
 }
 
@@ -41,7 +47,7 @@ button:focus {
 }
 
 #side-panel {
-    width: 20rem;
+    width: 19rem;
     padding: 4rem 0 0 4rem;
     background-color: #d2d3c7;
     height: calc(100vh - 4rem);
@@ -57,7 +63,7 @@ button:focus {
     height: 69vh;
     overflow: hidden;
     position: fixed;
-    left: 24rem;
+    left: 23rem;
     top: 0;
 }
 
@@ -107,7 +113,7 @@ button:focus {
     bottom: 0;
     left: 0;
     height: 4rem;
-    width: 24rem;
+    width: 23rem;
     display: flex;
     justify-content: center;
     background-color: #C8C9C0;

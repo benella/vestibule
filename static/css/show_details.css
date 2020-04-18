@@ -13,12 +13,6 @@
     margin-top: 8px;
 }
 
-.bullet {
-    font-size: 0.65em;
-    margin: 0 7px;
-    display: inline-block;
-}
-
 #show-actions-panel {
     position: absolute;
     top: 16rem;
@@ -91,8 +85,12 @@
     transform: translate(3px, 0);
 }
 
+.torrents-by-season {
+    margin-bottom: 10rem;
+}
+
 .episode-divider {
-    background-color: #C8C9C0;
+    background-color: #d2d3c7;
     margin-top: 36px;
     padding: 8px 10px;
 }
