@@ -20,7 +20,7 @@
 }
 
 #show-actions-panel {
-    position: fixed;
+    position: absolute;
     top: 16rem;
     right: 7rem;
     border-left: 14px solid #C8C9C0;
@@ -77,7 +77,7 @@
 
 #torrents-panel {
     margin-top: 4rem;
-    width: 39rem;
+    width: 42rem;
 }
 
 .show-action {
@@ -91,28 +91,33 @@
     transform: translate(3px, 0);
 }
 
-.torrent-wrap {
-    margin: 15px 0;
-    border: 3px solid;
+.episode-divider {
+    background-color: #C8C9C0;
+    margin-top: 36px;
+    padding: 8px 10px;
 }
 
-.torrent-title {
+.torrent-box {
+    margin: 15px 0;
+    border: solid 3px #333;
+}
+
+.torrent-info {
     font-size: 1.1em;
     font-weight: 400;
     background-color: #333;
     color: #e3e4db;
-    display: block;
+    display: flex;
     padding: 6px;
-    transition: 0.3s;
+    min-height: 70px;
+    justify-content: space-between;
 }
 
-.torrent-title-wrap {
-    width: 60%;
-}
-
-.torrent-data-warp {
-    width: 100%;
-    min-height: 50px;
+.torrent-title {
+    width: 42%;
+    padding: 7px 23px 0 0;
+    word-wrap: break-word;
+    position: relative;
 }
 
 .torrent-title-text {
@@ -120,24 +125,71 @@
 }
 
 .torrent-title-full {
-    color: #8E8E88;
+    color: #797974;
     font-weight: 100;
     font-size: 0.65em;
-    margin-top: 2px;
+    margin-top: 10px;
+    position: absolute;
+    top: 25px;
+    max-width: 88%;
 }
 
-.torrent-download-status {
-    color: #5bbb5b;
-    font-weight: 200;
-    margin-right: 3px;
+.torrent-tags {
+    padding-top: 5px;
 }
 
 .torrent-tag {
     display: inline-block;
-    border-right: 3px solid #333;
+    border-right: 1px solid #e3e4db;
     padding: 0 6px 1px;
+    color: #e3e4db;
+    font-size: 0.7em;
+    font-weight: 400;
 }
 
 .torrent-tag:last-child {
     border: none;
+}
+
+.torrent-publication-time {
+    display: inline-block;
+    padding: 0 6px 1px;
+    color: #797974;
+    font-size: 0.7em;
+    font-weight: 100;
+}
+
+.torrent-download {
+    display: flex;
+    height: 30px;
+    justify-content: flex-end;
+    width: 9rem;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.torrent-download-status {
+    color: #e3e4db;
+    font-weight: 500;
+    margin-right: 3px;
+    font-size: 0.9em;
+    transition: 0.2s;
+}
+
+.torrent-download-status-ready,
+.torrent-download-status-downloading {
+    color: #3f9359;
+}
+
+.torrent-download:hover .torrent-download-status {
+    color: #3f9359;
+}
+
+.torrent-download-icon {
+    height: 30px;
+}
+
+.torrent-download-bar {
+    width: 100%;
+    height: 15px;
 }

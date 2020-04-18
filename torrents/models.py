@@ -46,7 +46,7 @@ class Torrent(models.Model):
     @property
     def download_status_display(self):
         if self.download_status == Torrent.NEVER_STARTED:
-            return ""
+            return "Download"
         return self.get_download_status_display()
 
     @property

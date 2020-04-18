@@ -58,9 +58,12 @@ class Show(models.Model):
         Get show's episode torrents grouped by season
         :return:
         """
-        seasons = defaultdict(list)
+        seasons = defaultdict(dict)
+
         for torrent in self.torrents.all():
-            seasons[torrent.season].append(torrent)
+            if torrent.episode not in seasons[torrent.season].keys():
+                seasons[torrent.season][torrent.episode] = list()
+            seasons[torrent.season][torrent.episode].append(torrent)
 
         return dict(seasons)
 

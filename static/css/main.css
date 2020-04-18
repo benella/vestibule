@@ -36,7 +36,8 @@ button:focus {
     margin: 1rem 0 0 2rem;
     max-height: calc(100vh - 12rem);
     position: relative;
-    min-width: 860px;
+    min-width: 950px;
+    max-width: 1200px;
 }
 
 #side-panel {
@@ -52,7 +53,7 @@ button:focus {
 #strip {
     width: 14px;
     opacity: 0.5;
-    margin-top: 10%;
+    margin-top: 11rem;
     height: 69vh;
     overflow: hidden;
     position: fixed;

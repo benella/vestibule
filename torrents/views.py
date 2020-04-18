@@ -16,12 +16,19 @@ def download_torrent(request, torrent_id):
 
     else:
         with TransmissionClient() as transmission:
-            successful, message = transmission.download_torrent(torrent)
+            if transmission.is_up:
+                successful, message = transmission.download_torrent(torrent)
 
-            messages.add_message(
-                request=request,
-                level=messages.SUCCESS if successful else message.ERROR,
-                message=message
-            )
+                messages.add_message(
+                    request=request,
+                    level=messages.SUCCESS if successful else message.ERROR,
+                    message=message
+                )
+            else:
+                messages.add_message(
+                    request=request,
+                    level=messages.WARNING,
+                    message=f"Transmission seems to be down. Set it up and try again."
+                )
 
     return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': torrent.show.slug}))
