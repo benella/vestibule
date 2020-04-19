@@ -41,8 +41,9 @@ LOGGING = {
 
 ALLOWED_HOSTS = ['0.0.0.0',
                  '127.0.0.1',
-                 '192.168.0.15',
-                 '192.168.0.17']
+                 '192.168.*',
+                 'raspberrypi.local'
+                 ]
 
 
 # Application definition
