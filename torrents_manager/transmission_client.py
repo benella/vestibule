@@ -3,6 +3,7 @@ from clutch.client import Client
 from datetime import timedelta
 from requests.exceptions import ConnectionError
 
+from notifications import pushover
 from vestibule_configurations.models import VestibuleConfiguration
 from torrents.models import Torrent
 
@@ -14,7 +15,7 @@ class TransmissionClient:
 
     TRANSMISSION_API_ADDRESS = "http://{host}:9091/transmission/rpc"
     TRANSMISSION_WEB_ADDRESS = "http://{host}:9091"
-    DEFAULT_SHARE_TIME = timedelta(days=3)
+    DEFAULT_SHARE_TIME = timedelta(days=7)
     DEFAULT_SHARE_RATIO = 2
     ACTION_SUCCESS = "success"
 
@@ -109,6 +110,10 @@ class TransmissionClient:
         if is_ready and torrent.download_status != Torrent.READY:
             torrent.update_download_status(Torrent.READY)
             print(f"Download finished, copying files to library")
+            pushover.send_message(
+                title=f"{torrent.show.title} - New episode is ready",
+                message=f"{torrent.short_title}"
+            )
 
         if can_delete:
             print(f"Shared for {seeding_time}, deleting torrents and files")
