@@ -98,11 +98,13 @@ class TransmissionClient:
               f"Shred for: {seeding_time}"
               )
 
-        try:
-            torrent = Torrent.objects.get(transmission_torrent_id__exact=transmission_torrent_id)
-        except Torrent.DoesNotExist:
+        torrents = Torrent.objects.filter(transmission_torrent_id=transmission_torrent_id).order_by("-modified")
+        if len(torrents) == 0:
             print(f"Torrent not found in Vestibule, doing nothing")
             return
+
+        torrent = torrents[0]
+        print(f"Matched with Torrent in Vestibule - {torrent}")
 
         is_ready = torrent_info.get('percent_done') == 1
         can_delete = seeding_time >= TransmissionClient.DEFAULT_SHARE_TIME

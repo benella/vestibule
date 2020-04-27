@@ -187,7 +187,7 @@ class Show(models.Model):
 
         try:
             self.runtime = imdb_show_data.get("runtimes")[0]
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         if self.profile is None:
