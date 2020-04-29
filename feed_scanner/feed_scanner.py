@@ -14,3 +14,4 @@ def scan_torrents():
 
     for show in Show.objects.all():
         show.find_show_torrents(torrents=torrents)
+        show.update_show_downloads()

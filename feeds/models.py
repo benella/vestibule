@@ -4,6 +4,7 @@ import datetime
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
+from common import Quality, Source
 from django.utils.text import slugify
 from django.db import models
 
@@ -17,6 +18,7 @@ class Feed(models.Model):
     feed_time_format = models.CharField(max_length=256, default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     priority = models.IntegerField(default=0)
+    has_subtitles = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -67,18 +69,17 @@ class Feed(models.Model):
 @dataclass
 class FeedItem:
 
-    EXPECTED_QUALITY_KEYS = ["1080p", "720p", "2160p"]
-    EXPECTED_SOURCE_KEYS = ["web", "nf", "hdtv", "amzn", "bluray"]
-
     raw_title: str
     link: str
     publication_time: str
     feed: Feed
 
     def has_expected_keys(self):
-        title = self.raw_title.lower()
-        for expected_value in FeedItem.EXPECTED_QUALITY_KEYS:
-            if expected_value in title:
-                return True
 
-        return False
+        if Quality.parse_quality_form_phrase(self.raw_title) is None:
+            return False
+
+        if Source.pare_source_from_phrase(self.raw_title) is None:
+            return False
+
+        return True

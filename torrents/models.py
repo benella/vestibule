@@ -1,10 +1,10 @@
 import re
 from django.utils import timezone
 from django.db import models
+from common import Quality, Source
 
 SEASON_RE = re.compile("\.S(?P<season>\d+)")
 EPISODE_RE = re.compile("E(?P<episode>\d+)")
-QUALITIES = {"720p": "720P", "1080p": "1080P", "2160p": "4K"}
 
 
 class Torrent(models.Model):
@@ -34,16 +34,24 @@ class Torrent(models.Model):
 
     transmission_torrent_id = models.IntegerField(default=0, blank=True)
     download_status = models.CharField(choices=DOWNLOAD_STATUS_CHOICES, default=NEVER_STARTED, max_length=1)
+    profile_match_score = models.IntegerField(default=0)
+    profile_match = models.BooleanField(default=False)
+
 
     class Meta:
-        ordering = ('show', '-season', '-episode', 'feed')
+        ordering = ('show', '-season', '-episode', '-profile_match_score', 'feed')
+
+    @property
+    def was_downloaded(self):
+        return self.download_status != Torrent.NEVER_STARTED
 
     def __str__(self):
-        return "{show}{season}{episode}{quality} ({feed})".format(
+        return "{show}{season}{episode} ({quality}) ({source}) ({feed})".format(
             show=self.show.title,
             season=" S{}".format(self.season),
             episode=" E{}".format(self.episode) if self.episode else "",
-            quality=" ({})".format(self.quality),
+            quality=self.quality,
+            source=self.source_type,
             feed=self.feed.name
         )
 
@@ -76,7 +84,6 @@ class Torrent(models.Model):
     def parse_torrent_details(raw_title):
         season = "Unknown"
         episode = ""
-        quality = "Unknown"
 
         season_match = SEASON_RE.search(raw_title)
         if season_match:
@@ -92,9 +99,7 @@ class Torrent(models.Model):
             except AttributeError:
                 pass
 
-        for quality_option in QUALITIES.keys():
-            if quality_option in raw_title:
-                quality = QUALITIES[quality_option]
-                break
+        quality = Quality.parse_quality_form_phrase(raw_title)
+        source = Source.pare_source_from_phrase(raw_title)
 
-        return season, episode, quality
+        return season, episode, quality, source

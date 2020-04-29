@@ -18,8 +18,7 @@
         <p class="show-details">
             <span>{{ show.year }}</span>
             <span class="bullet">•</span>
-            <span>{{ show.runtime }}m</span>
-            <span class="bullet">•</span>
+            {% if show.runtime %}<span>{{ show.runtime }}m</span><span class="bullet">•</span>{% endif %}
             <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
         </p>
     </div>
@@ -47,7 +46,7 @@
                     </div>
                 {% endfor %}
                 </div>
-                <div id="seasons-filler-bar"></div>
+                {% if show.seasons %} <div id="seasons-filler-bar"></div> {% endif %}
             </div>
 
             <div class="torrents-by-season">
@@ -76,6 +75,7 @@
                                             <p>
                                                 <span class="torrent-tag">{{ torrent.feed }}</span>
                                                 <span class="torrent-tag">{{ torrent.quality }}</span>
+                                                <span class="torrent-tag">{{ torrent.source_type }}</span>
                                             </p>
                                             <p>
                                                 <span class="torrent-publication-time">{{ torrent.publication_time }}</span>
