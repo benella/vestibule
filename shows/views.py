@@ -35,6 +35,12 @@ def find_torrents(request, title):
     return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': show.slug}))
 
 
+def update_show_info(request, title):
+    show = Show.objects.get(slug=title)
+    show.update_show_info(request)
+    return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': show.slug}))
+
+
 class AddShowView(generic.CreateView):
     model = Show
     template_name = "show/add_show.html"

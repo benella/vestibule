@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'vestibule.apps.VestibuleConfig',
-    'shows',
+    'shows.apps.ShowsConfig',
     'torrents.apps.TorrentsConfig',
     'feeds.apps.FeedsConfig',
     'vestibule_configurations.apps.VestibuleConfigurationsConfig'

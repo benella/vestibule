@@ -13,11 +13,26 @@
     margin-top: 8px;
 }
 
+.show-status {
+    margin-top: 2rem;
+}
+
+.show-status-line {
+    font-weight: 100;
+}
+
+.show-next-episode-line {
+
+}
+
 #show-actions-panel {
     position: absolute;
     top: 16rem;
     right: 7rem;
     border-left: 14px solid #C8C9C0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
 }
 
 .seasons-bar {
@@ -75,7 +90,7 @@
 }
 
 .show-action {
-    margin-left: 20px;
+    margin: 0 0 5px 20px;
     font-size: 1.1em;
     transition: 0.3s;
 }

@@ -21,10 +21,20 @@
             {% if show.runtime %}<span>{{ show.runtime }}m</span><span class="bullet">•</span>{% endif %}
             <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
         </p>
+
+        <div class="show-status">
+            <p class="show-status-line">{{ show.status }}</p>
+            {% if show.next_episode %}
+                <p class="show-next-episode-line">Next Episode: {{ show.next_episode }}</p>
+            {% endif %}
+        </div>
+
+
     </div>
 
     <div id="show-actions-panel">
         <a class="show-action" href="{% url 'shows:find-torrents' title=show.slug %}">Find New Torrents</a>
+        <a class="show-action" href="{% url 'shows:update-info' title=show.slug %}">Update Show Info</a>
     </div>
 
     <div id="torrents-panel">
