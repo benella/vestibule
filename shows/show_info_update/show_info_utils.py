@@ -42,6 +42,10 @@ class FutureEpisode:
 
         if self.days_from_now == 0:
             return "airs today"
+
+        if self.days_from_now == 1:
+            return "airs tomorrow"
+
         return f"airs in {self.days_from_now} days"
 
 
