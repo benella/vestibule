@@ -67,6 +67,14 @@ class ShowProfile(models.Model):
         except IndexError:
             return "Show-less"
 
+    def save(self, *args, **kwargs):
+        super(ShowProfile, self).save(*args, **kwargs)
+        for show in self.show_set.all():
+            for torrent in show.torrents.all():
+                profile_match, profile_match_score = self.get_torrent_match_score(torrent)
+                torrent.profile_match_score = profile_match_score
+                torrent.profile_match = profile_match
+                torrent.save()
 
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
         if self.wait == ShowProfile.W_NONE:
