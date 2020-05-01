@@ -232,7 +232,7 @@ class Show(models.Model):
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
 
-        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", ".")
+        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
         relevant_items = list()
 
         for item in torrents:
