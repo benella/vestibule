@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/show_list.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{% static "js/show_list.js" %}"></script>
+{% endblock %}
+
+{% block main_panel %}
+    <section id="show-list">
+        {% for show in show_list %}
+            <a href="{% url "shows:details" slug=show.slug %}"><div class="show">
+                <p class="show-title">{{ show.title }}</p>
+                <div class="poster-strip">
+                    <img onload="update_show_palette(this)" class="strip-img" src="{{ show.thumbnail_link }}" hidden>
+                </div>
+            </div></a>
+
+        {% endfor %}
+    </section>
+{% endblock %}

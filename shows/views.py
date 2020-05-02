@@ -46,9 +46,8 @@ class AddShowView(generic.CreateView):
     template_name = "show/add_show.html"
     fields = ["imdb_id"]
 
-
     def get_success_url(self):
-        return reverse("home")
+        return reverse("shows:details", kwargs={'slug': self.object.slug})
 
 
 class ShowDetails(generic.DetailView):
@@ -59,3 +58,8 @@ class ShowDetails(generic.DetailView):
         context_data = super().get_context_data(**kwargs)
         context_data["shows"] = Show.objects.all()
         return context_data
+
+
+class ShowList(generic.ListView):
+    model = Show
+    template_name = "show/show_list.html"

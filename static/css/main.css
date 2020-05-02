@@ -1,4 +1,9 @@
 
+:root {
+    --main-color: #e3e4db;
+    --secondary-color: #C8C9C0
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -33,37 +38,43 @@ button:focus {
 }
 
 #main-box {
-    margin-left: 23rem;
-    width: calc(100vw - 24rem);
+    margin: 6.5rem 0 0 16rem;
 }
 
 #main-panel {
-    padding: 3rem;
-    margin: 1rem 0 0 2rem;
-    max-height: calc(100vh - 12rem);
+    padding-left: 3rem;
     position: relative;
-    min-width: 950px;
-    max-width: 1200px;
 }
 
 #side-panel {
-    width: 19rem;
-    padding: 4rem 0 0 4rem;
+    width: 12.5rem;
+    padding: 2rem 0 0 2.5rem;
     background-color: #d2d3c7;
-    height: calc(100vh - 4rem);
+    height: calc(100vh - 2rem);
     position: fixed;
     left: 0;
     top: 0;
 }
 
+#top-panel {
+    margin-bottom: 3rem;
+}
+
+.side-panel-divider {
+    background-color: var(--main-color);
+    height: 3px;
+    width: 85%;
+    margin: 2rem 0;
+    transition: 0.4s;
+}
+
 #strip {
-    width: 14px;
+    width: 1rem;
     opacity: 0.5;
-    margin-top: 11rem;
-    height: 69vh;
+    height: 100vh;
     overflow: hidden;
     position: fixed;
-    left: 23rem;
+    left: 0rem;
     top: 0;
 }
 
@@ -82,22 +93,27 @@ button:focus {
 
 .acier-title {
     font-family: acier-bat-noir, sans-serif;
-    font-size: 3em;
-    margin: 1rem 0;
+    font-size: 2.5em;
 }
 
-#subscription-list {
-    padding: 3rem 0 0 1rem;
+.side-panel-section-header {
+    font-size: 0.85em;
+    margin-bottom: 10px;
+    color: #959692;
 }
 
-.subscription {
-    font-size: 1.3em;
+.side-panel-links {
+    padding: 0 0 0 0.5rem;
+}
+
+.side-panel-link {
+    font-size: 1.1em;
     margin: 5px 0;
     transition: 0.3s;
     display: block;
 }
 
-.subscription:hover {
+.side-panel-link:hover {
     color: #757575;
     transform: translate(4px, 0);
 }
@@ -113,10 +129,11 @@ button:focus {
     bottom: 0;
     left: 0;
     height: 4rem;
-    width: 23rem;
+    width: 14rem;
     display: flex;
     justify-content: center;
     background-color: #C8C9C0;
+    padding-left: 1rem;
 }
 
 .service-wrap {
@@ -156,10 +173,9 @@ button:focus {
 }
 
 .messages {
-    position: absolute;
-    bottom: 6rem;
-    left: 3rem;
-    width: 19rem;
+    position: fixed;
+    top: 1rem;
+    left: 19rem;
 }
 
 .message-wrap {
@@ -173,16 +189,4 @@ button:focus {
 .in-line-icon {
     font-size: 1.2em;
     color: inherit;
-}
-
-.subscriptions-action {
-    transition: 0.3s;
-    font-family: acier-bat-solid, sans-serif;
-    font-size: 1.3em;
-    display: block;
-}
-
-.subscriptions-action:hover {
-    color: #757575;
-    transform: translate(4px, 0);
 }

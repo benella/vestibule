@@ -7,12 +7,25 @@
 {% endblock %}
 
 {% block strip %}
-    <img id="strip-img" src="{{ show.poster_link }}">
+    <img id="strip-img" src="{{ show.thumbnail_link }}">
 {% endblock strip %}
+
+{% block page_actions %}
+    <div class="side-panel-divider"></div>
+
+    <section class="side-panel-links">
+        <p class="side-panel-section-header">Show Actions</p>
+        <a class="side-panel-link" href="{% url 'shows:find-torrents' title=show.slug %}">Find New Torrents</a>
+        <a class="side-panel-link" href="{% url 'shows:update-info' title=show.slug %}">Update Show Info</a>
+    </section>
+{% endblock page_actions %}
+
 
 {% block main_panel %}
 
-    <div id="show-top-panel">
+    <section id="show-main-panel">
+    <div id="show-data-panel">
+
         <div class="show-header">{{ show.title }}</div>
 
         <p class="show-details">
@@ -30,11 +43,6 @@
         </div>
 
 
-    </div>
-
-    <div id="show-actions-panel">
-        <a class="show-action" href="{% url 'shows:find-torrents' title=show.slug %}">Find New Torrents</a>
-        <a class="show-action" href="{% url 'shows:update-info' title=show.slug %}">Update Show Info</a>
     </div>
 
     <div id="torrents-panel">
@@ -118,5 +126,5 @@
 
 
     </div>
-
+    </section>
 {% endblock %}

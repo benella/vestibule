@@ -165,9 +165,10 @@ class Show(models.Model):
     year = models.CharField(max_length=24, default="", blank=True)
     number_of_seasons = models.CharField(max_length=24, default="", blank=True)
     runtime = models.CharField(max_length=24, default="", blank=True)
-    status = models.CharField(max_length=256, default="")
-    next_episode = models.CharField(max_length=256, default="")
+    status = models.CharField(max_length=256, default="", blank=True)
+    next_episode = models.CharField(max_length=256, default="", blank=True)
     poster_link = models.URLField(default="", blank=True)
+    thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -182,6 +183,7 @@ class Show(models.Model):
         ia = IMDb()
         imdb_show_data = ia.get_movie(self.imdb_id)
         self.poster_link = imdb_show_data.get("full-size cover url")
+        self.thumbnail_link = imdb_show_data.get("cover url")
 
         if not self.title:
             self.title = imdb_show_data.get("title")
