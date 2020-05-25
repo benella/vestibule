@@ -13,6 +13,7 @@ from feeds.models import Feed
 from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source
+from shows.show_info_update.show_info_utils import get_next_episode
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,14 @@ class ShowProfile(models.Model):
         except IndexError:
             return "Show-less"
 
+    def save(self, *args, **kwargs):
+        super(ShowProfile, self).save(*args, **kwargs)
+        for show in self.show_set.all():
+            for torrent in show.torrents.all():
+                profile_match, profile_match_score = self.get_torrent_match_score(torrent)
+                torrent.profile_match_score = profile_match_score
+                torrent.profile_match = profile_match
+                torrent.save()
 
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
         if self.wait == ShowProfile.W_NONE:
@@ -150,20 +159,16 @@ class ShowProfile(models.Model):
 
 
 class Show(models.Model):
-    STATUS_OPTIONS = (
-        ('r', 'Running'),
-        ('e', 'Ended'),
-        ('u', 'Unknown'),
-        ('w', 'Waiting')
-    )
 
     imdb_id = models.CharField(max_length=24)
     title = models.CharField(max_length=256, default="", blank=True)
     year = models.CharField(max_length=24, default="", blank=True)
     number_of_seasons = models.CharField(max_length=24, default="", blank=True)
     runtime = models.CharField(max_length=24, default="", blank=True)
-    status = models.CharField(max_length=24, default="u", choices=STATUS_OPTIONS)
+    status = models.CharField(max_length=256, default="", blank=True)
+    next_episode = models.CharField(max_length=256, default="", blank=True)
     poster_link = models.URLField(default="", blank=True)
+    thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -178,6 +183,7 @@ class Show(models.Model):
         ia = IMDb()
         imdb_show_data = ia.get_movie(self.imdb_id)
         self.poster_link = imdb_show_data.get("full-size cover url")
+        self.thumbnail_link = imdb_show_data.get("cover url")
 
         if not self.title:
             self.title = imdb_show_data.get("title")
@@ -202,7 +208,6 @@ class Show(models.Model):
     def seasons(self):
         """
         Get show's episode torrents grouped by season
-        :return:
         """
         seasons = defaultdict(dict)
 
@@ -218,6 +223,18 @@ class Show(models.Model):
     def _show_torrents_titles(self):
         return [torrent.title for torrent in self.torrents.all()]
 
+    def update_show_info(self, request=None):
+        next_episode, show_status = get_next_episode(self.imdb_id)
+        self.status = show_status
+
+        if next_episode:
+            self.next_episode = str(next_episode)
+
+        self.save()
+
+        if request is not None:
+            messages.add_message(request, messages.SUCCESS, f"'{self}' info updated")
+
     def find_show_torrents(self, request=None, torrents: list = None):
 
         if torrents is None:
@@ -225,7 +242,7 @@ class Show(models.Model):
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
 
-        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", ".")
+        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
         relevant_items = list()
 
         for item in torrents:
