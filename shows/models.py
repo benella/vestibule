@@ -242,11 +242,11 @@ class Show(models.Model):
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
 
-        lookup_name = self.title.replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
+        lookup_name = self.title.lower().replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
         relevant_items = list()
 
         for item in torrents:
-            if lookup_name in item.raw_title:
+            if lookup_name in item.raw_title.lower():
                 relevant_items.append(item)
 
         print("[{}] Found {} torrents for show {}".format(
