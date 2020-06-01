@@ -27,11 +27,21 @@ class TransmissionClient:
         except VestibuleConfiguration.DoesNotExist:
             host = "localhost"
 
+        try:
+            self._rpc_username = VestibuleConfiguration.objects.get(name="Transmission RPC Username").value
+        except VestibuleConfiguration.DoesNotExist:
+            self._rpc_username = ""
+
+        try:
+            self._rpc_password = VestibuleConfiguration.objects.get(name="Transmission RPC Password").value
+        except VestibuleConfiguration.DoesNotExist:
+            self._rpc_password = ""
+
         self._api_address = TransmissionClient.TRANSMISSION_API_ADDRESS.format(host=host)
         self._web_address = TransmissionClient.TRANSMISSION_WEB_ADDRESS.format(host=host)
 
     def __enter__(self):
-        self.client = Client(address=self._api_address)
+        self.client = Client(address=self._api_address, username=self._rpc_username, password=self._rpc_password)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
