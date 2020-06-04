@@ -43,6 +43,7 @@ function create_service_status(service_name) {
     service_status(service_name).then(function (status) {
             service_div.setAttribute("href", status["url"]);
             service_div.setAttribute("target", "_blank");
+            service_div.classList.add("service-active");
             let service_status_line;
 
             if (status["up"]) {

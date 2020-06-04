@@ -150,7 +150,7 @@ button:focus {
     transition: 0.3s;
 }
 
-.service-wrap:hover .service-icon {
+.service-wrap:hover.service-active .service-icon {
     opacity: 1;
 }
 
