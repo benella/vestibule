@@ -4,7 +4,10 @@
 function update_services_status() {
     $.getJSON('/services', function (data) {
         let services_status_div = document.getElementById("services-status-box");
+        // Remove existing service status.
+        while (services_status_div.firstChild) services_status_div.removeChild(services_status_div.lastChild);
         data["services"].forEach(function (service) {
+            // Append new status icons service status.
             services_status_div.appendChild(create_service_status(service));
         });
     });
