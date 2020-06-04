@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^shows/', include(('shows.urls', 'shows'), namespace='shows')),
     url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
     url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
-    url(r'^services-status', views.services_status, name="services-status"),
+    url(r'^services$', views.services, name="services"),
+    url(r'^service-status$', views.service_status, name="service-status"),
+    url(r'^services-status$', views.services_status, name="services-status"),
     url(r'^$', views.Home.as_view(), name='home'),
 ]
