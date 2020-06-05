@@ -15,6 +15,22 @@
       "value": "192.168.0.15"
     }
   },
+    {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 3,
+    "fields": {
+      "name": "Transmission RPC Username",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 4,
+    "fields": {
+      "name": "Transmission RPC Password",
+      "value": ""
+    }
+  },
   {
     "model": "vestibule_configurations.VestibuleConfiguration",
     "pk": 5,
