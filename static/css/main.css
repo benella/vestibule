@@ -150,11 +150,13 @@ button:focus {
     transition: 0.3s;
 }
 
-.service-wrap:hover .service-icon {
+.service-wrap:hover.service-active .service-icon {
     opacity: 1;
 }
 
 .service-status-bar {
+    background-color: #7f7f7f;
+    transition: background-color 0.3s linear;
     height: 3px;
     width: 65%;
     position: absolute;
