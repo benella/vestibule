@@ -15,7 +15,7 @@
       "value": "192.168.0.15"
     }
   },
-  {
+    {
     "model": "vestibule_configurations.VestibuleConfiguration",
     "pk": 3,
     "fields": {
@@ -28,6 +28,22 @@
     "pk": 4,
     "fields": {
       "name": "Transmission RPC Password",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 5,
+    "fields": {
+      "name": "Pushover API Token",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 6,
+    "fields": {
+      "name": "Pushover User Token",
       "value": ""
     }
   }
