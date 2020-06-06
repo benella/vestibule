@@ -6,7 +6,7 @@
 }
 
 #show-data-panel {
-    width: 34rem;
+    width: 38rem;
     margin-right: 4rem;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .season-bar {
-    font-size: 1.18em;
+    font-size: 1.1em;
     color: #A4A5A0;
     border-bottom: solid 3px var(--main-color);
     padding: 0 20px 8px;
@@ -86,7 +86,7 @@
 
 #torrents-panel {
     margin: 6rem 2rem 0 0;
-    width: 42rem;
+    width: 38rem;
 }
 
 .torrents-by-season {
@@ -126,6 +126,7 @@
 
 .torrent-title-text {
     color: #e3e4db;
+    font-size: 0.9em;
 }
 
 .torrent-title-full {
@@ -176,7 +177,7 @@
     color: #e3e4db;
     font-weight: 500;
     margin-right: 3px;
-    font-size: 0.9em;
+    font-size: 0.8em;
     transition: 0.2s;
 }
 
@@ -196,4 +197,37 @@
 .torrent-download-bar {
     width: 100%;
     height: 15px;
+}
+
+.show-profile {
+    margin-top: 4.4rem;
+    border-top: solid 3px var(--main-color);
+    border-bottom: solid 3px var(--main-color);
+    padding: 2rem 0;
+}
+
+#profile-options {
+    display: none;
+    margin: 12px 0 0 1rem;
+    border-left: 3px solid #d2d3c7;
+    padding-left: 15px;
+}
+
+.show-section-header {
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.show-section-header:hover {
+    color: #757575;
+    transform: translate(4px, 0);
+}
+
+.option-name {
+    font-weight: 100;
+}
+
+.profile-option {
+    margin: 3px 0;
 }

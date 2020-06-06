@@ -31,7 +31,7 @@
         <p class="show-details">
             <span>{{ show.year }}</span>
             <span class="bullet">•</span>
-            {% if show.runtime %}<span>{{ show.runtime }}m</span><span class="bullet">•</span>{% endif %}
+            {% if show.network %}<span>{{ show.network }}</span><span class="bullet">•</span>{% endif %}
             <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
         </p>
 
@@ -42,6 +42,38 @@
             {% endif %}
         </div>
 
+        <div class="show-profile">
+            <p class="show-section-header" onclick="toggle_options()">Subscription Profile</p>
+            <div id="profile-options">
+
+                <div class="profile-option">
+                    <span class="option-name">Preferred Video Quality</span><span class="bullet">•</span>
+                    <span class="option-value">{{ show.profile.quality }}</span>
+                </div>
+
+                <div class="profile-option">
+                    <span class="option-name">Wait for Match</span><span class="bullet">•</span>
+                    <span class="option-value">{{ show.profile.get_wait_display }}</span>
+                </div>
+
+                <div class="profile-option">
+                    <span class="option-name">Download Automatically</span><span class="bullet">•</span>
+                    <span class="option-value">{% if show.profile.download_automatically %}Yes{% else %}No{% endif %}</span>
+                </div>
+
+                <div class="profile-option">
+                    <span class="option-name">Requires Subtitles</span><span class="bullet">•</span>
+                    <span class="option-value">{% if show.profile.subtitles %}Yes{% else %}No{% endif %}</span>
+                </div>
+
+                <div class="profile-option">
+                    <span class="option-name">High-Quality Sources</span><span class="bullet">•</span>
+                    <span class="option-value">{% if show.profile.high_quality_source %}Yes{% else %}No{% endif %}</span>
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 

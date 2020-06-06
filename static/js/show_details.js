@@ -7,3 +7,7 @@ function choose_season(season) {
     $(".season-torrents").removeClass("chosen-season-torrents");
     $("#torrents-season-" + season_number).addClass("chosen-season-torrents");
 }
+
+function toggle_options() {
+    $("#profile-options").toggle();
+}
