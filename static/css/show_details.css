@@ -1,6 +1,8 @@
 
 #show-main-panel {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 #show-data-panel {
@@ -83,7 +85,7 @@
 }
 
 #torrents-panel {
-    margin-top: 6rem;
+    margin: 6rem 2rem 0 0;
     width: 42rem;
 }
 

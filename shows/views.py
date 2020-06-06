@@ -21,8 +21,9 @@ def search_show(request, title):
         filtered_results.append({
             "title": result.get("title"),
             "year": result.get("year"),
-            "full-size cover url": result.get("full-size cover url"),
+            "full-size cover url": result.get("cover url"),
             "imdb_id": result.getID(),
+            "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=result.getID()),
             "subscribed": result.getID() in subscribed_shows_imdb_ids
         })
 
