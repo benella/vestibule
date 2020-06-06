@@ -30,7 +30,7 @@ button:focus {
 .bullet {
     font-family: -webkit-pictograph monospace;
     display: inline-block;
-    margin: 0 4px;
+    margin: 0 5px;
 }
 
 .fas {

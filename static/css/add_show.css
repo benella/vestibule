@@ -1,70 +1,80 @@
 
-#main-box {
-    padding-top: 10rem;
-    display: block;
+#add-show-main-panel {
+    margin-top: 12.6rem;
 }
 
 #search-panel p {
-    font-size: 2em;
+    font-size: 1.4em;
     float: left;
 }
 
 #search-panel input {
-    margin-left: 1rem;
+    margin-left: 8px;
     width: 18em;
-    font-size: 2em;
+    font-size: 1.4em;
     background-color: transparent;
     border: none;
     color: #3f9359;
 }
 
+#search-panel-strip {
+    height: 3px;
+    width: 36rem;
+    background-color: #C8C9C0;
+    margin-top: 3px;
+}
+
 #searchResults {
-    padding: 2rem;
+    padding: 1rem 0;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .show-title {
-    font-size: 1.5em;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.show-year {
+    font-size: 0.9em;
+    font-weight: 200;
 }
 
 .show-wrap {
-    margin: 15px 0;
-    display: flex;
-    width: 45%;
-}
-
-.show-data-wrap {
-    height: 10rem;
-}
-
-.subscribed-tag {
-    margin-top: 4rem;
-    border: 1px solid #3f9359;
-    border-radius: 3px;
-    padding: 3px 7px;
-    display: inline-block;
-    font-weight: 400;
-    color: #3f9359;
-}
-
-.add-show-tag {
-    margin-top: 4rem;
-    color: #3f9359;
-    transition: 0.3s;
+    margin: 5px 0;
+    height: 4rem;
+    width: 36rem;
+    background-color: #ddded4;
     cursor: pointer;
+    transition: 0.3s;
 }
 
-.add-show-tag:hover {
-    color: #6ac68a;
+.show-wrap:hover {
+    background-color: #d2d3c7;
+}
+
+.show-wrap:hover .subscribed-tag {
+    color: #AF4F68;
+}
+
+.show-wrap:hover .add-show-tag {
+    color: #3f9359;
+}
+
+.subscribed-tag,
+.add-show-tag{
+    font-size: 0.9em;
+    margin-top: 1px;
+    color: #a7a99e;
+    transition: 0.3s;
 }
 
 img.show-poster {
-    border-radius: 3px;
-    height: 10rem;
     float: left;
     margin-right: 1rem;
     max-width: 7rem;
+    height: 4rem;
 }
 

@@ -13,6 +13,7 @@ from feeds.models import Feed
 from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source
+from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import get_next_episode
 
 logger = logging.getLogger(__name__)
@@ -45,13 +46,13 @@ class ShowProfile(models.Model):
 
     WAIT_CHOICES = [
         (W_NONE, "Don't Wait"),
-        (W_1_DAY, "1 Day"),
-        (W_2_DAY, "2 Days"),
-        (W_3_DAY, "3 Days"),
-        (W_4_DAY, "4 Days"),
-        (W_5_DAY, "5 Days"),
-        (W_6_DAY, "6 Days"),
-        (W_1_WEEK, "1 Week"),
+        (W_1_DAY, "Up to a Day"),
+        (W_2_DAY, "Up to 2 Days"),
+        (W_3_DAY, "Up to 3 Days"),
+        (W_4_DAY, "Up to 4 Days"),
+        (W_5_DAY, "Up to 5 Days"),
+        (W_6_DAY, "Up to 6 Days"),
+        (W_1_WEEK, "Up to a Week"),
         (W_FOREVER, "Forever"),
     ]
 
@@ -165,6 +166,7 @@ class Show(models.Model):
     year = models.CharField(max_length=24, default="", blank=True)
     number_of_seasons = models.CharField(max_length=24, default="", blank=True)
     runtime = models.CharField(max_length=24, default="", blank=True)
+    network = models.CharField(max_length=24, default="", blank=True)
     status = models.CharField(max_length=256, default="", blank=True)
     next_episode = models.CharField(max_length=256, default="", blank=True)
     poster_link = models.URLField(default="", blank=True)
@@ -182,24 +184,16 @@ class Show(models.Model):
 
         ia = IMDb()
         imdb_show_data = ia.get_movie(self.imdb_id)
-        self.poster_link = imdb_show_data.get("full-size cover url")
-        self.thumbnail_link = imdb_show_data.get("cover url")
 
         if not self.title:
             self.title = imdb_show_data.get("title")
-
-        self.year = imdb_show_data.get("year")
-        self.number_of_seasons = imdb_show_data.get("number of seasons")
-
-        try:
-            self.runtime = imdb_show_data.get("runtimes")[0]
-        except (KeyError, TypeError):
-            pass
 
         if self.profile is None:
             new_profile = ShowProfile()
             new_profile.save()
             self.profile = new_profile
+
+        self.update_show_meta_data()
 
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
@@ -218,12 +212,30 @@ class Show(models.Model):
 
         return dict(seasons)
 
-
     @property
     def _show_torrents_titles(self):
         return [torrent.title for torrent in self.torrents.all()]
 
+    def update_show_meta_data(self):
+        ia = IMDb()
+        imdb_show_data = ia.get_movie(self.imdb_id)
+
+        if not self.network:
+            with TVDBVestibuleClient() as tvdb_client:
+                self.network = tvdb_client.get_show_original_network(self.imdb_id)
+
+        self.poster_link = imdb_show_data.get("full-size cover url")
+        self.thumbnail_link = imdb_show_data.get("cover url")
+        self.number_of_seasons = imdb_show_data.get("number of seasons")
+        self.year = imdb_show_data.get("year")
+
+        try:
+            self.runtime = imdb_show_data.get("runtimes")[0]
+        except (KeyError, TypeError):
+            pass
+
     def update_show_info(self, request=None):
+        self.update_show_meta_data()
         next_episode, show_status = get_next_episode(self.imdb_id)
         self.status = show_status
 

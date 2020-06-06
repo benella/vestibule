@@ -46,5 +46,29 @@
       "name": "Pushover User Token",
       "value": ""
     }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 7,
+    "fields": {
+      "name": "TVDB Username",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 8,
+    "fields": {
+      "name": "TVDB User Key",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 9,
+    "fields": {
+      "name": "TVDB API Key",
+      "value": ""
+    }
   }
 ]
