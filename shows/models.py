@@ -129,6 +129,11 @@ class ShowProfile(models.Model):
         score = 0
         match = False
 
+        # If subtitles are not required, match
+        if not self.subtitles:
+            match = True
+
+        # If subtitles are required, match only for feeds with subtitles
         if torrent.feed.has_subtitles and self.subtitles:
             match = True
             score += ShowProfile.SCORE_LEVEL_UP
