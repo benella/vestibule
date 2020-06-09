@@ -4,15 +4,17 @@ import requests
 
 class Pushover:
     def __init__(self):
+        self._api_token = ""
+        self._user_token = ""
         try:
             self._api_token = VestibuleConfiguration.objects.get(name="Pushover API Token").value
-        except VestibuleConfiguration.DoesNotExist:
-            self._api_token = ""
+        except VestibuleConfiguration.DoesNotExist as e:
+            print("Missing 'Pushover API Token': {e}".format(e=e))
 
         try:
-            self._rpc_username = VestibuleConfiguration.objects.get(name="Pushover User Token").value
-        except VestibuleConfiguration.DoesNotExist:
-            self._user_token = ""
+            self._user_token = VestibuleConfiguration.objects.get(name="Pushover User Token").value
+        except VestibuleConfiguration.DoesNotExist as e:
+            print("Missing 'Pushover API Token': {e}".format(e=e))
 
     def has_credentials(self):
         return self._api_token != "" and self._user_token != ""
@@ -29,7 +31,9 @@ class Pushover:
             "title": title,
             "message": message
         }
-        requests.post(url="https://api.pushover.net/1/messages.json", data=data)
+        response = requests.post(url="https://api.pushover.net/1/messages.json", data=data)
+        if not response.ok:
+            print("Pushover: Failed Sending Notification: {reason}".format(reason=response.reason))
 
 
 def send_message(title, message=""):
