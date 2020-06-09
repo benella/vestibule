@@ -45,4 +45,8 @@ class TVDBVestibuleClient:
         return self.client.get_series_by_imdb_id(imdb_id=f"tt{imdb_id}")
 
     def get_show_original_network(self, imdb_id) -> str:
-        return self.get_show_by_imdb_id(imdb_id).get("network", "")
+        try:
+            return self.get_show_by_imdb_id(imdb_id).get("network", "")
+        except ConnectionRefusedError as e:
+            print("Failed connecting to tvdb: ", e)
+            return ""
