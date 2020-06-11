@@ -2,6 +2,7 @@ from plexapi.server import PlexServer
 from requests.exceptions import ConnectionError
 
 from vestibule_configurations.models import VestibuleConfiguration
+from common import ip_utils
 
 
 class PlexClient:
@@ -11,10 +12,12 @@ class PlexClient:
     def __init__(self):
         try:
             plex_token = VestibuleConfiguration.objects.get(name="Plex Token").value
-            host = VestibuleConfiguration.objects.get(name="Host Address").value
 
         except VestibuleConfiguration.DoesNotExist:
             plex_token = None
+
+        host = ip_utils.get_local_ip()
+        if host is None:
             host = "localhost"
 
         self._base_url = PlexClient.PLEX_BASE_URL.format(host=host)
