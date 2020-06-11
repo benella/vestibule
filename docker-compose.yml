@@ -6,5 +6,4 @@ services:
     command: python manage.py runserver 0.0.0.0:1220 --noreload
     volumes:
       - .:/code
-    ports:
-      - "1220:1220"
+    network_mode: "host"
