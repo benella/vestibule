@@ -9,14 +9,6 @@
   },
   {
     "model": "vestibule_configurations.VestibuleConfiguration",
-    "pk": 2,
-    "fields": {
-      "name": "Host Address",
-      "value": "192.168.0.15"
-    }
-  },
-    {
-    "model": "vestibule_configurations.VestibuleConfiguration",
     "pk": 3,
     "fields": {
       "name": "Transmission RPC Username",

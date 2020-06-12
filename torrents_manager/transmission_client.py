@@ -3,6 +3,7 @@ from clutch.client import Client
 from datetime import timedelta
 from requests.exceptions import ConnectionError
 
+from common import ip_utils
 from notifications import pushover
 from vestibule_configurations.models import VestibuleConfiguration
 from torrents.models import Torrent
@@ -19,12 +20,10 @@ class TransmissionClient:
     DEFAULT_SHARE_RATIO = 2
     ACTION_SUCCESS = "success"
 
-
     def __init__(self):
 
-        try:
-            host = VestibuleConfiguration.objects.get(name="Host Address").value
-        except VestibuleConfiguration.DoesNotExist:
+        host = ip_utils.get_local_ip()
+        if host is None:
             host = "localhost"
 
         try:
