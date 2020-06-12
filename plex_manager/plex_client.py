@@ -1,4 +1,5 @@
 from plexapi.server import PlexServer
+from plexapi.exceptions import BadRequest
 from requests.exceptions import ConnectionError
 
 from vestibule_configurations.models import VestibuleConfiguration
@@ -31,7 +32,7 @@ class PlexClient:
         try:
             PlexServer(baseurl=self._base_url, token=self._token)
             return True
-        except ConnectionError as e:
+        except (ConnectionError, BadRequest) as e:
             print(f"Plex is down - {e}")
             return False
 
