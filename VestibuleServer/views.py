@@ -20,23 +20,13 @@ class Home(generic.TemplateView):
         return context
 
 
-def services_status(request):
-    with TransmissionClient() as transmission:
-        transmission_status = transmission.status()
-
-    with PlexClient() as plex:
-        plex_status = plex.status()
-
-    return JsonResponse({"services_status": {"plex": plex_status, "transmission": transmission_status}})
-
-
 @csrf_exempt
 def service_status(request):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 
     service = request.POST["service"]
-    status = {}
+
     if service == "transmission":
         with TransmissionClient() as transmission:
             status = transmission.status()

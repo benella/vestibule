@@ -11,7 +11,10 @@
             {% for torrent in recent_activity %}
                 <a href="{% url "shows:details" slug=torrent.show.slug %}">
                 <div class="dashboard-model-entry">
-                    <p class="dashboard-model-line">{{ torrent.short_title }} <span class="bullet">•</span>
+                    <p class="dashboard-model-line">{{ torrent.short_title }}
+                        <span class="bullet">•</span>
+                        <span class="torrent-quality">{{ torrent.quality }}</span>
+                        <span class="bullet">•</span>
                         <span class="torrent-download-status">{{ torrent.download_status_display }}</span>
                     </p>
                     <p class="dashboard-model-time">{{ torrent.modified|date:"F j, Y, G:i" }}</p>
@@ -25,7 +28,10 @@
             {% for torrent in recently_found %}
                 <a href="{% url "shows:details" slug=torrent.show.slug %}">
                 <div class="dashboard-model-entry">
-                    <p class="dashboard-model-line">{{ torrent.short_title }} <span class="bullet">•</span>
+                    <p class="dashboard-model-line">{{ torrent.short_title }}
+                        <span class="bullet">•</span>
+                        <span class="torrent-quality">{{ torrent.quality }}</span>
+                        <span class="bullet">•</span>
                         <span class="torrent-feed">{{ torrent.feed }}</span>
                     </p>
                     <p class="dashboard-model-time">{{ torrent.created|date:"F j, Y, G:i" }}</p>

@@ -98,11 +98,16 @@ class TransmissionClient:
         Remove, copy files and update Vestibule torrent as needed according to torrent info
         """
         transmission_torrent_id = int(torrent_info.get('id'))
+        try:
+            percent_done = int(torrent_info.get('percent_done')) * 100
+        except ValueError:
+            percent_done = 0
+
         seeding_time = timedelta(seconds=torrent_info.get('seconds_seeding'))
 
         print(f"Torrent: {torrent_info.get('name')} (ID {transmission_torrent_id})")
 
-        print(f"> Done: {100 * torrent_info.get('percent_done')}%, "
+        print(f"> Done: {percent_done}%, "
               f"Ratio: {torrent_info.get('upload_ratio')}, "
               f"Shred for: {seeding_time}"
               )
@@ -115,8 +120,9 @@ class TransmissionClient:
         torrent = torrents[0]
         print(f"Matched with Torrent in Vestibule - {torrent}")
 
-        is_ready = torrent_info.get('percent_done') == 1
+        is_ready = percent_done == 100
         can_delete = seeding_time >= TransmissionClient.DEFAULT_SHARE_TIME
+        torrent.update_percent_done(percent_done)
 
         if is_ready and torrent.download_status != Torrent.READY:
             torrent.update_download_status(Torrent.READY)

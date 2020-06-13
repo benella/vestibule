@@ -11,3 +11,21 @@ function choose_season(season) {
 function toggle_options() {
     $("#profile-options").toggle();
 }
+
+function show_all_matches(episode) {
+    let episode_number = episode.getAttribute("data-episode-number");
+    let episodes_count = episode.getAttribute("data-episodes-count");
+    let episodes = $(".episode-number-"+episode_number).not(".best-match");
+
+    // Hide
+    if (episodes.css("display") === "flex") {
+        episodes.css('display', 'none');
+        $(episode).html(`Show all ${episodes_count} torrents`);
+
+    // Show
+    } else {
+        episodes.css('display', 'flex');
+        $(episode).html("Show best match only");
+    }
+
+}

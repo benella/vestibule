@@ -101,52 +101,74 @@
 
             <div class="torrents-by-season">
 
-                {% for season, epidoses in show.seasons.items %}
+                {% for season, episodes in show.seasons.items %}
                     <div class="season-torrents {% if forloop.first %}chosen-season-torrents{% endif %}" id="torrents-season-{{ season }}">
 
-                        {% for episode, torrents in epidoses.items %}
+                        {% for episode, torrents in episodes.items %}
                             <div class="episode-divider">
+                            <p>
                             {% if episode %}
-                                <p>Episode {{ episode }}</p>
+                                <span>Episode {{ episode }}</span>
                             {% else %}
-                                <p>Full Season</p>
+                                <span>Full Season</span>
                             {% endif %}
+
+                            {% if torrents|length > 1 %}
+                                <span class="bullet">•</span>
+                                <span class="show-all-matches"
+                                      onclick="show_all_matches(this)"
+                                      data-episode-number="{{ episode }}"
+                                      data-episodes-count="{{ torrents|length }}">Show all {{ torrents|length }} torrents</span>
+                            {% endif %}
+                            </p>
                             </div>
 
                             {% for torrent in torrents %}
-                                <div class="torrent-box">
-                                    <div class="torrent-info">
-                                        <div class="torrent-title">
-                                                <p class="torrent-title-text">{{ torrent.short_title }}</p>
-                                                <p class="torrent-title-full">{{ torrent.title }}</p>
-                                        </div>
-
-                                        <div class="torrent-tags">
-                                            <p>
-                                                <span class="torrent-tag">{{ torrent.feed }}</span>
-                                                <span class="torrent-tag">{{ torrent.quality }}</span>
-                                                <span class="torrent-tag">{{ torrent.source_type }}</span>
-                                            </p>
-                                            <p>
-                                                <span class="torrent-publication-time">{{ torrent.publication_time }}</span>
-                                            </p>
-                                        </div>
-
+                                <div class="torrent-box {% if forloop.first %} best-match {% endif %} episode-number-{{ episode }}">
+                                    <div class="torrent-actions">
+                                        <div class="torrent-progress" style="height: {{ torrent.percent_done }}%;"></div>
                                         <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}">
-                                            <div class="torrent-download">
-                                                <p class="torrent-download-status
-                                                          torrent-download-status-{{ torrent.download_status_display|lower }}">
-                                                    {{ torrent.download_status_display }}
-                                                </p>
-                                                <img src="{% static "images/torrent_download_icon.svg" %}"
+                                            <div class="
+                                            torrent-action {% if torrent.is_ready %} torrent-downloaded{% endif %}">
+                                                <img src="{% static "images/transmission_icon.svg" %}"
                                                      alt="{{ torrent.download_status_display }}"
                                                      class="torrent-download-icon"
                                                 >
                                             </div>
                                         </a>
                                     </div>
+                                    <div class="torrent-info">
+                                        <p class="torrent-title">
+                                        {% if torrent.profile_match %}
+                                            <span class="torrent-profile-match"></span>
+                                        {% endif %}
 
-                                    <div class="torrent-download-bar"></div>
+                                        {{ torrent.short_title }}
+
+                                        <span class="bullet torrent-tag-bullet">•</span>
+                                        <span class="torrent-tag">{{ torrent.feed }}</span>
+                                        <span class="bullet torrent-tag-bullet">•</span>
+                                        <span class="torrent-tag">{{ torrent.quality }}</span>
+                                        {% if torrent.source_type %}
+                                            <span class="bullet torrent-tag-bullet">•</span>
+                                            <span class="torrent-tag">{{ torrent.source_type }}</span></p>
+                                        {% endif %}
+
+                                        <p>
+                                            <span class="torrent-publication-time">{{ torrent.publication_time }}</span>
+                                            <span class="bullet torrent-tag-bullet">•</span>
+                                            <span class="torrent-title-full">{{ torrent.title }}</span>
+                                        </p>
+
+                                    {% if torrent.was_downloaded %}
+                                        <div class="torrent-download">
+                                            <p class="torrent-download-status
+                                                      torrent-download-status-{{ torrent.download_status_display|lower }}">
+                                                {{ torrent.download_status_display }}
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                    </div>
 
                                 </div>
                             {% endfor %}

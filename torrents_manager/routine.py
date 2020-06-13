@@ -4,7 +4,7 @@ from torrents_manager.torrents_updater import update_torrents
 
 
 def start():
-    minutes_interval = 10
+    minutes_interval = 5
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(update_torrents, 'interval', minutes=minutes_interval)

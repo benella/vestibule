@@ -48,13 +48,15 @@ class Source:
 
     WEB = "Web"
     NETFLIX = "Netflix"
-    HDTV = "HD-TV"
+    HDTV = "HDTV"
     AMAZON = "Amazon"
+    HULU = "Hulu"
     BLUE_RAY = "BlueRay"
 
     SOURCE_KEYS = OrderedDict([
         ("amzn", AMAZON),
         ("amazon", AMAZON),
+        ("hulu", HULU),
         ("nf", NETFLIX),
         ("bluray", BLUE_RAY),
         ("web", WEB),
@@ -64,6 +66,7 @@ class Source:
     SOURCES_VALUES = {
         AMAZON: 110,
         NETFLIX: 110,
+        HULU: 110,
         BLUE_RAY: 100,
         WEB: 100,
         HDTV: 40
