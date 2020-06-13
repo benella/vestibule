@@ -1,4 +1,3 @@
-
 function add_show(show) {
     let imdb_id = show.getAttribute("data-imdb-id");
     let imdb_input = document.getElementById("id_imdb_id");
@@ -6,24 +5,31 @@ function add_show(show) {
     document.getElementById("new-show-form").submit();
 }
 
+window.last_promise = 0;
+
 function search_show() {
     let title = document.getElementById("search-term").value;
     let results_div = $("#searchResults");
 
-    if (title.length < 4) {
+    if (title.length < 2) {
         results_div.html("");
         return
     }
 
-    $.getJSON('/shows/search/' + title, function(data) {
-        let filtered = data["filtered"];
-        results_div.html("");
+    const promise_timestamp = Date.now();
+    window.last_promise = promise_timestamp;
+    $.getJSON('/shows/search/' + title).then((data) => update_from_results(results_div, data, promise_timestamp))
+}
 
-        for(let i = 0; i < filtered.length; i++) {
-            let show_data = filtered[i];
-            results_div.append(create_formatted_results(show_data))
-        }
-    });
+function update_from_results(results_div, data, promise_timestamp) {
+    if (window.last_promise !== promise_timestamp) return;
+    let filtered = data["filtered"];
+    results_div.html("");
+
+    for (let i = 0; i < filtered.length; i++) {
+        let show_data = filtered[i];
+        results_div.append(create_formatted_results(show_data))
+    }
 }
 
 function create_formatted_results(show_data) {
