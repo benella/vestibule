@@ -34,6 +34,7 @@ class Torrent(models.Model):
 
     transmission_torrent_id = models.IntegerField(default=0, blank=True)
     download_status = models.CharField(choices=DOWNLOAD_STATUS_CHOICES, default=NEVER_STARTED, max_length=1)
+    percent_done = models.IntegerField(default=0)
     profile_match_score = models.IntegerField(default=0)
     profile_match = models.BooleanField(default=False)
 
@@ -44,6 +45,10 @@ class Torrent(models.Model):
     @property
     def was_downloaded(self):
         return self.download_status != Torrent.NEVER_STARTED
+
+    @property
+    def is_ready(self):
+        return self.download_status == Torrent.READY
 
     def __str__(self):
         return "{show}{season}{episode} ({quality}) ({source}) ({feed})".format(
@@ -66,6 +71,10 @@ class Torrent(models.Model):
         self.modified = timezone.now()
         self.save()
 
+    def update_percent_done(self, percent_done):
+        self.percent_done = percent_done
+        self.save()
+
     @property
     def download_status_display(self):
         if self.download_status == Torrent.NEVER_STARTED:
@@ -78,6 +87,15 @@ class Torrent(models.Model):
             show=self.show.title,
             season=" S{}".format(self.season),
             episode=" E{}".format(self.episode) if self.episode else ""
+        )
+
+    @property
+    def dashboard_title(self):
+        return "{show}{season}{episode} ({quality})".format(
+            show=self.show.title,
+            season=" S{}".format(self.season),
+            episode=" E{}".format(self.episode) if self.episode else "",
+            quality=self.quality
         )
 
     @staticmethod
