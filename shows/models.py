@@ -14,13 +14,12 @@ from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, ShowType
 from common.tvdb_client import TVDBVestibuleClient
-from shows.show_info_update.show_info_utils import get_next_episode
+from shows.show_info_update.show_info_utils import get_next_episode, get_movie_status
 
 logger = logging.getLogger(__name__)
 
 
 class ShowProfile(models.Model):
-
     SCORE_LEVEL_UP = 100
 
     QUALITY_CHOICES = [
@@ -184,7 +183,7 @@ class Show(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, default=ShowType.SHOW, max_length=16)
 
     class Meta:
-        ordering = ('title', )
+        ordering = ('title',)
 
     def __str__(self):
         return self.title
@@ -211,15 +210,16 @@ class Show(models.Model):
         """
         Get show's episode torrents grouped by season
         """
-        if self.type == ShowType.MOVIE:
-            raise TypeError("Trying to get seasons of {title}, which is a movie.".format(title=self.title))
-
         seasons = defaultdict(dict)
 
-        for torrent in self.torrents.all():
-            if torrent.episode not in seasons[torrent.season].keys():
-                seasons[torrent.season][torrent.episode] = list()
-            seasons[torrent.season][torrent.episode].append(torrent)
+        if self.type == ShowType.MOVIE and len(self.torrents.all()) > 0:
+            seasons[""][""] = self.torrents.all()
+
+        elif self.type == ShowType.SHOW:
+            for torrent in self.torrents.all():
+                if torrent.episode not in seasons[torrent.season].keys():
+                    seasons[torrent.season][torrent.episode] = list()
+                seasons[torrent.season][torrent.episode].append(torrent)
 
         return dict(seasons)
 
@@ -230,21 +230,20 @@ class Show(models.Model):
     def update_show_meta_data(self):
         ia = IMDb()
         imdb_show_data = ia.get_movie(self.imdb_id)
+        self.year = imdb_show_data.get("year")
 
         if self.type == ShowType.SHOW:
             if not self.network:
                 with TVDBVestibuleClient() as tvdb_client:
                     self.network = tvdb_client.get_show_original_network(self.imdb_id)
             self.number_of_seasons = imdb_show_data.get("number of seasons")
-            self.year = imdb_show_data.get("year")
-            try:
-                self.runtime = imdb_show_data.get("runtimes")[0]
-            except (KeyError, TypeError):
-                pass
-
         elif self.type == ShowType.MOVIE:
             self.release_date = imdb_show_data.get("original air date")
 
+        try:
+            self.runtime = imdb_show_data.get("runtimes")[0]
+        except (KeyError, TypeError):
+            pass
         self.poster_link = imdb_show_data.get("full-size cover url")
         self.thumbnail_link = imdb_show_data.get("cover url")
 
@@ -253,9 +252,10 @@ class Show(models.Model):
         if self.type == ShowType.SHOW:
             next_episode, show_status = get_next_episode(self.imdb_id)
             self.status = show_status
-
             if next_episode:
                 self.next_episode = str(next_episode)
+        elif self.type == ShowType.MOVIE:
+            self.status = get_movie_status(self.imdb_id)
 
         self.save()
 
@@ -269,7 +269,8 @@ class Show(models.Model):
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
 
-        lookup_name = self.title.lower().replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
+        lookup_name = self.title.lower().replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace(
+            "'", "")
         relevant_items = list()
 
         for item in torrents:
