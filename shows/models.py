@@ -12,7 +12,7 @@ from imdb import IMDb
 from feeds.models import Feed
 from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
-from common import Quality, Source
+from common import Quality, Source, ShowType
 from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import get_next_episode
 
@@ -110,7 +110,6 @@ class ShowProfile(models.Model):
 
         return timezone.now() < first_torrent_created_at + timedelta(days=days)
 
-
     def __str__(self):
         return f"{self.show} - Show Profile"
 
@@ -163,8 +162,11 @@ class ShowProfile(models.Model):
         return source_score >= ShowProfile.SCORE_LEVEL_UP, Source.source_value(torrent.source_type)
 
 
-
 class Show(models.Model):
+    TYPE_CHOICES = [
+        (ShowType.SHOW, ShowType.SHOW),
+        (ShowType.MOVIE, ShowType.MOVIE),
+    ]
 
     imdb_id = models.CharField(max_length=24)
     title = models.CharField(max_length=256, default="", blank=True)
@@ -178,6 +180,7 @@ class Show(models.Model):
     thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
+    type = models.CharField(choices=TYPE_CHOICES, default=ShowType.SHOW, max_length=16)
 
     class Meta:
         ordering = ('title', )
