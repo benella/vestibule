@@ -9,13 +9,21 @@
 {% block main_panel %}
     <section id="show-list">
         {% for show in show_list %}
-            <a href="{% url "shows:details" slug=show.slug %}"><div class="show">
-                <p class="show-title">{{ show.title }}</p>
-                <div class="poster-strip">
-                    <img onload="update_show_palette(this)" class="strip-img" src="{{ show.thumbnail_link }}" hidden>
-                </div>
-            </div></a>
-
+            {% if show.type == "Show" and "shows" in request.path or show.type == "Movie" and "movies" in request.path %}
+                {% if show.type == "Show" %}
+                <a href="{% url "shows:details" slug=show.slug %}">
+                {% elif show.type == "Movie" %}
+                    <a href="{% url "movies:details" slug=show.slug %}">
+                {% endif %}
+                    <div class="show">
+                        <p class="show-title">{{ show.title }}</p>
+                        <div class="poster-strip">
+                            <img onload="update_show_palette(this)" class="strip-img" src="{{ show.thumbnail_link }}"
+                                 hidden>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
         {% endfor %}
     </section>
 {% endblock %}

@@ -24,161 +24,183 @@
 {% block main_panel %}
 
     <section id="show-main-panel">
-    <div id="show-data-panel">
+        <div id="show-data-panel">
 
-        <div class="show-header">{{ show.title }}</div>
+            <div class="show-header">{{ show.title }}</div>
 
-        <p class="show-details">
-            <span>{{ show.year }}</span>
-            <span class="bullet">•</span>
-            {% if show.network %}<span>{{ show.network }}</span><span class="bullet">•</span>{% endif %}
-            <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
-        </p>
+            <p class="show-details">
+                <span>{{ show.year }}</span>
+                {% if show.network %}
+                    <span class="bullet">•</span>
+                    <span>{{ show.network }}</span>
+                {% endif %}
+                {% if show.number_of_seasons %}
+                    <span class="bullet">•</span>
+                    <span>{{ show.number_of_seasons }} Season{{ show.number_of_seasons|pluralize:"s" }}</span>
+                {% endif %}
+                {% if show.type == "Movie" %}
+                    {% if show.runtime %}
+                        <span class="bullet">•</span>
+                        <span>{{ show.runtime }} Minutes </span>
+                    {% endif %}
+                {% endif %}
+            </p>
 
-        <div class="show-status">
-            <p class="show-status-line">{{ show.status }}</p>
-            {% if show.next_episode %}
-                <p class="show-next-episode-line">Next Episode: {{ show.next_episode }}</p>
-            {% endif %}
-        </div>
-
-        <div class="show-profile">
-            <p class="show-section-header" onclick="toggle_options()">Subscription Profile</p>
-            <div id="profile-options">
-
-                <div class="profile-option">
-                    <span class="option-name">Preferred Video Quality</span><span class="bullet">•</span>
-                    <span class="option-value">{{ show.profile.quality }}</span>
-                </div>
-
-                <div class="profile-option">
-                    <span class="option-name">Wait for Match</span><span class="bullet">•</span>
-                    <span class="option-value">{{ show.profile.get_wait_display }}</span>
-                </div>
-
-                <div class="profile-option">
-                    <span class="option-name">Download Automatically</span><span class="bullet">•</span>
-                    <span class="option-value">{% if show.profile.download_automatically %}Yes{% else %}No{% endif %}</span>
-                </div>
-
-                <div class="profile-option">
-                    <span class="option-name">Requires Subtitles</span><span class="bullet">•</span>
-                    <span class="option-value">{% if show.profile.subtitles %}Yes{% else %}No{% endif %}</span>
-                </div>
-
-                <div class="profile-option">
-                    <span class="option-name">High-Quality Sources</span><span class="bullet">•</span>
-                    <span class="option-value">{% if show.profile.high_quality_source %}Yes{% else %}No{% endif %}</span>
-                </div>
-
+            <div class="show-status">
+                <p class="show-status-line">{{ show.status }}</p>
+                {% if show.next_episode %}
+                    <p class="show-next-episode-line">Next Episode: {{ show.next_episode }}</p>
+                {% endif %}
             </div>
 
-        </div>
+            <div class="show-profile">
+                <p class="show-section-header" onclick="toggle_options()">Subscription Profile</p>
+                <div id="profile-options">
 
-    </div>
-
-    <div id="torrents-panel">
-
-        {% if not show.seasons %}
-            <div class="message-wrap">
-                <p>No Torrents found yet</p>
-            </div>
-        {% endif %}
-
-        <div>
-            <div class="seasons-bar">
-                <div class="seasons">
-                {% for season in show.seasons.keys %}
-                    <div class="season-bar {% if forloop.first %}chosen-season{% endif %}"
-                         data-season-number="{{ season }}"
-                         onclick="choose_season(this)">
-                        <p>Season {{ season }}</p>
+                    <div class="profile-option">
+                        <span class="option-name">Preferred Video Quality</span><span class="bullet">•</span>
+                        <span class="option-value">{{ show.profile.quality }}</span>
                     </div>
-                {% endfor %}
+
+                    <div class="profile-option">
+                        <span class="option-name">Wait for Match</span><span class="bullet">•</span>
+                        <span class="option-value">{{ show.profile.get_wait_display }}</span>
+                    </div>
+
+                    <div class="profile-option">
+                        <span class="option-name">Download Automatically</span><span class="bullet">•</span>
+                        <span class="option-value">{% if show.profile.download_automatically %}Yes{% else %}
+                            No{% endif %}</span>
+                    </div>
+
+                    <div class="profile-option">
+                        <span class="option-name">Requires Subtitles</span><span class="bullet">•</span>
+                        <span class="option-value">{% if show.profile.subtitles %}Yes{% else %}No{% endif %}</span>
+                    </div>
+
+                    <div class="profile-option">
+                        <span class="option-name">High-Quality Sources</span><span class="bullet">•</span>
+                        <span class="option-value">{% if show.profile.high_quality_source %}Yes{% else %}
+                            No{% endif %}</span>
+                    </div>
+
                 </div>
-                {% if show.seasons %} <div id="seasons-filler-bar"></div> {% endif %}
+
             </div>
 
-            <div class="torrents-by-season">
+        </div>
 
-                {% for season, episodes in show.seasons.items %}
-                    <div class="season-torrents {% if forloop.first %}chosen-season-torrents{% endif %}" id="torrents-season-{{ season }}">
+        <div id="torrents-panel">
 
-                        {% for episode, torrents in episodes.items %}
-                            <div class="episode-divider">
-                            <p>
-                            {% if episode %}
-                                <span>Episode {{ episode }}</span>
-                            {% else %}
-                                <span>Full Season</span>
-                            {% endif %}
+            {% if not show.seasons %}
+                <div class="message-wrap">
+                    <p>No Torrents found yet</p>
+                </div>
+            {% endif %}
 
-                            {% if torrents|length > 1 %}
-                                <span class="bullet">•</span>
-                                <span class="show-all-matches"
-                                      onclick="show_all_matches(this)"
-                                      data-episode-number="{{ episode }}"
-                                      data-episodes-count="{{ torrents|length }}">Show all {{ torrents|length }} torrents</span>
-                            {% endif %}
-                            </p>
-                            </div>
-
-                            {% for torrent in torrents %}
-                                <div class="torrent-box {% if forloop.first %} best-match {% endif %} episode-number-{{ episode }}">
-                                    <div class="torrent-actions">
-                                        <div class="torrent-progress" style="height: {{ torrent.percent_done }}%;"></div>
-                                        <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}">
-                                            <div class="
-                                            torrent-action {% if torrent.is_ready %} torrent-downloaded{% endif %}">
-                                                <img src="{% static "images/transmission_icon.svg" %}"
-                                                     alt="{{ torrent.download_status_display }}"
-                                                     class="torrent-download-icon"
-                                                >
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="torrent-info">
-                                        <p class="torrent-title">
-                                        {% if torrent.profile_match %}
-                                            <span class="torrent-profile-match"></span>
-                                        {% endif %}
-
-                                        {{ torrent.short_title }}
-
-                                        <span class="bullet torrent-tag-bullet">•</span>
-                                        <span class="torrent-tag">{{ torrent.feed }}</span>
-                                        <span class="bullet torrent-tag-bullet">•</span>
-                                        <span class="torrent-tag">{{ torrent.quality }}</span>
-                                        {% if torrent.source_type %}
-                                            <span class="bullet torrent-tag-bullet">•</span>
-                                            <span class="torrent-tag">{{ torrent.source_type }}</span></p>
-                                        {% endif %}
-
-                                        <p>
-                                            <span class="torrent-publication-time">{{ torrent.publication_time }}</span>
-                                            <span class="bullet torrent-tag-bullet">•</span>
-                                            <span class="torrent-title-full">{{ torrent.title }}</span>
-                                        </p>
-
-                                    {% if torrent.was_downloaded %}
-                                        <div class="torrent-download">
-                                            <p class="torrent-download-status
-                                                      torrent-download-status-{{ torrent.download_status_display|lower }}">
-                                                {{ torrent.download_status_display }}
-                                            </p>
-                                        </div>
-                                    {% endif %}
-                                    </div>
-
+            <div>
+                {% if show.type == "Show" %}
+                    <div class="seasons-bar">
+                        <div class="seasons">
+                            {% for season in show.seasons.keys %}
+                                <div class="season-bar {% if forloop.first %}chosen-season{% endif %}"
+                                     data-season-number="{{ season }}"
+                                     onclick="choose_season(this)">
+                                    <p>Season {{ season }}</p>
                                 </div>
                             {% endfor %}
-                        {% endfor %}
+                        </div>
+                        {% if show.seasons %}
+                            <div id="seasons-filler-bar"></div> {% endif %}
                     </div>
-                {% endfor %}
+                {% endif %}
+
+                <div class="torrents-by-season">
+
+                    {% for season, episodes in show.seasons.items %}
+                        <div class="season-torrents {% if forloop.first %}chosen-season-torrents{% endif %}"
+                             id="torrents-season-{{ season }}">
+
+                            {% for episode, torrents in episodes.items %}
+                                <div class="episode-divider">
+                                    <p>
+                                        {% if show.type == "Show" %}
+                                            {% if episode %}
+                                                <span>Episode {{ episode }}</span>
+                                            {% else %}
+                                                <span>Full Season</span>
+                                            {% endif %}
+                                        {% elif show.type == "Movie" %}
+                                            <span>Available Torrents</span>
+                                        {% endif %}
+
+                                        {% if torrents|length > 1 %}
+                                            <span class="bullet">•</span>
+                                            <span class="show-all-matches"
+                                                  onclick="show_all_matches(this)"
+                                                  data-episode-number="{{ episode }}"
+                                                  data-episodes-count="{{ torrents|length }}">Show all {{ torrents|length }} torrents</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                {% for torrent in torrents %}
+                                    <div class="torrent-box {% if forloop.first %} best-match {% endif %} episode-number-{{ episode }}">
+                                        <div class="torrent-actions">
+                                            <div class="torrent-progress"
+                                                 style="height: {{ torrent.percent_done }}%;"></div>
+                                            <a href="{% url 'torrents:download-torrent' torrent_id=torrent.id %}">
+                                                <div class="
+                                            torrent-action {% if torrent.is_ready %} torrent-downloaded{% endif %}">
+                                                    <img src="{% static "images/transmission_icon.svg" %}"
+                                                         alt="{{ torrent.download_status_display }}"
+                                                         class="torrent-download-icon"
+                                                    >
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="torrent-info">
+                                            <p class="torrent-title">
+                                                {% if torrent.profile_match %}
+                                                    <span class="torrent-profile-match"></span>
+                                                {% endif %}
+
+                                                {{ torrent.short_title }}
+
+                                                <span class="bullet torrent-tag-bullet">•</span>
+                                                <span class="torrent-tag">{{ torrent.feed }}</span>
+                                                <span class="bullet torrent-tag-bullet">•</span>
+                                                <span class="torrent-tag">{{ torrent.quality }}</span>
+                                                {% if torrent.source_type %}
+                                                    <span class="bullet torrent-tag-bullet">•</span>
+                                                    <span class="torrent-tag">{{ torrent.source_type }}</span></p>
+                                                {% endif %}
+
+                                            <p>
+                                                <span class="torrent-publication-time">{{ torrent.publication_time }}</span>
+                                                <span class="bullet torrent-tag-bullet">•</span>
+                                                <span class="torrent-title-full">{{ torrent.title }}</span>
+                                            </p>
+
+                                            {% if torrent.was_downloaded %}
+                                                <div class="torrent-download">
+                                                    <p class="torrent-download-status
+                                                      torrent-download-status-{{ torrent.download_status_display|lower }}">
+                                                        {{ torrent.download_status_display }}
+                                                    </p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
+
+
         </div>
-
-
-    </div>
     </section>
 {% endblock %}
