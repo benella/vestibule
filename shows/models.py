@@ -176,6 +176,7 @@ class Show(models.Model):
     network = models.CharField(max_length=24, default="", blank=True)
     status = models.CharField(max_length=256, default="", blank=True)
     next_episode = models.CharField(max_length=256, default="", blank=True)
+    release_date = models.CharField(max_length=256, default="", blank=True)
     poster_link = models.URLField(default="", blank=True)
     thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
@@ -241,6 +242,9 @@ class Show(models.Model):
             except (KeyError, TypeError):
                 pass
 
+        elif self.type == ShowType.MOVIE:
+            self.release_date = imdb_show_data.get("original air date")
+
         self.poster_link = imdb_show_data.get("full-size cover url")
         self.thumbnail_link = imdb_show_data.get("cover url")
 
@@ -302,6 +306,9 @@ class Show(models.Model):
             if self.type == ShowType.SHOW:
                 torrent.season = season
                 torrent.episode = episode
+            elif self.type == ShowType.MOVIE:
+                torrent.season = ""
+                torrent.episode = ""
             torrent.show = self
             torrent.save()
 
@@ -331,13 +338,13 @@ class Show(models.Model):
                 for episode, torrents in episodes.items():
                     if not episode:
                         continue
-                    self._update_episode_downloads(season=season, episode=episode, torrents=torrents)
+                    self._update_episode_or_movie_downloads(season=season, episode=episode, torrents=torrents)
+        elif self.type == ShowType.MOVIE:
+            self._update_episode_or_movie_downloads(season="", episode="", torrents=self.torrents.all())
 
-    def _update_episode_downloads(self, season: str, episode: str, torrents: List[Torrent]):
-        if self.type == ShowType.MOVIE:
-            raise TypeError("Trying updates episode downloads of {title}, which is a movie.".format(title=self.title))
-
-        logger.info(f"{season}-{episode} has {len(torrents)} torrents")
+    def _update_episode_or_movie_downloads(self, season: str, episode: str, torrents: List[Torrent]):
+        if self.type == ShowType.SHOW:
+            logger.info(f"{season}-{episode} has {len(torrents)} torrents")
 
         if len(torrents) == 0:
             return
