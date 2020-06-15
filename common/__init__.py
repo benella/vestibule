@@ -59,6 +59,8 @@ class Source:
         ("hulu", HULU),
         ("nf", NETFLIX),
         ("bluray", BLUE_RAY),
+        ("bdrip", BLUE_RAY),
+        ("brrip", BLUE_RAY),
         ("web", WEB),
         ("hdtv", HDTV),
     ])
