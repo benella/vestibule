@@ -83,3 +83,9 @@ class Source:
     @staticmethod
     def source_value(source):
         return Source.SOURCES_VALUES.get(source, 0)
+
+
+@dataclass
+class ShowType:
+    SHOW = "Show"
+    MOVIE = "Movie"
