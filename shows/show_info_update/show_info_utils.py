@@ -127,3 +127,78 @@ def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
 
     future_episodes.sort(key=lambda x: x.episode_value)
     return future_episodes[0], f"Continuing, has {len(future_episodes)} upcoming episodes."
+
+
+def _released_status(datetime_object):
+    difference = datetime.now() - datetime_object
+    days = difference.days
+    if days == 0:
+        return "Released Today"
+    if days == 1:
+        return "Released Yesterday"
+    if days <= 31:
+        return "Released {days} days ago".format(days=days)
+
+    return "Released on {date}".format(date=datetime_object.strftime("%d %b %Y"))
+
+
+def get_movie_status(imdb_id):
+    ia = IMDb()
+    movie = ia.get_movie(imdb_id)
+    release_date_str = movie.get("original air date").split(" (")[0]
+    fake_future_episode = None
+    # Full Date
+    for date_format in ["%d %b. %Y", "%d %b %Y"]:
+        try:
+            release_date = datetime.strptime(release_date_str, date_format)
+            if datetime.now() > release_date:
+                return _released_status(release_date)
+            if release_date >= datetime.now():
+                fake_future_episode = FutureEpisode(
+                    episode_data=None,
+                    episode_air_time=release_date,
+                    air_time_unknown=False,
+                    month_only=False,
+                    year_only=False,
+                    show=movie
+                )
+        except ValueError:
+            pass
+
+    # Moth Only
+    for date_format in ["%b. %Y", "%b %Y"]:
+        try:
+            release_date = datetime.strptime(release_date_str, date_format)
+            if datetime.now() > release_date:
+                return _released_status(release_date)
+            fake_future_episode = FutureEpisode(
+                episode_data=None,
+                episode_air_time=release_date,
+                air_time_unknown=False,
+                month_only=True,
+                year_only=False,
+                show=movie
+            )
+        except ValueError:
+            pass
+
+    # Year Only
+    try:
+        release_date = datetime.strptime(release_date_str, "%Y")
+        if datetime.now() > release_date:
+            return _released_status(release_date)
+        fake_future_episode = FutureEpisode(
+            episode_data=None,
+            episode_air_time=release_date,
+            air_time_unknown=False,
+            month_only=False,
+            year_only=True,
+            show=movie
+        )
+    except ValueError:
+        pass
+
+    if fake_future_episode is None:
+        return "Unknown release date"
+
+    return fake_future_episode.airs
