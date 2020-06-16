@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
 from . import views
+from shows import views as show_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^shows/', include(('shows.urls', 'shows'), namespace='shows')),
     url(r'^movies/', include(('shows.urls', 'movies'), namespace='movies')),
+    url(r'^add$', show_views.AddShowView.as_view(), name='add'),
     url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
     url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
     url(r'^services$', views.services, name="services"),
