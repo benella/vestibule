@@ -49,6 +49,11 @@
     background-color: #ddded4;
     cursor: pointer;
     transition: 0.3s;
+    display: none;
+}
+
+.show-wrap.search-result-display {
+    display: block !important;
 }
 
 .show-wrap:hover {
@@ -64,7 +69,7 @@
 }
 
 .subscribed-tag,
-.add-show-tag{
+.add-show-tag {
     font-size: 0.9em;
     margin-top: 1px;
     color: #a7a99e;
@@ -78,3 +83,28 @@ img.show-poster {
     height: 4rem;
 }
 
+.search-mode {
+    font-size: 1.1em;
+    color: #A4A5A0;
+    border-bottom: solid 3px var(--main-color);
+    padding: 0 20px 8px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.search-mode:hover {
+    color: #333333;
+}
+
+.search-mode p {
+    color: inherit;
+}
+
+.search-mode-chosen {
+    color: #333333;
+    border-bottom: solid 3px #333333;
+}
+
+#searchMode {
+    padding-top: 8px;
+}

@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 from imdb import IMDb
+from common import ShowType
 
 
 def search_show(request, title):
@@ -12,9 +13,15 @@ def search_show(request, title):
     subscribed_shows_imdb_ids = [show.imdb_id for show in Show.objects.all()]
     results = ia.search_movie(title)
     filtered_results = list()
+    show_type = ""
 
     for result in results:
-        if result.get("kind") not in ["tv series", "tv miniseries"]:
+        if result.get("kind") in ["tv series", "tv miniseries"]:
+            show_type = ShowType.SHOW
+
+        elif result.get("kind") == "movie":
+            show_type = ShowType.MOVIE
+        else:
             print("skipping {} (kind: {})".format(result.get("title"), result.get("kind")))
             continue
 
@@ -24,7 +31,8 @@ def search_show(request, title):
             "full-size cover url": result.get("cover url"),
             "imdb_id": result.getID(),
             "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=result.getID()),
-            "subscribed": result.getID() in subscribed_shows_imdb_ids
+            "subscribed": result.getID() in subscribed_shows_imdb_ids,
+            "type": show_type,
         })
 
     return JsonResponse({"filtered": filtered_results})
@@ -45,10 +53,18 @@ def update_show_info(request, title):
 class AddShowView(generic.CreateView):
     model = Show
     template_name = "show/add_show.html"
-    fields = ["imdb_id"]
+    fields = ["imdb_id", "type"]
 
     def get_success_url(self):
-        return reverse("shows:details", kwargs={'slug': self.object.slug})
+        show_type = self.request.POST.get("type")
+        view_name = ""
+        if show_type == ShowType.SHOW:
+            view_name = "shows:details"
+        elif show_type == ShowType.MOVIE:
+            view_name = "movies:details"
+        else:
+            raise ValueError("Unknown show type: {}".format(show_type))
+        return reverse(view_name, kwargs={'slug': self.object.slug})
 
 
 class ShowDetails(generic.DetailView):
