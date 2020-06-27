@@ -23,7 +23,7 @@ class Quality:
     }
 
     @staticmethod
-    def parse_quality_form_phrase(phrase: str):
+    def parse_quality_form_phrase(phrase: str) -> str:
         phrase = phrase.lower()
 
         for key, quality in Quality.QUALITY_KEYS.items():

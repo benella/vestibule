@@ -2,11 +2,11 @@ import logging
 import requests
 import datetime
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass
+from typing import List
 
-from common import Quality, Source
 from django.utils.text import slugify
 from django.db import models
+from feeds.feet_item import FeedItem
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +30,9 @@ class Feed(models.Model):
         self.slug = slugify(self.name)
         super(Feed, self).save(*args, **kwargs)
 
-    def read_feed(self):
+    def read_feed(self) -> List[FeedItem]:
         """
-        :rtype: list of FeedItem
+        Read RSS feed, and return a a list of FeedItem
         """
         feed = requests.get(self.rss_url)
         root = ET.fromstring(feed.text)
@@ -48,6 +48,8 @@ class Feed(models.Model):
                 feed=self
             )
 
+            feed_item.parse_title()
+
             if not feed_item.has_expected_keys():
                 logger.warning(f"- Skipping item {feed_item.raw_title} ({feed_item.publication_time})")
                 continue
@@ -57,29 +59,9 @@ class Feed(models.Model):
 
         return feed_items
 
-    def _formatted_publication_time(self, raw_publication_time):
+    def _formatted_publication_time(self, raw_publication_time: str) -> str:
         """
-        :type raw_publication_time: str
-        :rtype: str
+        Parse publication time according to Feed time format and return a formatted sting
         """
         to_datetime = datetime.datetime.strptime(raw_publication_time, self.feed_time_format)
         return to_datetime.strftime("%d.%m.%Y %H:%M")
-
-
-@dataclass
-class FeedItem:
-
-    raw_title: str
-    link: str
-    publication_time: str
-    feed: Feed
-
-    def has_expected_keys(self):
-
-        if Quality.parse_quality_form_phrase(self.raw_title) is None:
-            return False
-
-        if Source.pare_source_from_phrase(self.raw_title) is None:
-            return False
-
-        return True

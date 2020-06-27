@@ -62,5 +62,21 @@
       "name": "TVDB API Key",
       "value": ""
     }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 10,
+    "fields": {
+      "name": "Media Folder Path",
+      "value": ""
+    }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 10,
+    "fields": {
+      "name": "Keep Media Folder Organised",
+      "value": "False"
+    }
   }
 ]

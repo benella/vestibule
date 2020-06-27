@@ -11,3 +11,8 @@ class FeedDetails(generic.DetailView):
         feed = self.get_object()
         context_data["feed_data"] = feed.read_feed()
         return context_data
+
+
+class FeedList(generic.ListView):
+    model = Feed
+    template_name = "feed/feed_list.html"

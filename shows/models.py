@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Tuple, List
 from datetime import timedelta
 from django.utils import timezone
@@ -10,6 +11,7 @@ from django.contrib import messages
 
 from imdb import IMDb
 from feeds.models import Feed
+from feeds.feet_item import FeedItem
 from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source
@@ -178,6 +180,7 @@ class Show(models.Model):
     thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
+    lookup_names = models.TextField(default="", blank=True, null=True)
 
     class Meta:
         ordering = ('title', )
@@ -202,6 +205,30 @@ class Show(models.Model):
 
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
+
+    def generate_lookup_names(self, imdb_show_data: dict):
+        """
+        Creates list of possible torrent show titles, and keeps it
+        Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
+        """
+        aliases = [self.title] + imdb_show_data["akas"]
+        formatted_aliases = list()
+
+        for name in aliases:
+            formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
+            formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+            formatted_name = re.sub("[:(),']", "", formatted_name).lower()
+            formatted_name = re.sub("\.+", ".", formatted_name.strip())
+            formatted_aliases.append(formatted_name)
+            formatted_aliases.append(f"{formatted_name}.{self.year}")
+
+        self.lookup_names = "\n".join(formatted_aliases)
+
+    def get_lookup_names_list(self) -> List[str]:
+        """
+        Returns the lookup names as a list of strings
+        """
+        return self.lookup_names.split("\n")
 
     @property
     def seasons(self):
@@ -233,6 +260,7 @@ class Show(models.Model):
         self.thumbnail_link = imdb_show_data.get("cover url")
         self.number_of_seasons = imdb_show_data.get("number of seasons")
         self.year = imdb_show_data.get("year")
+        self.generate_lookup_names(imdb_show_data)
 
         try:
             self.runtime = imdb_show_data.get("runtimes")[0]
@@ -246,24 +274,27 @@ class Show(models.Model):
 
         if next_episode:
             self.next_episode = str(next_episode)
-
+        else:
+            self.next_episode = ""
         self.save()
 
         if request is not None:
             messages.add_message(request, messages.SUCCESS, f"'{self}' info updated")
 
-    def find_show_torrents(self, request=None, torrents: list = None):
-
+    def find_show_torrents(self, request=None, torrents: List[FeedItem] = None):
+        """
+        Read or get Feeds, find and add torrents matching the show
+        """
         if torrents is None:
             torrents = list()
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
 
-        lookup_name = self.title.lower().replace(" ", ".").replace("-", ".").replace("_", ".").replace(":", "").replace("'", "")
         relevant_items = list()
+        lookup_names = self.get_lookup_names_list()
 
         for item in torrents:
-            if lookup_name in item.raw_title.lower():
+            if item.parsed_values.show_title.lower() in lookup_names:
                 relevant_items.append(item)
 
         print("[{}] Found {} torrents for show {}".format(
@@ -271,11 +302,10 @@ class Show(models.Model):
 
         self.add_torrents_from_feed(relevant_items, request)
 
-    def add_torrents_from_feed(self, feed_list, request=None):
+    def add_torrents_from_feed(self, feed_list: List[FeedItem], request=None):
         """
-        :type feed_list: list of feeds.models.FeedItem
+        Add show torrents from given filtered list
         """
-
         new_torrents = list()
 
         for feed_item in feed_list:
@@ -284,14 +314,12 @@ class Show(models.Model):
                 print("Torrent titled {} is not new".format(feed_item.raw_title))
                 continue
 
-            season, episode, quality, source = Torrent.parse_torrent_details(feed_item.raw_title)
-
             torrent = Torrent()
             torrent.title = feed_item.raw_title
-            torrent.season = season
-            torrent.episode = episode
-            torrent.quality = quality
-            torrent.source_type = source
+            torrent.season = str(feed_item.parsed_values.season)
+            torrent.episode = feed_item.parsed_values.get_episode()
+            torrent.quality = feed_item.parsed_values.video_quality
+            torrent.source_type = feed_item.parsed_values.source
             torrent.link = feed_item.link
             torrent.publication_time = feed_item.publication_time
             torrent.feed = feed_item.feed
@@ -313,10 +341,11 @@ class Show(models.Model):
             else:
                 messages.add_message(request, messages.INFO, f"No new Torrents found for {self}")
 
-
-
     def update_show_downloads(self):
-
+        """
+        Update the show's torrents according to the installation profile.
+        Download torrent if needed.
+        """
         if not self.profile.download_automatically:
             logger.info(f"> '{self}' profile is set to 'Don't Download Automatically' - doing nothing")
             return
@@ -328,8 +357,10 @@ class Show(models.Model):
                     continue
                 self._update_episode_downloads(season=season, episode=episode, torrents=torrents)
 
-
     def _update_episode_downloads(self, season: str, episode: str, torrents: List[Torrent]):
+        """
+        Check if an episode requires torrents downloads, according to profile.
+        """
         logger.info(f"{season}-{episode} has {len(torrents)} torrents")
 
         if len(torrents) == 0:

@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/feed_list.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block main_panel %}
+    <section id="feeds-list">
+        {% for feed in feed_list %}
+
+            <a href="{% url "feeds:details" slug=feed.slug %}"><div class="feed">
+                <p class="feed-title">{{ feed.name }}</p>
+                <div class="feed-strip"></div>
+            </div></a>
+
+        {% endfor %}
+    </section>
+{% endblock %}
