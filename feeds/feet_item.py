@@ -28,7 +28,7 @@ class ShowTorrentValues:
     def get_episode(self):
         if self.episode is not None:
             return str(self.episode)
-        return None
+        return ""
 
 
 class FeedItem:

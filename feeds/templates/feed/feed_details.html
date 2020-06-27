@@ -8,11 +8,36 @@
 {% block main_panel %}
     <div class="feed-header">{{ feed.name }}</div>
 
-    <div id="feed-data">
+    <p class="feed-details">
+        <span>Priority {{ feed.priority }}</span>
+        <span class="bullet">•</span>
+        <a target="_blank" href="{{ feed.rss_url }}" class="rss-link">RSS Feed</a>
+    </p>
+
+    <div class="feed-data">
         {% for feed_item in feed_data %}
             <div class="feed-item-data">
                 <a class="feed-item-title" href="{{ feed_item.link }}">{{ feed_item.raw_title }}</a>
-                <p class="feed-item-publication-time">{{ feed_item.parsed_values }}</p>
+                <p class="feed-item-parsed-values">
+                    <span class="parsed-value">{{ feed_item.parsed_values.show_title }}</span>
+                    <span class="bullet">•</span>
+                    <span class="parsed-key">Season </span>
+                    <span class="parsed-value">{{ feed_item.parsed_values.season }}</span>
+                    <span class="bullet">•</span>
+                    {% if feed_item.parsed_values.is_full_season %}
+                        <span class="parsed-key">Full Season</span>
+                    {% else %}
+                        <span class="parsed-key">Episode </span>
+                        <span class="parsed-value">{{ feed_item.parsed_values.episode }}</span>
+                    {% endif %}
+                    <span class="bullet">•</span>
+                    <span class="parsed-key">Video Quality: </span>
+                    <span class="parsed-value">{{ feed_item.parsed_values.video_quality }}</span>
+                    <span class="bullet">•</span>
+                    <span class="parsed-key">Source: </span>
+                    <span class="parsed-value">{{ feed_item.parsed_values.source }}</span>
+
+                </p>
                 <p class="feed-item-publication-time">{{ feed_item.publication_time }}</p>
             </div>
         {% endfor %}

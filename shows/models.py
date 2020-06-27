@@ -274,7 +274,8 @@ class Show(models.Model):
 
         if next_episode:
             self.next_episode = str(next_episode)
-
+        else:
+            self.next_episode = ""
         self.save()
 
         if request is not None:
