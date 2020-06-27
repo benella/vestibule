@@ -12,6 +12,7 @@
         {% for feed_item in feed_data %}
             <div class="feed-item-data">
                 <a class="feed-item-title" href="{{ feed_item.link }}">{{ feed_item.raw_title }}</a>
+                <p class="feed-item-publication-time">{{ feed_item.parsed_values }}</p>
                 <p class="feed-item-publication-time">{{ feed_item.publication_time }}</p>
             </div>
         {% endfor %}

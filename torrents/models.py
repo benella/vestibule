@@ -1,10 +1,5 @@
-import re
 from django.utils import timezone
 from django.db import models
-from common import Quality, Source
-
-SEASON_RE = re.compile("\.S(?P<season>\d+)")
-EPISODE_RE = re.compile("E(?P<episode>\d+)")
 
 
 class Torrent(models.Model):
@@ -97,27 +92,3 @@ class Torrent(models.Model):
             episode=" E{}".format(self.episode) if self.episode else "",
             quality=self.quality
         )
-
-    @staticmethod
-    def parse_torrent_details(raw_title):
-        season = "Unknown"
-        episode = ""
-
-        season_match = SEASON_RE.search(raw_title)
-        if season_match:
-            try:
-                season = season_match.group("season")
-            except AttributeError:
-                pass
-
-        episode_match = EPISODE_RE.search(raw_title)
-        if episode_match:
-            try:
-                episode = episode_match.group("episode")
-            except AttributeError:
-                pass
-
-        quality = Quality.parse_quality_form_phrase(raw_title)
-        source = Source.pare_source_from_phrase(raw_title)
-
-        return season, episode, quality, source
