@@ -1,7 +1,9 @@
+import os
 from typing import List
 from clutch.client import Client
 from datetime import timedelta
 from requests.exceptions import ConnectionError
+from pathlib import Path
 
 from common import ip_utils
 from notifications import pushover
@@ -38,6 +40,19 @@ class TransmissionClient:
 
         self._api_address = TransmissionClient.TRANSMISSION_API_ADDRESS.format(host=host)
         self._web_address = TransmissionClient.TRANSMISSION_WEB_ADDRESS.format(host=host)
+
+        try:
+            self.keep_media_folder_organised = VestibuleConfiguration.objects.get(
+                name="Keep Media Folder Organised").bool_value
+        except VestibuleConfiguration.DoesNotExist:
+            self.keep_media_folder_organised = False
+
+        try:
+            self.media_folder_path = VestibuleConfiguration.objects.get(name="Media Folder Path").value
+        except VestibuleConfiguration.DoesNotExist:
+            self.keep_media_folder_organised = False
+            self.media_folder_path = ""
+
 
     def __enter__(self):
         self.client = Client(address=self._api_address, username=self._rpc_username, password=self._rpc_password)
@@ -77,21 +92,39 @@ class TransmissionClient:
         response = self.client.torrent.accessor(all_fields=True)
         return response.arguments.get("torrents", [])
 
+    def get_shows_download_directory(self):
+        return os.path.join(self.media_folder_path, "Shows")
+
+    def get_show_torrent_download_directory(self, torrent: Torrent) -> str:
+        """
+        Find, and generate if needed, a download directory for the given Torrent
+        """
+        path = os.path.join(self.get_shows_download_directory(),
+                            torrent.show.title,
+                            f"Season {torrent.season}")
+        Path(path).mkdir(exist_ok=True, parents=True)
+        return path
 
     def download_torrent(self, torrent: Torrent):
         """
         Start a torrent download on Transmission with the torrent's link, and update torrent's status.
         """
-        response = self.client.torrent.add(arguments={"filename": torrent.link})
+        arguments = {"filename": torrent.link}
+        if self.keep_media_folder_organised:
+            download_dir = self.get_show_torrent_download_directory(torrent)
+            print(f"Downloading {torrent} to {download_dir}")
+            arguments["download_dir"] = download_dir
+
+        response = self.client.torrent.add(arguments=arguments)
+        transmission_torrent_id = response.arguments["torrent_added"]["id"]
 
         if response.result != TransmissionClient.ACTION_SUCCESS:
             return False, f"Failed to download torrent {torrent}"
 
-        torrent.transmission_torrent_id = response.arguments["torrent_added"]["id"]
+        torrent.transmission_torrent_id = transmission_torrent_id
         torrent.update_download_status(Torrent.DOWNLOADING)
 
         return True, f"Downloading {torrent}"
-
 
     def update_torrent(self, torrent_info: dict):
         """
