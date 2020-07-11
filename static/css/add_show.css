@@ -78,3 +78,28 @@ img.show-poster {
     height: 4rem;
 }
 
+@media only screen and (max-width: 500px) {
+    #add-show-main-panel {
+        margin-top: 6rem;
+    }
+
+    #search-panel {
+        font-size: 0.8em;
+    }
+
+    #search-panel input {
+        width: auto;
+    }
+
+    #search-panel-strip {
+        width: 100%;
+    }
+
+    #searchResults {
+        margin-bottom: 4rem;
+    }
+
+    .show-wrap {
+        width: 100%;
+    }
+}

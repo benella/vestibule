@@ -1,7 +1,5 @@
 
 function update_show_palette(obj) {
-
-    console.log(obj)
     const colorThief = new ColorThief();
     const image = obj
     const img = new Image();
