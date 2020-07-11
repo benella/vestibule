@@ -5,9 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Vestibule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{% static "images/favicon.png" %}" />
     <link rel="stylesheet" href="https://use.typekit.net/gki7zvg.css">
     <link rel="stylesheet" type="text/css" href="{% static "css/main.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/main_responsive.css" %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
     <script src="{% static "js/main.js" %}"></script>
@@ -20,21 +22,23 @@
                 <a href="{% url 'home' %}" class="acier-title">VESTIBULE</a>
             </section>
 
-            <section class="side-panel-links">
-                <a href="{% url 'shows:list' %}" class="side-panel-link">Shows</a>
-                <a href="{% url 'feeds:list' %}" class="side-panel-link">Feeds</a>
-                <a href="{% url 'shows:list' %}" class="side-panel-link">Torrents</a>
-            </section>
+            <div id="main-links-box">
+                <section class="side-panel-links">
+                    <a href="{% url 'shows:list' %}" class="side-panel-link">Shows</a>
+                    <a href="{% url 'feeds:list' %}" class="side-panel-link">Feeds</a>
+                    <a href="{% url 'shows:list' %}" class="side-panel-link">Torrents</a>
+                </section>
 
-            <div class="side-panel-divider"></div>
+                <div class="side-panel-divider"></div>
 
-            <section class="side-panel-links">
-                <a href="{% url 'shows:add-show' %}" class="side-panel-link">Add Show</a>
-            </section>
-
+                <section class="side-panel-links">
+                    <a href="{% url 'shows:add-show' %}" class="side-panel-link">Add Show</a>
+                </section>
+            </div>
             {% block page_actions %} {% endblock page_actions %}
 
             <section id="services-status-box"></section>
+            <div id="mobile-menu-btn" onclick="toggle_mobile_menu()"><span></span><span></span><span></span></div>
 
         {% if messages %}
             <div class="messages">

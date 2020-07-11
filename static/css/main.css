@@ -111,6 +111,7 @@ button:focus {
     margin: 5px 0;
     transition: 0.3s;
     display: block;
+    color: inherit;
 }
 
 .side-panel-link:hover {
@@ -122,6 +123,10 @@ button:focus {
     position: absolute;
     bottom: 16rem;
     font-family: monospace;
+}
+
+#mobile-menu-btn {
+    display: none;
 }
 
 #services-status-box {

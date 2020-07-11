@@ -7,11 +7,13 @@ class Torrent(models.Model):
     NEVER_STARTED = "N"
     DOWNLOADING = "D"
     READY = "R"
+    STOPPED = "S"
 
     DOWNLOAD_STATUS_CHOICES = [
         (NEVER_STARTED, "Never Started"),
         (DOWNLOADING, "Downloading"),
         (READY, "Ready"),
+        (STOPPED, "Stopped"),
     ]
 
     created = models.DateTimeField(editable=False, default=timezone.now)

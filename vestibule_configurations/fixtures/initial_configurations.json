@@ -78,5 +78,13 @@
       "name": "Keep Media Folder Organised",
       "value": "False"
     }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 11,
+    "fields": {
+      "name": "Default Seeding Time (Days)",
+      "value": "10"
+    }
   }
 ]
