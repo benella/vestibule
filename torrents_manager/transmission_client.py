@@ -18,8 +18,6 @@ class TransmissionClient:
 
     TRANSMISSION_API_ADDRESS = "http://{host}:9091/transmission/rpc"
     TRANSMISSION_WEB_ADDRESS = "http://{host}:9091"
-    DEFAULT_SHARE_TIME = timedelta(days=7)
-    DEFAULT_SHARE_RATIO = 2
     ACTION_SUCCESS = "success"
 
     def __init__(self):
@@ -52,6 +50,14 @@ class TransmissionClient:
         except VestibuleConfiguration.DoesNotExist:
             self.keep_media_folder_organised = False
             self.media_folder_path = ""
+
+        try:
+            days_to_share = int(VestibuleConfiguration.objects.get(name="Default Seeding Time (Days)").value)
+        except (VestibuleConfiguration.DoesNotExist, ValueError):
+            days_to_share = 10
+
+        self.default_share_time = timedelta(days=days_to_share)
+
 
 
     def __enter__(self):
@@ -154,19 +160,28 @@ class TransmissionClient:
         print(f"Matched with Torrent in Vestibule - {torrent}")
 
         is_ready = percent_done == 100
-        can_delete = seeding_time >= TransmissionClient.DEFAULT_SHARE_TIME
+        can_delete = seeding_time >= self.default_share_time
         torrent.update_percent_done(percent_done)
 
         if is_ready and torrent.download_status != Torrent.READY:
             torrent.update_download_status(Torrent.READY)
-            print(f"Download finished, copying files to library")
+            print(f"Download finished for {torrent}, seeding")
             pushover.send_message(
                 title=f"{torrent.show.title} - New episode is ready",
                 message=f"{torrent.short_title}"
             )
 
         if can_delete:
-            print(f"Shared for {seeding_time}, deleting torrents and files")
+            print(f"Shared for {seeding_time}, removing from Transmission (not deleting files)")
+            self.remove_torrent(transmission_torrent_id=transmission_torrent_id)
+            torrent.update_download_status(Torrent.STOPPED)
+
+    def remove_torrent(self, transmission_torrent_id: int, delete_data: bool = False):
+        """
+        Remove Torrent from list
+        """
+        self.client.torrent.remove(arguments={
+            "ids": [transmission_torrent_id], "delete_local_data": delete_data})
 
     def update_live_torrents(self):
         """

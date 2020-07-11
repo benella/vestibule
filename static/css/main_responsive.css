@@ -1,0 +1,106 @@
+
+@media only screen and (max-width: 500px) {
+    #side-panel {
+        width: 100vw;
+        height: 34px;
+        padding: 4px 0;
+        z-index: 10;
+        top: 5px;
+    }
+
+    #top-panel {
+        margin: 2px 0 0 42px;
+        font-size: 0.7em;
+    }
+
+    #strip {
+        height: 5px;
+        width: 100vw;
+        z-index: 10;
+    }
+
+    #strip-img {
+        width: 110%;
+        top: -9px;
+        left: -3px;
+        filter: blur(2px);
+        height: 30px;
+    }
+
+    #main-box {
+        margin: 70px 5px 0 5px;
+    }
+
+    #main-links-box {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        width: 100vw;
+        top: 47px;
+        background-color: #797974;
+    }
+
+    .side-panel-links {
+        padding: 0 0 0 50px;
+        color: #e3e4db;
+    }
+
+    .side-panel-divider {
+        width: calc(100% - 6rem);
+        margin: 1rem 3rem;
+    }
+
+    .side-panel-links:first-child{
+        margin-top: 2rem;
+    }
+
+    .side-panel-links:last-child {
+        margin-bottom: 2rem;
+    }
+
+    #services-status-box {
+        right: 0;
+        left: auto;
+        width: 104px;
+        padding: 0;
+        height: 42px;
+        top: 0;
+        background-color: transparent;
+    }
+
+    .service-icon {
+        height: 25px;
+        margin-top: 5px;
+    }
+
+    .service-status-bar {
+        top: auto;
+        bottom: 0;
+    }
+
+    .service-wrap {
+        padding: 4px;
+        width: 2.5rem;
+    }
+
+    #main-panel {
+        padding-left: 0;
+    }
+
+#mobile-menu-btn {
+    display: block;
+    position: absolute;
+    height: 34px;
+    width: 25px;
+    top: 6px;
+    left: 0;
+}
+
+#mobile-menu-btn span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #797974;
+    margin-top: 6px;
+}
+}

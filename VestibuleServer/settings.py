@@ -42,6 +42,7 @@ LOGGING = {
 ALLOWED_HOSTS = ['0.0.0.0',
                  '127.0.0.1',
                  '192.168.*',
+                 '192.168.0.18',
                  'raspberrypi.local'
                  ]
 
