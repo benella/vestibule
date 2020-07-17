@@ -34,8 +34,11 @@
                 <section class="side-panel-links">
                     <a href="{% url 'shows:add-show' %}" class="side-panel-link">Add Show</a>
                 </section>
+
+                {% block page_actions %} {% endblock page_actions %}
+
             </div>
-            {% block page_actions %} {% endblock page_actions %}
+
 
             <section id="services-status-box"></section>
             <div id="mobile-menu-btn" onclick="toggle_mobile_menu()"><span></span><span></span><span></span></div>
