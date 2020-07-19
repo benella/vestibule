@@ -35,3 +35,12 @@
     transition: 0.3s;
     opacity: 0.6;
 }
+
+@media only screen and (max-width: 500px) {
+    #feeds-list {
+        flex-wrap: nowrap;
+        flex-direction: column;
+        padding: 1rem;
+        height: auto;
+    }
+}
