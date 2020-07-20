@@ -40,6 +40,12 @@ class PlexClient:
             "url": self._base_url
         }
 
+    def update_library(self) -> None:
+        plex = self._get_instance()
+        if plex is not None:
+            print("Updating Plex library")
+            plex.library.update()
+
     def _get_instance(self) -> Union[PlexServer, None]:
         try:
             plex = PlexServer(baseurl=self._base_url, token=self._token)

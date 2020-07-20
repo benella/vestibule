@@ -6,6 +6,7 @@ from requests.exceptions import ConnectionError
 from pathlib import Path
 
 from common import ip_utils
+from plex_manager.plex_client import PlexClient
 from notifications import pushover
 from vestibule_configurations.models import VestibuleConfiguration
 from torrents.models import Torrent
@@ -58,8 +59,6 @@ class TransmissionClient:
 
         self.default_share_time = timedelta(days=days_to_share)
 
-
-
     def __enter__(self):
         self.client = Client(address=self._api_address, username=self._rpc_username, password=self._rpc_password)
         return self
@@ -89,7 +88,6 @@ class TransmissionClient:
         Link used to access Transmission web interface
         """
         return self._web_address
-
 
     def list_torrents(self) -> List[dict]:
         """
@@ -166,6 +164,7 @@ class TransmissionClient:
         if is_ready and torrent.download_status != Torrent.READY:
             torrent.update_download_status(Torrent.READY)
             print(f"Download finished for {torrent}, seeding")
+            PlexClient().update_library()
             pushover.send_message(
                 title=f"{torrent.show.title} - New episode is ready",
                 message=f"{torrent.short_title}"
