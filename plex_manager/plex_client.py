@@ -1,13 +1,13 @@
 from plexapi.server import PlexServer
 from plexapi.exceptions import BadRequest
 from requests.exceptions import ConnectionError
+from typing import Union
 
 from vestibule_configurations.models import VestibuleConfiguration
 from common import ip_utils
 
 
 class PlexClient:
-
     PLEX_BASE_URL = "http://{host}:32400"
 
     def __init__(self):
@@ -32,15 +32,24 @@ class PlexClient:
 
     @property
     def is_up(self) -> bool:
-        try:
-            PlexServer(baseurl=self._base_url, token=self._token)
-            return True
-        except (ConnectionError, BadRequest) as e:
-            print(f"Plex is down - {e}")
-            return False
+        return self._get_instance() is not None
 
     def status(self) -> dict:
         return {
             "up": self.is_up,
             "url": self._base_url
         }
+
+    def update_library(self) -> None:
+        plex = self._get_instance()
+        if plex is not None:
+            print("Updating Plex library")
+            plex.library.update()
+
+    def _get_instance(self) -> Union[PlexServer, None]:
+        try:
+            plex = PlexServer(baseurl=self._base_url, token=self._token)
+            return plex
+        except (ConnectionError, BadRequest) as e:
+            print(f"Plex is down - {e}")
+            return None
