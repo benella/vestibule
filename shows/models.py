@@ -1,7 +1,7 @@
 import logging
 import re
 from typing import Tuple, List
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 from collections import defaultdict
 
@@ -176,6 +176,7 @@ class Show(models.Model):
     network = models.CharField(max_length=24, default="", blank=True)
     status = models.CharField(max_length=256, default="", blank=True)
     next_episode = models.CharField(max_length=256, default="", blank=True)
+    next_episode_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
     poster_link = models.URLField(default="", blank=True)
     thumbnail_link = models.URLField(default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
@@ -230,6 +231,41 @@ class Show(models.Model):
         """
         return self.lookup_names.split("\n")
 
+    # Torrents listing
+    def latest_torrents_activity(self, limit=10):
+        return self.torrents.exclude(
+            download_status=Torrent.NEVER_STARTED).order_by("-modified")[:limit]
+
+    @property
+    def last_active_torrents(self):
+        return self.latest_torrents_activity(limit=3)
+
+    @property
+    def last_torrent_activity(self):
+        try:
+            return self.latest_torrents_activity(limit=1)[0].modified
+        except IndexError:
+            return None
+
+
+    def latest_torrents_found(self, limit=10):
+        return self.torrents.exclude().order_by("-created")[:limit]
+
+    @property
+    def last_found_torrents(self):
+        return self.latest_torrents_found(limit=3)
+
+    @property
+    def last_torrent_found(self):
+        try:
+            return self.latest_torrents_found(limit=1)[0].created
+        except IndexError:
+            return None
+
+    @property
+    def next_episode_order_value(self):
+        return int(self.next_episode_time_code.replace("-", ""))
+
     @property
     def seasons(self):
         """
@@ -273,9 +309,12 @@ class Show(models.Model):
         self.status = show_status
 
         if next_episode:
+            self.next_episode_time_code = next_episode.absolute_episode_air_time_code
             self.next_episode = str(next_episode)
         else:
+            self.next_episode_time_code = "9999-99-99"
             self.next_episode = ""
+
         self.save()
 
         if request is not None:

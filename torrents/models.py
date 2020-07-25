@@ -87,6 +87,13 @@ class Torrent(models.Model):
         )
 
     @property
+    def season_episode_title(self):
+        return "{season}{episode}".format(
+            season=" S{}".format(self.season),
+            episode=" E{}".format(self.episode) if self.episode else ""
+        )
+
+    @property
     def dashboard_title(self):
         return "{show}{season}{episode} ({quality})".format(
             show=self.show.title,

@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 
 
+def get_today():
+    return datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+
 @dataclass
 class FutureEpisode:
     show: Movie
@@ -13,9 +17,29 @@ class FutureEpisode:
     month_only: bool
     year_only: bool
 
+
     def __str__(self):
         return f"Season {self.episode_data['season']} Episode {self.episode_data['episode']} - " \
                f"'{self.episode_data['title']}', {self.airs}."
+
+    @property
+    def absolute_episode_air_time_code(self):
+        """
+        Used to compare Shoes air times. Converts episode airtime into code:
+            '2020-07-24', '2020-99-99', '2020-10-99', '9999-99-99'
+        """
+        if self.air_time_unknown:
+            return "9999-99-99"
+
+        if self.month_only:
+            return f"{self.episode_air_time.year}-{self.episode_air_time.strftime('%m')}-99"
+
+        if self.year_only:
+            return f"{self.episode_air_time.year}-99-99"
+
+        return f"{self.episode_air_time.year}-" \
+               f"{self.episode_air_time.strftime('%m')}-" \
+               f"{self.episode_air_time.strftime('%d')}"
 
     @property
     def days_from_now(self) -> int:
@@ -23,7 +47,7 @@ class FutureEpisode:
 
     @property
     def time_from_now(self):
-        return self.episode_air_time - datetime.now()
+        return self.episode_air_time - get_today()
 
     @property
     def episode_value(self) -> int:
@@ -55,9 +79,11 @@ def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
     ia.update(show, "episodes")
     future_episodes = list()
 
+    now = get_today()
+
     for season_number, season_episodes in show["episodes"].items():
         for episode_number, episode in season_episodes.items():
-            episode_air_time = datetime.now() + timedelta(days=365)
+            episode_air_time = datetime.max
 
             # No Date
             if 'original air date' not in episode.keys():
@@ -75,7 +101,7 @@ def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
             for date_format in ["%d %b. %Y", "%d %b %Y"]:
                 try:
                     episode_air_time = datetime.strptime(episode['original air date'], date_format)
-                    if episode_air_time >= datetime.now():
+                    if episode_air_time >= now:
                         future_episodes.append(FutureEpisode(
                             episode_data=episode,
                             episode_air_time=episode_air_time,
@@ -88,12 +114,12 @@ def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
                 except ValueError:
                     pass
 
-            # Moth Only
+            # Month Only
             for date_format in ["%b. %Y", "%b %Y"]:
                 try:
                     episode_air_time = datetime.strptime(episode['original air date'], date_format)
-                    if (episode_air_time.year >= datetime.now().year) and \
-                            (episode_air_time.month >= datetime.now().month):
+                    if (episode_air_time.year >= now.year) and \
+                            (episode_air_time.month >= now.month):
                         future_episodes.append(FutureEpisode(
                             episode_data=episode,
                             episode_air_time=episode_air_time,
@@ -109,7 +135,7 @@ def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
             # Year Only
             try:
                 episode_air_time = datetime.strptime(episode['original air date'], "%Y")
-                if episode_air_time.year >= datetime.now().year:
+                if episode_air_time.year >= now.year:
                     future_episodes.append(FutureEpisode(
                         episode_data=episode,
                         episode_air_time=episode_air_time,

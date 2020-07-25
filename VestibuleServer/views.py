@@ -13,10 +13,16 @@ class Home(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(Home, self).get_context_data(**kwargs)
-        context['shows'] = Show.objects.all()
-        context['recently_found'] = Torrent.objects.all().order_by("-created")[:10]
-        context['recent_activity'] = Torrent.objects.exclude(download_status=Torrent.NEVER_STARTED).order_by(
-            "-modified")[:10]
+
+        context['upcoming_shows'] = sorted(Show.objects.exclude(
+            next_episode_time_code="9999-99-99"), key=lambda s: s.next_episode_order_value)
+
+        active_shows = [show for show in Show.objects.all() if show.last_torrent_activity is not None]
+        context['recent_activity'] = sorted(active_shows, key=lambda s: s.last_torrent_activity, reverse=True)
+
+        found_shows = [show for show in Show.objects.all() if show.last_torrent_found is not None]
+        context['recently_found'] = sorted(found_shows, key=lambda s: s.last_torrent_found, reverse=True)
+
         return context
 
 
