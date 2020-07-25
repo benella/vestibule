@@ -1,7 +1,9 @@
 
 :root {
     --main-color: #e3e4db;
-    --secondary-color: #C8C9C0
+    --secondary-color: #C8C9C0;
+    --trasparent-light: #e1e2d666;
+    --trasparent-semi-light: rgba(225, 226, 214, 0.65);
 }
 
 * {
@@ -38,7 +40,7 @@ button:focus {
 }
 
 #main-box {
-    margin: 6.5rem 0 0 16rem;
+    margin: 5.5rem 0 0 15rem;
 }
 
 #main-panel {
@@ -48,8 +50,8 @@ button:focus {
 
 #side-panel {
     width: 12.5rem;
-    padding: 2rem 0 0 2.5rem;
-    background-color: #d2d3c7;
+    padding: 3rem 0 0 1.5rem;
+    background-color: var(--trasparent-light);
     height: calc(100vh - 2rem);
     position: fixed;
     left: 0;
@@ -61,7 +63,7 @@ button:focus {
 }
 
 .side-panel-divider {
-    background-color: var(--main-color);
+    background-color: var(--trasparent-semi-light);
     height: 3px;
     width: 85%;
     margin: 2rem 0;
@@ -69,13 +71,14 @@ button:focus {
 }
 
 #strip {
-    width: 1rem;
+    width: 27rem;
     opacity: 0.5;
     height: 100vh;
     overflow: hidden;
     position: fixed;
     left: 0rem;
     top: 0;
+    z-index: -1;
 }
 
 #strip-img {
@@ -83,12 +86,20 @@ button:focus {
     -moz-filter: blur(7px);
     -o-filter: blur(7px);
     -ms-filter: blur(5px);
-    filter: blur(7px);
+    filter: blur(30px);
     height: 106%;
-    width: 8rem;
+    width: 130%;
     position: absolute;
-    left: -3.5rem;
+    left: -2.5rem;
     top: -20px;
+}
+
+#strip-cover {
+    height: 100%;
+    width: 13rem;
+    position: fixed;
+    left: 14rem;
+    background: linear-gradient(90deg, rgba(227,228,219,0.7) 0%, rgba(227,228,219,1) 100%);
 }
 
 .acier-title {
@@ -99,7 +110,7 @@ button:focus {
 .side-panel-section-header {
     font-size: 0.85em;
     margin-bottom: 10px;
-    color: #959692;
+    opacity: 0.8;
 }
 
 .side-panel-links {
@@ -130,15 +141,14 @@ button:focus {
 }
 
 #services-status-box {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     height: 4rem;
     width: 14rem;
     display: flex;
     justify-content: center;
-    background-color: #C8C9C0;
-    padding-left: 1rem;
+    background-color: var(--trasparent-light);
 }
 
 .service-wrap {
@@ -181,8 +191,8 @@ button:focus {
 
 .messages {
     position: fixed;
-    top: 1rem;
-    left: 19rem;
+    bottom: 6rem;
+    left: 1rem;
 }
 
 .message-wrap {
