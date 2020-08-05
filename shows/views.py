@@ -20,7 +20,7 @@ def search_show(request, title):
 
         filtered_results.append({
             "title": result.get("title"),
-            "year": result.get("year"),
+            "year": result.get("year", "Unknown Year"),
             "full-size cover url": result.get("cover url"),
             "imdb_id": result.getID(),
             "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=result.getID()),

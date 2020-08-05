@@ -212,7 +212,7 @@ class Show(models.Model):
         Creates list of possible torrent show titles, and keeps it
         Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
         """
-        aliases = [self.title] + imdb_show_data["akas"]
+        aliases = [self.title] + imdb_show_data.get("akas", [])
         formatted_aliases = list()
 
         for name in aliases:
@@ -295,7 +295,7 @@ class Show(models.Model):
         self.poster_link = imdb_show_data.get("full-size cover url")
         self.thumbnail_link = imdb_show_data.get("cover url")
         self.number_of_seasons = imdb_show_data.get("number of seasons")
-        self.year = imdb_show_data.get("year")
+        self.year = imdb_show_data.get("year", "Unknown Year")
         self.generate_lookup_names(imdb_show_data)
 
         try:
