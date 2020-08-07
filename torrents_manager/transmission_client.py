@@ -104,7 +104,7 @@ class TransmissionClient:
         Find, and generate if needed, a download directory for the given Torrent
         """
         path = os.path.join(self.get_shows_download_directory(),
-                            torrent.show.title,
+                            torrent.show.safe_folder_name,
                             f"Season {torrent.season}")
         Path(path).mkdir(exist_ok=True, parents=True)
         return path

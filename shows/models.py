@@ -218,7 +218,7 @@ class Show(models.Model):
         for name in aliases:
             formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
             formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
-            formatted_name = re.sub("[:(),']", "", formatted_name).lower()
+            formatted_name = re.sub("[:(),'?]", "", formatted_name).lower()
             formatted_name = re.sub("\.+", ".", formatted_name.strip())
             formatted_aliases.append(formatted_name)
             formatted_aliases.append(f"{formatted_name}.{self.year}")
@@ -230,6 +230,10 @@ class Show(models.Model):
         Returns the lookup names as a list of strings
         """
         return self.lookup_names.split("\n")
+
+    @property
+    def safe_folder_name(self) -> str:
+        return re.sub("[:/]", "", self.title)
 
     # Torrents listing
     def latest_torrents_activity(self, limit=10):
