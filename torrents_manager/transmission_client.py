@@ -57,7 +57,13 @@ class TransmissionClient:
         except (VestibuleConfiguration.DoesNotExist, ValueError):
             days_to_share = 10
 
+        try:
+            share_ratio = float(VestibuleConfiguration.objects.get(name="Default Share Ratio").value)
+        except (VestibuleConfiguration.DoesNotExist, ValueError):
+            share_ratio = 4
+
         self.default_share_time = timedelta(days=days_to_share)
+        self.default_share_ratio = share_ratio
 
     def __enter__(self):
         self.client = Client(address=self._api_address, username=self._rpc_username, password=self._rpc_password)
@@ -141,11 +147,12 @@ class TransmissionClient:
             percent_done = 0
 
         seeding_time = timedelta(seconds=torrent_info.get('seconds_seeding'))
+        upload_ratio = float(torrent_info.get('upload_ratio'))
 
         print(f"Torrent: {torrent_info.get('name')} (ID {transmission_torrent_id})")
 
         print(f"> Done: {percent_done}%, "
-              f"Ratio: {torrent_info.get('upload_ratio')}, "
+              f"Ratio: {upload_ratio}, "
               f"Shred for: {seeding_time}"
               )
 
@@ -158,7 +165,7 @@ class TransmissionClient:
         print(f"Matched with Torrent in Vestibule - {torrent}")
 
         is_ready = percent_done == 100
-        can_delete = seeding_time >= self.default_share_time
+        can_delete = (seeding_time >= self.default_share_time) or (upload_ratio > self.default_share_ratio)
         torrent.update_percent_done(percent_done)
 
         if is_ready and torrent.download_status != Torrent.READY:
@@ -171,7 +178,7 @@ class TransmissionClient:
             )
 
         if can_delete:
-            print(f"Shared for {seeding_time}, removing from Transmission (not deleting files)")
+            print(f"Shared for {seeding_time} ({upload_ratio}), removing from Transmission (not deleting files)")
             self.remove_torrent(transmission_torrent_id=transmission_torrent_id)
             torrent.update_download_status(Torrent.STOPPED)
 

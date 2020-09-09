@@ -86,5 +86,13 @@
       "name": "Default Seeding Time (Days)",
       "value": "10"
     }
+  },
+  {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 12,
+    "fields": {
+      "name": "Default Share Ratio",
+      "value": "4"
+    }
   }
 ]
