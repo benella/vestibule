@@ -1,7 +1,7 @@
 import logging
 import re
 from typing import Tuple, List
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.utils import timezone
 from collections import defaultdict
 
@@ -14,7 +14,7 @@ from feeds.models import Feed
 from feeds.feet_item import FeedItem
 from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
-from common import Quality, Source
+from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import get_next_episode
 
@@ -296,8 +296,8 @@ class Show(models.Model):
             with TVDBVestibuleClient() as tvdb_client:
                 self.network = tvdb_client.get_show_original_network(self.imdb_id)
 
-        self.poster_link = imdb_show_data.get("full-size cover url")
-        self.thumbnail_link = imdb_show_data.get("cover url")
+        self.poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
+        self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
         self.number_of_seasons = imdb_show_data.get("number of seasons")
         self.year = imdb_show_data.get("year", "Unknown Year")
         self.generate_lookup_names(imdb_show_data)
