@@ -18,7 +18,7 @@ class TorrentList(generic.TemplateView):
             download_status=Torrent.DOWNLOADING).order_by("-percent_done")
 
         context['seeding'] = Torrent.objects.all().filter(
-            download_status=Torrent.READY).order_by("modified")
+            download_status=Torrent.READY).order_by("-modified")
 
         found_shows = [show for show in Show.objects.all() if show.last_torrent_found is not None]
         context['recently_found'] = sorted(found_shows, key=lambda s: s.last_torrent_found, reverse=True)
