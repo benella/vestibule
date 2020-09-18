@@ -142,7 +142,7 @@ class TransmissionClient:
         """
         transmission_torrent_id = int(torrent_info.get('id'))
         try:
-            percent_done = int(torrent_info.get('percent_done')) * 100
+            percent_done = int(torrent_info.get('percent_done') * 100)
         except ValueError:
             percent_done = 0
 
