@@ -11,8 +11,12 @@
     <div class="dashboard-models">
         <div class="dashboard-model">
             <p class="dashboard-model-title">Downloading</p>
-            <div class="dashboard-model-entries">
 
+            {% if not downloading %}
+                <p class="no-found">No downloading Torrents found</p>
+            {% endif %}
+
+            <div class="dashboard-model-entries">
             {% for torrent in downloading %}
                 <a href="{% url "shows:details" slug=torrent.show.slug %}">
                 <div class="dashboard-model-entry">
@@ -36,8 +40,12 @@
 
         <div class="dashboard-model">
             <p class="dashboard-model-title">Seeding</p>
-            <div class="dashboard-model-entries">
 
+            {% if not seeding %}
+                <p class="no-found">No seeding Torrents found</p>
+            {% endif %}
+
+            <div class="dashboard-model-entries">
             {% for torrent in seeding %}
                 <a href="{% url "shows:details" slug=torrent.show.slug %}">
                 <div class="dashboard-model-entry">

@@ -5,6 +5,7 @@ from datetime import timedelta
 from requests.exceptions import ConnectionError
 from pathlib import Path
 
+from django.db.models import Q
 from common import ip_utils
 from plex_manager.plex_client import PlexClient
 from notifications import pushover
@@ -198,3 +199,18 @@ class TransmissionClient:
 
         for torrent_info in torrents:
             self.update_torrent(torrent_info)
+
+
+
+    def clear_inactive_torrents(self):
+        """
+        Setting status Stopped for Vestibule torrents with status Downloading or Ready not found in Transmission
+        """
+        transmission_torrents_ids = [transmission_torrent.get("id") for transmission_torrent in self.list_torrents()]
+        vestibule_torrents = Torrent.objects.all().filter(
+            Q(download_status=Torrent.READY) | Q(download_status=Torrent.DOWNLOADING))
+
+        for torrent in vestibule_torrents:
+            if torrent.transmission_torrent_id not in transmission_torrents_ids:
+                print(f"Setting status Stopped for {torrent} - not found on Transmission")
+                torrent.update_download_status(Torrent.STOPPED)

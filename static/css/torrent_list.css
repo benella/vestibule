@@ -7,3 +7,7 @@
 .section-divider {
     height: 5rem;
 }
+
+.no-found {
+    color: #797974;
+}
