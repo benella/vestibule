@@ -1,0 +1,116 @@
+{% extends "main.html" %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/dashboard.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/torrent_list.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{% static "js/show_list.js" %}"></script>
+{% endblock %}
+
+{% block main_panel %}
+    <div class="dashboard-models">
+        <div class="dashboard-model">
+            <p class="dashboard-model-title">Downloading</p>
+            <div class="dashboard-model-entries">
+
+            {% for torrent in downloading %}
+                <a href="{% url "shows:details" slug=torrent.show.slug %}">
+                <div class="dashboard-model-entry">
+                    <div class="poster-strip">
+                        <div class="progress-bar-progress" style="width: {{ torrent.percent_done }}%"></div>
+                    </div>
+                    <p class="dashboard-model-entry-title">{{ torrent.short_title }}</p>
+                    <p class="dashboard-model-entry-text">{{ torrent.quality }}
+                        <span class="bullet">•</span>
+                        <span>{{ torrent.feed }}</span>
+                        <span class="bullet">•</span>
+                        <span>{{ torrent.source_type }}</span>
+                        <span class="bullet">•</span>
+                        <span>{{ torrent.percent_done }}%</span>
+                    </p>
+                </div>
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-model">
+            <p class="dashboard-model-title">Seeding</p>
+            <div class="dashboard-model-entries">
+
+            {% for torrent in seeding %}
+                <a href="{% url "shows:details" slug=torrent.show.slug %}">
+                <div class="dashboard-model-entry">
+                    <div class="poster-strip"></div>
+                    <p class="dashboard-model-entry-title">{{ torrent.short_title }}</p>
+                    <p class="dashboard-model-entry-text">{{ torrent.quality }}
+                        <span class="bullet">•</span>
+                        <span>{{ torrent.feed }}</span>
+                        <span class="bullet">•</span>
+                        <span>{{ torrent.source_type }}</span>
+                    </p>
+                </div>
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="dashboard-models">
+        <div class="dashboard-model">
+            <p class="dashboard-model-title">Recent Activity</p>
+            <div class="dashboard-model-entries">
+            {% for show in recent_activity %}
+                <a href="{% url "shows:details" slug=show.slug %}">
+                <div class="dashboard-model-entry">
+                    <div class="poster-strip">
+                        <img onload="update_show_palette(this)" class="strip-img" src="{{ show.thumbnail_link }}" hidden>
+                    </div>
+                    <p class="dashboard-model-entry-title">{{ show.title }}</p>
+                    {% for torrent in show.last_active_torrents %}
+                        <p class="dashboard-model-entry-text">{{ torrent.season_episode_title }}
+                            <span class="bullet">•</span>
+                            <span>{{ torrent.quality }}</span>
+                            <span class="bullet">•</span>
+                            <span class="torrent-download-status">{{ torrent.download_status_display }}</span>
+                        </p>
+                        <p class="dashboard-model-time">{{ torrent.modified|date:"F j, Y, G:i" }}</p>
+                    {% endfor %}
+
+                </div>
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-model">
+            <p class="dashboard-model-title">Recently Found Torrents</p>
+            <div class="dashboard-model-entries">
+            {% for show in recently_found %}
+                <a href="{% url "shows:details" slug=show.slug %}">
+                <div class="dashboard-model-entry">
+                    <div class="poster-strip">
+                        <img onload="update_show_palette(this)" class="strip-img" src="{{ show.thumbnail_link }}" hidden>
+                    </div>
+                    <p class="dashboard-model-entry-title">{{ show.title }}
+                        {% for torrent in show.last_found_torrents %}
+                            <p class="dashboard-model-entry-text">{{ torrent.season_episode_title }}
+                                <span class="bullet">•</span>
+                                <span>{{ torrent.quality }}</span>
+                                <span class="bullet">•</span>
+                                <span>{{ torrent.feed }}</span>
+                            </p>
+                            <p class="dashboard-model-time">{{ torrent.created|date:"F j, Y, G:i" }}</p>
+                        {% endfor %}
+                    </p>
+                </div>
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

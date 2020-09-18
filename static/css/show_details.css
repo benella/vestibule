@@ -214,17 +214,17 @@
 }
 
 .torrent-action:hover {
-    background-color: #3f9359;
+    background-color: var(--torrent-green);
 }
 
 .torrent-downloaded {
-    background-color: #3f9359;
+    background-color: var(--torrent-green);
 }
 
 .torrent-progress {
     position: absolute;
     height: 0;
-    background-color: #3f9359;
+    background-color: var(--torrent-green);
     width: 100%;
     bottom: 0;
 }
