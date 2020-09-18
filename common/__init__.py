@@ -1,6 +1,9 @@
 import math
 from dataclasses import dataclass
 from collections import OrderedDict
+from VestibuleServer.settings import STATIC_URL
+
+DEFAULT_POSTER = f"{STATIC_URL}/images/vestibule_default-13.jpg"
 
 
 @dataclass

@@ -50,3 +50,6 @@ class TVDBVestibuleClient:
         except ConnectionRefusedError as e:
             print("Failed connecting to tvdb: ", e)
             return ""
+
+        except LookupError:
+            return ""
