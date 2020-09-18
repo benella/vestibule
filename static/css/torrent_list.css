@@ -1,0 +1,9 @@
+
+.progress-bar-progress {
+    background-color: var(--torrent-green);
+    height: 100%;
+}
+
+.section-divider {
+    height: 5rem;
+}

@@ -4,6 +4,9 @@
     --secondary-color: #C8C9C0;
     --trasparent-light: #e1e2d666;
     --trasparent-semi-light: rgba(225, 226, 214, 0.65);
+    --torrent-green: #3f9359;
+    --main-back: #e3e4db;
+    --main-back-dark: #bfbfb8
 }
 
 * {
@@ -15,7 +18,7 @@
 }
 
 body {
-    background-color: #e3e4db;
+    background-color: var(--main-back);
 }
 
 a {
