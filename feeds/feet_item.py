@@ -34,7 +34,7 @@ class ShowTorrentValues:
 class FeedItem:
 
     SHOW_TORRENT_RE = re.compile(
-        r"(?P<title>[\w.]+).(S(?P<season>\d\d))(E(?P<episode>\d\d))?(.(?P<episode_name>[\w.]+))?"
+        r"(?P<title>[\w.]+).(S(?P<season>\d\d))(E(?P<episode>\d\d))?(.(?P<episode_name>[\w.-]+))?"
         r"((?P<quality>.\d\d\d\d?p)).(?P<source>[\w\.-]+)")
 
     def __init__(self, raw_title: str, link: str, publication_time: str, feed: 'Feed'):
