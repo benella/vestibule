@@ -22,7 +22,7 @@ class RarbgTorrentsAPIFeed(TorrentsAPIFeed):
 
     def __init__(self):
         self._client = None
-        self._last_api_request = time.time() - self.API_REQUEST_GAP
+        self._last_api_request = time.time()
 
     def __enter__(self):
         self._client = rarbgapi.RarbgAPI()
