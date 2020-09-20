@@ -11,7 +11,11 @@
     <p class="feed-details">
         <span>Priority {{ feed.priority }}</span>
         <span class="bullet">•</span>
-        <a target="_blank" href="{{ feed.rss_url }}" class="rss-link">RSS Feed</a>
+        {% if feed.api_feed %}
+            <span>API Feed</span>
+        {% else %}
+            <a target="_blank" href="{{ feed.rss_url }}" class="rss-link">RSS Feed</a>
+        {% endif %}
     </p>
 
     <div class="feed-data">
