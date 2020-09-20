@@ -17,6 +17,7 @@ from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import get_next_episode
+from api_feeds import search_feeds_by_imdb_id
 
 logger = logging.getLogger(__name__)
 
@@ -207,6 +208,10 @@ class Show(models.Model):
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
 
+    @property
+    def formatted_imdb_id(self):
+        return f"tt{self.imdb_id}"
+
     def generate_lookup_names(self, imdb_show_data: dict):
         """
         Creates list of possible torrent show titles, and keeps it
@@ -332,6 +337,8 @@ class Show(models.Model):
             torrents = list()
             for feed in Feed.objects.all():
                 torrents += feed.read_feed()
+
+        torrents += search_feeds_by_imdb_id(imdb_id=self.formatted_imdb_id)
 
         relevant_items = list()
         lookup_names = self.get_lookup_names_list()

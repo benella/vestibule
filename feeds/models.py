@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class Feed(models.Model):
     name = models.CharField(max_length=40)
     rss_url = models.URLField()
+    api_feed = models.BooleanField(default=False)
     last_read = models.DateTimeField(blank=True, null=True)
     feed_time_format = models.CharField(max_length=256, default="", blank=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
@@ -34,6 +35,9 @@ class Feed(models.Model):
         """
         Read RSS feed, and return a a list of FeedItem
         """
+        if self.api_feed:
+            return []
+
         feed = requests.get(self.rss_url)
         root = ET.fromstring(feed.text)
         feed_items = list()
