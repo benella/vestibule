@@ -37,12 +37,15 @@ class RarbgTorrentsAPIFeed(TorrentsAPIFeed):
         Making client requests while keeping 1 request / 2 seconds
         """
         sleep_time = (self._last_api_request + self.API_REQUEST_GAP) - time.time()
-        print(sleep_time)
         if sleep_time > 0:
             time.sleep(sleep_time)
 
         try:
             result = method(**arguments)
+            if not result:
+                time.sleep(self.API_REQUEST_GAP * 2)
+                result = method(**arguments)
+
         except ValueError as e:
             logger.warning(f"Got error: {str(e)}")
             result = []
