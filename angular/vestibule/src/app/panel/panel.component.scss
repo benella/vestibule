@@ -1,0 +1,77 @@
+@import "../../styling/variables";
+
+#panel {
+    width: 12.5rem;
+    padding: 3rem 0 0 1.5rem;
+    background-color: $transparent-light;
+    height: calc(100vh - 2rem);
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+#vestibule-home {
+  margin-bottom: 3rem;
+}
+
+.acier-title {
+    font-family: acier-bat-noir, sans-serif;
+    font-size: 2.5em;
+}
+
+.side-panel-divider {
+    background-color: $transparent-semi-light;
+    height: 3px;
+    width: 85%;
+    margin: 2rem 0;
+    transition: 0.4s;
+}
+
+.side-panel-links {
+    padding: 0 0 0 0.5rem;
+}
+
+.side-panel-link {
+    font-size: 1.1em;
+    margin: 5px 0;
+    transition: 0.3s;
+    display: block;
+    color: inherit;
+}
+
+.side-panel-link:hover {
+    color: #757575;
+    transform: translate(4px, 0);
+}
+
+#strip {
+    width: 27rem;
+    opacity: 0.5;
+    height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    left: 0rem;
+    top: 0;
+    z-index: -1;
+}
+
+#strip-img {
+    -webkit-filter: blur(7px);
+    -moz-filter: blur(7px);
+    -o-filter: blur(7px);
+    -ms-filter: blur(5px);
+    filter: blur(30px);
+    height: 106%;
+    width: 130%;
+    position: absolute;
+    left: -2.5rem;
+    top: -20px;
+}
+
+#strip-cover {
+    height: 100%;
+    width: 13rem;
+    position: fixed;
+    left: 14rem;
+    background: linear-gradient(90deg, rgba(227,228,219,0.7) 0%, rgba(227,228,219,1) 100%);
+}

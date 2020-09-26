@@ -26,6 +26,10 @@ class Home(generic.TemplateView):
         return context
 
 
+class Angular(generic.TemplateView):
+    template_name = "index.html"
+
+
 @csrf_exempt
 def service_status(request):
     if request.method != "POST":

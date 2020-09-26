@@ -1,0 +1,31 @@
+@import "https://use.typekit.net/gki7zvg.css";
+@import "styling/variables";
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: halyard-display, sans-serif;
+    font-weight: 400;
+    color: #333333;
+}
+
+body {
+    background-color: $main-back;
+}
+
+a {
+    text-decoration: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+.bullet {
+    font-family: -webkit-pictograph monospace;
+    display: inline-block;
+    margin: 0 5px;
+}
