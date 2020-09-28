@@ -1,0 +1,55 @@
+@import "../../../styling/variables";
+
+#services-status-box {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 4rem;
+    width: 14rem;
+    display: flex;
+    justify-content: center;
+    background-color: $transparent-light;
+}
+
+.service-wrap {
+  padding: 0.7rem;
+  width: 3rem;
+  position: relative;
+
+  .service-icon {
+    display: block;
+    height: 35px;
+    margin: 3px auto 0;
+    opacity: 0.5;
+    transition: 0.3s;
+  }
+
+  &:hover.service-active .service-icon {
+    opacity: 0.9;
+  }
+}
+
+
+.service-wrap:hover.service-active .service-icon {
+    opacity: 1;
+}
+
+.service-status-bar {
+    background-color: #7f7f7f;
+    transition: background-color 0.3s linear;
+    height: 3px;
+    width: 65%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 40;
+}
+
+.service-up .service-status-bar {
+    background-color: #3f9359;
+}
+
+.service-down .service-status-bar {
+    background-color: #AF4F68;
+}

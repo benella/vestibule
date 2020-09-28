@@ -10,7 +10,11 @@
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.png" %}">
 </head>
 <body>
-  <app-root>Vestibule Loading</app-root>
+  <app-root><img
+          alt="Loading"
+          src="{% static "images/favicon.png" %}"
+          style="height: 50px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%)"
+  ></app-root>
   <script src="{% static 'angular/runtime.js' %}" defer></script>
   <script src="{% static 'angular/polyfills.js' %}" defer></script>
   <script src="{% static 'angular/styles.js' %}" defer></script>

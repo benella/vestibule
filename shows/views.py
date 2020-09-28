@@ -1,8 +1,9 @@
-from django.http import JsonResponse
 from .models import Show
 from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+from .serializers import ShowListItemSerializer, ShowDetailsSerializer
 
 from imdb import IMDb
 
@@ -64,3 +65,21 @@ class ShowDetails(generic.DetailView):
 class ShowList(generic.ListView):
     model = Show
     template_name = "show/show_list.html"
+
+
+class ListShows(generic.ListView):
+    model = Show
+
+    def get(self, request, *args, **kwargs):
+        shows = self.get_queryset()
+        serializer = ShowListItemSerializer(shows, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+
+class GetShow(generic.DetailView):
+    model = Show
+
+    def get(self, request, *args, **kwargs):
+        serializer = ShowDetailsSerializer(self.get_object())
+        return JsonResponse(serializer.data, safe=False)

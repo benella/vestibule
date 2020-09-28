@@ -1,0 +1,23 @@
+<section id="services-status-box">
+
+  <!--  Plex Status -->
+  <a class="service-wrap service-active"
+     [ngClass]="{'service-up': plexStatus?.up, 'service-down': !plexStatus?.up}"
+     target="_blank" href="{{plexStatus?.url}}">
+
+    <div class="service-status-bar"></div>
+    <img class="service-icon" alt="Plex is {{plexStatus?.up ? 'Up' : 'Down'}}"
+         src="/static/images/plex_icon.svg">
+  </a>
+
+  <!--  Transmission Status -->
+  <a class="service-wrap service-active"
+     [ngClass]="{'service-up': transmissionStatus?.up, 'service-down': !transmissionStatus?.up}"
+     target="_blank" href="{{transmissionStatus?.url}}">
+
+    <div class="service-status-bar"></div>
+    <img class="service-icon" alt="Transmission is {{transmissionStatus?.up ? 'Up' : 'Down'}}"
+         src="/static/images/transmission_icon.svg">
+  </a>
+
+</section>

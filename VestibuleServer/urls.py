@@ -20,10 +20,12 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^shows/', include(('shows.urls', 'shows'), namespace='shows')),
-    url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
-    url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
-    url(r'^services$', views.services, name="services"),
-    url(r'^service-status$', views.service_status, name="service-status"),
+    url(r'^api/shows/', include(('shows.urls', 'shows'), namespace='shows')),
+    # url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
+    # url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
+    url(r'^api/services-status$', views.services_status, name="services-status"),
+    path('api-auth/', include('rest_framework.urls')),
+
     url(r'^$', views.Angular.as_view(), name='home'),
+    url(r'^(?P<path>.*)$', views.Angular.as_view(), name='angular'),
 ]

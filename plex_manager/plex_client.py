@@ -36,6 +36,7 @@ class PlexClient:
 
     def status(self) -> dict:
         return {
+            "name": "plex",
             "up": self.is_up,
             "url": self._base_url
         }

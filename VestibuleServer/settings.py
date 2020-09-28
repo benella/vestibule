@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'vestibule.apps.VestibuleConfig',
     'shows.apps.ShowsConfig',
     'torrents.apps.TorrentsConfig',

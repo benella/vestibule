@@ -1,13 +1,13 @@
 <section id="panel">
 
   <div id="vestibule-home">
-    <a href="/" class="acier-title">VESTIBULE</a>
+    <a [routerLink]="'/dashboard'" class="acier-title">VESTIBULE</a>
   </div>
 
   <div id="main-links-box">
 
       <section class="side-panel-links">
-          <a href="/" class="side-panel-link">Shows</a>
+          <a [routerLink]="'/shows'" class="side-panel-link">Shows</a>
           <a href="/" class="side-panel-link">Feeds</a>
           <a href="/" class="side-panel-link">Torrents</a>
       </section>
@@ -19,6 +19,8 @@
       </section>
 
   </div>
+
+  <vestibule-services-status></vestibule-services-status>
 
 </section>
 
