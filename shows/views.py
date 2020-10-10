@@ -3,7 +3,12 @@ from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from .serializers import ShowListItemSerializer, ShowDetailsSerializer
+from rest_framework import generics
+from rest_framework import viewsets
+
+from .serializers import ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer
+from torrents.serializers import TorrentSerializer
+from torrents.models import Torrent
 
 from imdb import IMDb
 
@@ -52,34 +57,31 @@ class AddShowView(generic.CreateView):
         return reverse("shows:details", kwargs={'slug': self.object.slug})
 
 
-class ShowDetails(generic.DetailView):
-    model = Show
-    template_name = "show/show_details.html"
-
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data["shows"] = Show.objects.all()
-        return context_data
+class ShowList(generics.ListAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowListItemSerializer
 
 
-class ShowList(generic.ListView):
-    model = Show
-    template_name = "show/show_list.html"
+class ShowListCreate(generics.ListCreateAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowCreateSerializer
 
 
-class ListShows(generic.ListView):
-    model = Show
-
-    def get(self, request, *args, **kwargs):
-        shows = self.get_queryset()
-        serializer = ShowListItemSerializer(shows, many=True)
-        return JsonResponse(serializer.data, safe=False)
+class ShowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowDetailsSerializer
+    lookup_field = "slug"
 
 
+class ShowTorrentsList(generics.ListAPIView):
+    queryset = Torrent.objects.all()
+    serializer_class = TorrentSerializer
 
-class GetShow(generic.DetailView):
-    model = Show
+    def get_queryset(self):
+        return self.queryset.filter(show__slug=self.kwargs.get('show_slug'))
 
-    def get(self, request, *args, **kwargs):
-        serializer = ShowDetailsSerializer(self.get_object())
-        return JsonResponse(serializer.data, safe=False)
+
+class ShowViewSet(viewsets.ModelViewSet):
+    queryset = Show.objects.all()
+    serializer_class = ShowDetailsSerializer
+    lookup_field = 'slug'

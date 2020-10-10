@@ -1,5 +1,5 @@
-// Vestibule service status interface
-export class ServiceStatus {
+
+export interface ServiceStatus {
   name: string;
   up: boolean;
   url: string;

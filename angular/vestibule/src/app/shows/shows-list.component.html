@@ -1,1 +1,8 @@
-<p>shows-list works!</p>
+<section id="show-list">
+
+    <a *ngFor="let show of shows" [routerLink]="shows"><div class="show">
+        <p class="show-title">{{ show.title }}</p>
+        <vestibule-poster-strip [posterUrl]="show.thumbnail_link"></vestibule-poster-strip>
+    </div></a>
+
+</section>

@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Show
+from .models import Show, ShowProfile
+
+
+class ShowProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShowProfile
+        fields = '__all__'
 
 
 class ShowListItemSerializer(serializers.ModelSerializer):
@@ -8,7 +14,15 @@ class ShowListItemSerializer(serializers.ModelSerializer):
         fields = ['imdb_id', 'title', 'year', 'network', 'thumbnail_link']
 
 
+class ShowCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Show
+        fields = ['imdb_id']
+
+
 class ShowDetailsSerializer(serializers.ModelSerializer):
+    profile = ShowProfileSerializer(read_only=True)
+
     class Meta:
         model = Show
         fields = ['imdb_id',
@@ -23,5 +37,6 @@ class ShowDetailsSerializer(serializers.ModelSerializer):
                   'poster_link',
                   'thumbnail_link',
                   'profile',
-                  'lookup_names'
+                  'lookup_names',
+                  'formatted_imdb_id',
                   ]

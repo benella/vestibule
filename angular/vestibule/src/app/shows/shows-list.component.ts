@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {ShowsService} from "./shows.service";
+import {ShowInList} from "./show";
 
 @Component({
   selector: 'vestibule-shows-list',
@@ -6,10 +8,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./shows-list.component.scss']
 })
 export class ShowsListComponent implements OnInit {
-
-  constructor() { }
+  shows: ShowInList[]
+  constructor(private showsService: ShowsService) { }
 
   ngOnInit(): void {
+    this.showsService.listShows().subscribe(
+      data => this.shows = data
+    )
   }
 
 }
