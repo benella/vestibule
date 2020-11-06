@@ -2,7 +2,7 @@
 
     <a *ngFor="let show of shows" [routerLink]="shows"><div class="show">
         <p class="show-title">{{ show.title }}</p>
-        <vestibule-poster-strip [posterUrl]="show.thumbnail_link"></vestibule-poster-strip>
+        <vestibule-poster-strip [paletteList]="show.palette_list"></vestibule-poster-strip>
     </div></a>
 
 </section>

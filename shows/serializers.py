@@ -11,7 +11,7 @@ class ShowProfileSerializer(serializers.ModelSerializer):
 class ShowListItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Show
-        fields = ['imdb_id', 'title', 'year', 'network', 'thumbnail_link']
+        fields = ['imdb_id', 'title', 'year', 'network', 'thumbnail_link', 'palette_list']
 
 
 class ShowCreateSerializer(serializers.ModelSerializer):
@@ -36,6 +36,7 @@ class ShowDetailsSerializer(serializers.ModelSerializer):
                   'next_episode_time_code',
                   'poster_link',
                   'thumbnail_link',
+                  'palette_list',
                   'profile',
                   'lookup_names',
                   'formatted_imdb_id',

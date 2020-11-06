@@ -7,3 +7,4 @@ transmission-clutch==2.0.3
 PlexAPI==3.3.0
 tvdb-api-client==0.4.0
 RarbgAPI==0.4.2
+colorgram.py==1.2.0

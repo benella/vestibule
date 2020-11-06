@@ -5,4 +5,5 @@ export interface ShowInList {
   year: string
   network: string
   thumbnail_link: string
+  palette_list: number[][]
 }

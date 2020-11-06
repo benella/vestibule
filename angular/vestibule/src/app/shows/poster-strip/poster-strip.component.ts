@@ -6,12 +6,16 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./poster-strip.component.scss']
 })
 export class PosterStripComponent implements OnInit {
-  @Input() posterUrl: string
+  @Input() paletteList: number[][]
+  public mainColor: string
   constructor() { }
 
   ngOnInit(): void {
-    console.log(this.posterUrl);
-
+    if (this.paletteList.length) {
+      this.mainColor = `rgb(${this.paletteList[0][0]}, ${this.paletteList[0][1]}, ${this.paletteList[0][2]})`
+    } else {
+      this.mainColor = `rgb(93, 108, 172)`
+    }
   }
 
 }

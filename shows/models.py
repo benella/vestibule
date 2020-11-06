@@ -1,14 +1,19 @@
 import logging
 import re
+import requests
 from typing import Tuple, List
 from datetime import timedelta
-from django.utils import timezone
 from collections import defaultdict
+from io import BytesIO
 
+from django.utils import timezone
 from django.db import models
 from django.utils.text import slugify
 from django.contrib import messages
 
+import json
+from colorgram import extract
+from PIL import Image
 from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
@@ -180,6 +185,7 @@ class Show(models.Model):
     next_episode_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
     poster_link = models.URLField(default="", blank=True)
     thumbnail_link = models.URLField(default="", blank=True)
+    palette = models.CharField(max_length=256, default="", blank=True, null=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
     lookup_names = models.TextField(default="", blank=True, null=True)
@@ -211,6 +217,12 @@ class Show(models.Model):
     @property
     def formatted_imdb_id(self):
         return f"tt{self.imdb_id}"
+
+    @property
+    def palette_list(self) -> List[List[int]]:
+        if self.palette:
+            return json.loads(self.palette)
+        return []
 
     def generate_lookup_names(self, imdb_show_data: dict):
         """
@@ -303,6 +315,7 @@ class Show(models.Model):
 
         self.poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
         self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
+        self.extract_palette()
         self.number_of_seasons = imdb_show_data.get("number of seasons")
         self.year = imdb_show_data.get("year", "Unknown Year")
         self.generate_lookup_names(imdb_show_data)
@@ -311,6 +324,14 @@ class Show(models.Model):
             self.runtime = imdb_show_data.get("runtimes")[0]
         except (KeyError, TypeError):
             pass
+
+    def extract_palette(self):
+        if not self.thumbnail_link:
+            return
+        response = requests.get(self.thumbnail_link)
+        img = Image.open(BytesIO(response.content))
+        colors = extract(img, 3)
+        self.palette = str([[color.rgb.r, color.rgb.g, color.rgb.b] for color in colors])
 
     def update_show_info(self, request=None):
         self.update_show_meta_data()

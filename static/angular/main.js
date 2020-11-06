@@ -49,7 +49,7 @@ function ShowsListComponent_a_1_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](show_r1.title);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("posterUrl", show_r1.thumbnail_link);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("paletteList", show_r1.palette_list);
 } }
 class ShowsListComponent {
     constructor(showsService) {
@@ -60,7 +60,7 @@ class ShowsListComponent {
     }
 }
 ShowsListComponent.ɵfac = function ShowsListComponent_Factory(t) { return new (t || ShowsListComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shows_service__WEBPACK_IMPORTED_MODULE_1__["ShowsService"])); };
-ShowsListComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowsListComponent, selectors: [["vestibule-shows-list"]], decls: 2, vars: 1, consts: [["id", "show-list"], [3, "routerLink", 4, "ngFor", "ngForOf"], [3, "routerLink"], [1, "show"], [1, "show-title"], [3, "posterUrl"]], template: function ShowsListComponent_Template(rf, ctx) { if (rf & 1) {
+ShowsListComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowsListComponent, selectors: [["vestibule-shows-list"]], decls: 2, vars: 1, consts: [["id", "show-list"], [3, "routerLink", 4, "ngFor", "ngForOf"], [3, "routerLink"], [1, "show"], [1, "show-title"], [3, "paletteList"]], template: function ShowsListComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "section", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, ShowsListComponent_a_1_Template, 5, 3, "a", 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
@@ -234,20 +234,28 @@ ShowsService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInje
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PosterStripComponent", function() { return PosterStripComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "ofXK");
 
 
+
+const _c0 = function (a0) { return { backgroundColor: a0 }; };
 class PosterStripComponent {
     constructor() { }
     ngOnInit() {
-        console.log(this.posterUrl);
+        if (this.paletteList.length) {
+            this.mainColor = `rgb(${this.paletteList[0][0]}, ${this.paletteList[0][1]}, ${this.paletteList[0][2]})`;
+        }
+        else {
+            this.mainColor = `rgb(93, 108, 172)`;
+        }
     }
 }
 PosterStripComponent.ɵfac = function PosterStripComponent_Factory(t) { return new (t || PosterStripComponent)(); };
-PosterStripComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: PosterStripComponent, selectors: [["vestibule-poster-strip"]], inputs: { posterUrl: "posterUrl" }, decls: 2, vars: 0, template: function PosterStripComponent_Template(rf, ctx) { if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "p");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "poster-strip works!");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-    } }, styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL3Nob3dzL3Bvc3Rlci1zdHJpcC9wb3N0ZXItc3RyaXAuY29tcG9uZW50LnNjc3MifQ== */"] });
+PosterStripComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: PosterStripComponent, selectors: [["vestibule-poster-strip"]], inputs: { paletteList: "paletteList" }, decls: 1, vars: 3, consts: [[1, "poster-strip", 3, "ngStyle"]], template: function PosterStripComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "div", 0);
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngStyle", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](1, _c0, ctx.mainColor));
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["NgStyle"]], styles: [".poster-strip[_ngcontent-%COMP%] {\n  overflow: hidden;\n  position: relative;\n  height: 3px;\n  width: 5rem;\n  background-color: var(--secondary-color);\n  transition: 0.3s;\n  opacity: 0.6;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hvd3MvcG9zdGVyLXN0cmlwL3Bvc3Rlci1zdHJpcC5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGdCQUFBO0VBQ0Esa0JBQUE7RUFDQSxXQUFBO0VBQ0EsV0FBQTtFQUNBLHdDQUFBO0VBQ0EsZ0JBQUE7RUFDQSxZQUFBO0FBQ0oiLCJmaWxlIjoic3JjL2FwcC9zaG93cy9wb3N0ZXItc3RyaXAvcG9zdGVyLXN0cmlwLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLnBvc3Rlci1zdHJpcCB7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgICBwb3NpdGlvbjogcmVsYXRpdmU7XG4gICAgaGVpZ2h0OiAzcHg7XG4gICAgd2lkdGg6IDVyZW07XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tc2Vjb25kYXJ5LWNvbG9yKTtcbiAgICB0cmFuc2l0aW9uOiAwLjNzO1xuICAgIG9wYWNpdHk6IDAuNjtcbn1cbiJdfQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](PosterStripComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -255,7 +263,7 @@ PosterStripComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
                 templateUrl: './poster-strip.component.html',
                 styleUrls: ['./poster-strip.component.scss']
             }]
-    }], function () { return []; }, { posterUrl: [{
+    }], function () { return []; }, { paletteList: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
         }] }); })();
 
