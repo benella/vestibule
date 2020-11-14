@@ -12,8 +12,7 @@ from django.utils.text import slugify
 from django.contrib import messages
 
 import json
-from colorgram import extract
-from PIL import Image
+from colorthief import ColorThief
 from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
@@ -329,9 +328,8 @@ class Show(models.Model):
         if not self.thumbnail_link:
             return
         response = requests.get(self.thumbnail_link)
-        img = Image.open(BytesIO(response.content))
-        colors = extract(img, 3)
-        self.palette = str([[color.rgb.r, color.rgb.g, color.rgb.b] for color in colors])
+        color_thief = ColorThief(BytesIO(response.content))
+        self.palette = str([list(color) for color in color_thief.get_palette(color_count=2)])
 
     def update_show_info(self, request=None):
         self.update_show_meta_data()

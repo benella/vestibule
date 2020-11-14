@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {ShowsService} from "./shows.service";
-import {ShowInList} from "./show";
+import { ShowsService } from "./shows.service";
+import { ShowInList } from "./show";
 
 @Component({
   selector: 'vestibule-shows-list',

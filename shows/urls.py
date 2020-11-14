@@ -6,7 +6,7 @@ urlpatterns = [
     url(r'^list$', views.ShowList.as_view(), name='list'),
     url(r'^list_create$', views.ShowListCreate.as_view(), name='list_create'),
     url(r'^(?P<show_slug>.+)/torrents$', views.ShowTorrentsList.as_view(), name='torrents'),
-    url(r'^(?P<slug>.+)$', views.ShowRetrieveUpdateDestroy.as_view(), name='detail'),
+    url(r'^(?P<imdb_id>.+)$', views.ShowRetrieveUpdateDestroy.as_view(), name='detail'),
 
     url(r'^search/(?P<title>.+)$', views.search_show, name='search-show'),
     url(r'^find_torrents/(?P<title>.+)$', views.find_torrents, name='find-torrents'),

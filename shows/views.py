@@ -70,7 +70,7 @@ class ShowListCreate(generics.ListCreateAPIView):
 class ShowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Show.objects.all()
     serializer_class = ShowDetailsSerializer
-    lookup_field = "slug"
+    lookup_field = "imdb_id"
 
 
 class ShowTorrentsList(generics.ListAPIView):

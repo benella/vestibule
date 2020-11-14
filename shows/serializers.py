@@ -38,6 +38,5 @@ class ShowDetailsSerializer(serializers.ModelSerializer):
                   'thumbnail_link',
                   'palette_list',
                   'profile',
-                  'lookup_names',
                   'formatted_imdb_id',
                   ]

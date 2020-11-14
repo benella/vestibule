@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PanelBackgroundService } from './panel-background/panel-background.service'
 
 @Component({
   selector: 'vestibule-panel',
@@ -6,10 +7,22 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./panel.component.scss']
 })
 export class PanelComponent implements OnInit {
+  backgroundURL: string
+  defaultBackgroundURL: string
+  isDynamicVisible = false
 
-  constructor() { }
+  constructor(private panelBackgroundService: PanelBackgroundService) { }
 
   ngOnInit(): void {
+    this.defaultBackgroundURL = this.panelBackgroundService.defaultBackgroundURL
+    this.panelBackgroundService.currentBackground.subscribe(url => {
+      if (url === ""){
+        this.isDynamicVisible = false
+      } else {
+        this.backgroundURL = url
+        this.isDynamicVisible = true
+      }
+    })
   }
 
 }
