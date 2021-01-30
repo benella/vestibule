@@ -4,7 +4,7 @@ from .shows_updater import update_shows
 
 
 def start():
-    minutes_interval = 720
+    minutes_interval = 30
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(update_shows, 'interval', minutes=minutes_interval)

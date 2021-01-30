@@ -1,0 +1,17 @@
+<ng-container *ngIf="torrents.length">
+  <div class="torrents-section-header">
+    <p (click)="toggleListOpen()">{{ title }}
+      <span [class.matching-torrents]=matchingTorrents class="torrents-count">{{torrents.length}}</span>
+      <span class="list-action"> {{openList ? 'Hide' : 'Show'}}</span>
+    </p>
+  </div>
+  <div class="torrents-section-list" *ngIf="openList">
+    <div *ngFor="let torrent of torrents" class="torrent-cont">
+      <vestibule-show-torrent
+        [show]="show"
+        [season]="season"
+        [episode]="episode"
+        [torrent]="torrent"></vestibule-show-torrent>
+    </div>
+  </div>
+</ng-container>

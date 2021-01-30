@@ -1,14 +1,14 @@
-from .models import Show
+from .models import Show, ShowProfile
 from django.views import generic
 from django.urls import reverse
-from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework.response import Response
 
-from .serializers import ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer
-from torrents.serializers import TorrentSerializer
-from torrents.models import Torrent
+from .serializers import (
+    ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer, ShowProfileSerializer, ShowTorrentsSerializer
+)
 
 from imdb import IMDb
 
@@ -36,18 +36,6 @@ def search_show(request, title):
     return JsonResponse({"filtered": filtered_results})
 
 
-def find_torrents(request, title):
-    show = Show.objects.get(slug=title)
-    show.find_show_torrents(request)
-    return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': show.slug}))
-
-
-def update_show_info(request, title):
-    show = Show.objects.get(slug=title)
-    show.update_show_info(request)
-    return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': show.slug}))
-
-
 class AddShowView(generic.CreateView):
     model = Show
     template_name = "show/add_show.html"
@@ -67,18 +55,51 @@ class ShowListCreate(generics.ListCreateAPIView):
     serializer_class = ShowCreateSerializer
 
 
+class ShowUpdateInfo(generics.RetrieveAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowDetailsSerializer
+    lookup_field = "imdb_id"
+
+    def retrieve(self, request, *args, **kwargs):
+        show = self.get_object()
+        show.update_show_info()
+        serializer = self.get_serializer(show)
+        return Response(serializer.data)
+
+
+class ShowFindTorrents(generics.RetrieveAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowDetailsSerializer
+    lookup_field = "imdb_id"
+
+    def retrieve(self, request, *args, **kwargs):
+        show = self.get_object()
+        show.find_show_torrents()
+        serializer = self.get_serializer(show)
+        return Response(serializer.data)
+
+
+class ShowProfileUpdate(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ShowProfileSerializer
+    lookup_url_kwarg = 'imdb_id'
+
+    def get_queryset(self):
+        return ShowProfile.objects.filter(show__imdb_id=self.kwargs.get('imdb_id'))
+
+    def get_object(self):
+        return self.get_queryset()[0]
+
+
 class ShowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Show.objects.all()
     serializer_class = ShowDetailsSerializer
     lookup_field = "imdb_id"
 
 
-class ShowTorrentsList(generics.ListAPIView):
-    queryset = Torrent.objects.all()
-    serializer_class = TorrentSerializer
-
-    def get_queryset(self):
-        return self.queryset.filter(show__slug=self.kwargs.get('show_slug'))
+class ShowTorrentsRetrieve(generics.RetrieveAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowTorrentsSerializer
+    lookup_field = "imdb_id"
 
 
 class ShowViewSet(viewsets.ModelViewSet):

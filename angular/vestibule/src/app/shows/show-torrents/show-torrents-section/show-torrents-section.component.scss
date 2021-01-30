@@ -1,0 +1,50 @@
+@import "../../../../styling/variables";
+
+
+.torrents-section-header {
+  padding-bottom: 2rem;
+  font-weight: 100;
+  transition: 0.3s;
+
+  p {
+    cursor: pointer;
+    color: $unselected-dark;
+    transition: inherit;
+
+    &:hover {
+      color: $black;
+
+      .torrents-count.matching-torrents {
+        color: $value-true;
+      }
+
+      .list-action {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .torrents-count {
+    color: $unselected;
+    transition: inherit;
+    display: inline-block;
+    margin-left: 0.5rem;
+  }
+
+  .list-action {
+    transition: inherit;
+    color: $unselected-dark;
+    display: inline-block;
+    margin-left: 0.5rem;
+    opacity: 0.3;
+    font-weight: 100;
+  }
+}
+
+.torrents-section-list {
+  padding-bottom: 2rem;
+}
+
+.torrent-cont {
+
+}

@@ -1,0 +1,126 @@
+@import "../../../../styling/variables";
+
+.torrent-cont {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 3px solid $black;
+}
+
+.torrent-actions-cont {
+  display: flex;
+  margin-right: 0.5rem;
+
+  .torrent-action {
+    width: 2.5rem;
+    height: 1.2rem;
+    text-align: center;
+    transition: 0.3s;
+
+    img {
+      height: 100%;
+      transition: 0.2s;
+    }
+
+    &:first-child {
+      border-radius: 0.6rem 0 0 0.6rem;
+    }
+
+    &:last-child {
+      border-radius: 0 0.6rem 0.6rem 0;
+    }
+  }
+
+  .action-download {
+    cursor: pointer;
+    background-color: #c8c9c0;
+
+    &:hover {
+      background-color: $value-true;
+    }
+  }
+
+  .action-plus {
+    cursor: pointer;
+    background-color: #a4a5a0;
+  }
+
+  .x-mode {
+    transform: rotate(45deg);
+  }
+}
+
+.torrent-details-cont {
+  display: flex;
+  padding: 0.5rem 0;
+}
+
+.torrent-title-cont {
+  .torrent-title {
+    font-weight: 400;
+  }
+
+  .torrent-publication-time {
+    display: inline-block;
+    margin-left: 1rem;
+    font-weight: 100;
+    font-size: 0.8em;
+    color: $unselected-dark;
+  }
+}
+
+.torrent-info-cont {
+  display: flex;
+  color: $light-text;
+}
+
+.torrent-tags {
+  display: flex;
+  height: 1.2rem;
+}
+
+.tag {
+  background-color: $light-text;
+  font-size: 0.8em;
+  padding: 0 0.5rem;
+
+  &:first-child {
+    border-radius: 0.6rem 0 0 0.6rem;
+  }
+
+  &:last-child {
+    border-radius: 0 0.6rem 0.6rem 0;
+  }
+
+  &:only-child {
+    border-radius: 0.6rem;
+  }
+
+  &.feed-tag {
+    background-color: #38bbe8;
+  }
+
+  &.quality-tag {
+    background-color: #ff7bac;
+  }
+
+  &.source-type-tag {
+    background-color: #fca61d;
+  }
+
+  &.download-status-tag {
+    margin-left: 0.3rem;
+    background-color: $value-true;
+  }
+
+  &.torrent-link {
+    background-color: $unselected;
+  }
+
+  &.torrent-full-name {
+    font-size: 0.7em;
+    font-weight: 100;
+    padding-top: 2px;
+    max-width: 24rem;
+    overflow: auto;
+  }
+}

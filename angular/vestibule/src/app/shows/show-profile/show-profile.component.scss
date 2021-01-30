@@ -1,0 +1,74 @@
+@import "../../../styling/variables";
+
+.profile-form-field {
+  margin-bottom: 1.5rem;
+}
+
+.profile-option-description {
+  font-size: 0.9em;
+  font-weight: 100;
+  color: $unselected;
+}
+
+.profile-form-option-select {
+  border: none;
+  background: none;
+  color: $value-true;
+}
+
+@keyframes flash_border {
+  0% {
+    border-color: $value-true;
+  }
+  50% {
+    border-color: $value-true-hover;
+  }
+  100% {
+    border-color: $value-true;
+  }
+}
+
+.profile-form-submit {
+  color: $value-true;
+  font-size: 1em;
+  margin-top: 1rem;
+  padding-bottom: 5px;
+  border: none;
+  background: none;
+  transition: 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    color: $value-true-hover;
+  }
+
+  &.disabled {
+    color: $unselected;
+    cursor: auto;
+  }
+
+  &.loading {
+    border-bottom: solid $value-true 3px;
+    animation-name: flash_border;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  &.error {
+    color: $value-false;
+  }
+}
+
+.save-error-text {
+  font-size: 0.9em;
+  color: $unselected;
+}
+
+.value-true {
+  color: $value-true;
+}
+
+.value-false {
+  color: $value-false;
+}

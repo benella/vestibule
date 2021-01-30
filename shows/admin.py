@@ -1,5 +1,5 @@
 from django.contrib import admin
-from shows.models import Show, ShowProfile
+from shows.models import Show, ShowProfile, Season, Episode
 
 
 class ShowAdmin(admin.ModelAdmin):
@@ -14,3 +14,17 @@ class ShowProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ShowProfile, ShowProfileAdmin)
+
+
+class SeasonAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Season, SeasonAdmin)
+
+
+class EpisodeAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Episode, EpisodeAdmin)

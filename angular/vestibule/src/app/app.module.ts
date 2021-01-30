@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { PanelComponent } from './panel/panel.component';
 import { ServicesStatusComponent } from './panel/services-status/services-status.component';
 import { HttpClientModule } from "@angular/common/http";
-import {ShowsModule} from "./shows/shows.module";
+import { ShowsModule } from "./shows/shows.module";
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({

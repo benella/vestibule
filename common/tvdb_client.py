@@ -53,3 +53,13 @@ class TVDBVestibuleClient:
 
         except LookupError:
             return ""
+
+    def get_show_status(self, imdb_id) -> str:
+        try:
+            return self.get_show_by_imdb_id(imdb_id).get("status", "")
+        except ConnectionRefusedError as e:
+            print("Failed connecting to tvdb: ", e)
+            return ""
+
+        except LookupError:
+            return ""

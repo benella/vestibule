@@ -9,11 +9,14 @@ import { ShowInList } from "./show";
 })
 export class ShowsListComponent implements OnInit {
   shows: ShowInList[]
+  showsByStatus: { [status: string] : ShowInList[] }
   constructor(private showsService: ShowsService) { }
 
   ngOnInit(): void {
     this.showsService.listShows().subscribe(
-      data => this.shows = data
+      data => {
+        this.shows = data
+      }
     )
   }
 

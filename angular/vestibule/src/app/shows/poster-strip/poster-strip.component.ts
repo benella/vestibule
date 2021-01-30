@@ -24,9 +24,15 @@ export class PosterStripComponent implements OnInit {
     }
   }
 
-  stripBackground(): object{
+  stripGradientBackground(): object {
     return {
       background: `linear-gradient(90deg, ${this.mainColor} 0%, ${this.secondaryColor} 100%)`
+    }
+  }
+
+  stripBackground(): object {
+    return {
+      backgroundColor: this.mainColor
     }
   }
 }

@@ -45,7 +45,7 @@
 }
 
 #strip {
-    width: 27rem;
+    width: 35rem;
     opacity: 0.5;
     height: 100vh;
     overflow: hidden;
@@ -79,8 +79,8 @@
 
 #strip-cover {
     height: 100%;
-    width: 13rem;
+    width: 21rem;
     position: fixed;
     left: 14rem;
-    background: linear-gradient(90deg, rgba(227,228,219,0.7) 0%, rgba(227,228,219,1) 100%);
+    background: linear-gradient(90deg, rgba(227,228,219,0.65) 0%, rgba(227,228,219,1) 100%);
 }
