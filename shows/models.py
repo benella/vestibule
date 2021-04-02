@@ -406,7 +406,7 @@ class Show(models.Model):
         """
         Returns True if updated
         """
-        if (not torrent.episode) or (not torrent.season) or torrent.episode_data:
+        if (not torrent.episode) or (not torrent.season) or (not torrent.season_data) or torrent.episode_data:
             return
 
         try:
