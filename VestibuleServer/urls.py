@@ -22,8 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls'), name="rest_framework"),
     url(r'^api/shows/', include(('shows.urls', 'shows'), namespace='shows')),
+    url(r'^api/torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
 
-    # url(r'^torrents/', include(('torrents.urls', 'torrents'), namespace='torrents')),
     # url(r'^feeds/', include(('feeds.urls', 'feeds'), namespace='feeds')),
     url(r'^api/services-status$', views.services_status, name="services-status"),
 

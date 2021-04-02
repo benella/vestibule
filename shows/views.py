@@ -27,22 +27,14 @@ def search_show(request, title):
         filtered_results.append({
             "title": result.get("title"),
             "year": result.get("year", "Unknown Year"),
-            "full-size cover url": result.get("cover url"),
+            "cover_url": result.get("cover url"),
+            "full_cover_url": result.get("full-size cover url"),
             "imdb_id": result.getID(),
             "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=result.getID()),
             "subscribed": result.getID() in subscribed_shows_imdb_ids
         })
 
-    return JsonResponse({"filtered": filtered_results})
-
-
-class AddShowView(generic.CreateView):
-    model = Show
-    template_name = "show/add_show.html"
-    fields = ["imdb_id"]
-
-    def get_success_url(self):
-        return reverse("shows:details", kwargs={'slug': self.object.slug})
+    return JsonResponse({"results": filtered_results})
 
 
 class ShowList(generics.ListAPIView):
@@ -50,7 +42,7 @@ class ShowList(generics.ListAPIView):
     serializer_class = ShowListItemSerializer
 
 
-class ShowListCreate(generics.ListCreateAPIView):
+class ShowSubscribe(generics.CreateAPIView):
     queryset = Show.objects.all()
     serializer_class = ShowCreateSerializer
 

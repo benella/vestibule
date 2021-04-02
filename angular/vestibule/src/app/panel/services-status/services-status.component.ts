@@ -25,8 +25,8 @@ export class ServicesStatusComponent implements OnInit, OnDestroy{
   updateServicesStatus(): void {
     this.servicesStatusService.getServicesStatus().subscribe(
       data => {
-        this.plexStatus = data["services"]["plex"];
-        this.transmissionStatus = data["services"]["transmission"];
+        this.plexStatus = data.services["plex"];
+        this.transmissionStatus = data.services["transmission"];
       }
     );
   }

@@ -23,7 +23,7 @@
       </div>
     </section>
 
-    <section id="episode-details-cont">
+    <section id="episode-details-cont" *ngIf="selectedEpisode">
       <div class="episode-details-header">
         <p class="episode-details-title">{{selectedEpisode.title}}</p>
         <p class="episode-details-subtitle-info">

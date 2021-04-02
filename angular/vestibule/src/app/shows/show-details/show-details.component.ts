@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ShowsService} from "./shows.service";
-import {ShowDetails} from "./show";
-import {PanelBackgroundService} from "../panel/panel-background/panel-background.service";
-import {LoadingButtonStatus} from "../shared/loading-button/loading-button-status";
+import {ShowsService} from "../shows.service";
+import {ShowDetails} from "../show";
+import {PanelBackgroundService} from "../../panel/panel-background/panel-background.service";
+import {LoadingButtonStatus} from "../../shared/loading-button/loading-button-status";
 import {Router} from "@angular/router"
 import {Subject} from "rxjs";
 
@@ -74,7 +74,7 @@ export class ShowDetailsComponent implements OnInit, OnDestroy {
         this.show = data
         this.findShowTorrentsStatus = LoadingButtonStatus.idle
       },
-      error => {
+      () => {
         this.findShowTorrentsStatus = LoadingButtonStatus.error
       }
     )

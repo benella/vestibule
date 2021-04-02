@@ -2,7 +2,11 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.views import generic
+from rest_framework import generics
+from rest_framework.response import Response
+
 from .models import Torrent
+from .serializers import TorrentSerializer
 from shows.models import Show
 from torrents_manager.transmission_client import TransmissionClient
 
@@ -27,6 +31,34 @@ class TorrentList(generic.TemplateView):
         context['recent_activity'] = sorted(active_shows, key=lambda s: s.last_torrent_activity, reverse=True)
 
         return context
+
+
+class DownloadTorrent(generics.RetrieveAPIView):
+    queryset = Torrent.objects.all()
+    serializer_class = TorrentSerializer
+    lookup_field = "id"
+
+    def retrieve(self, request, *args, **kwargs):
+        torrent = self.get_object()
+
+        if torrent.download_status != torrent.DOWNLOADING:
+
+            with TransmissionClient() as transmission:
+                if transmission.is_up:
+                    successful, message = transmission.download_torrent(torrent)
+                else:
+                    successful = False
+                    message = "Transmission client seems to be down"
+        else:
+            successful = False
+            message = f"{torrent} is already downloading"
+
+        serializer = self.get_serializer(torrent)
+        return Response(dict(
+            torrent=serializer.data,
+            successful=successful,
+            message=message)
+        )
 
 
 def download_torrent(request, torrent_id):

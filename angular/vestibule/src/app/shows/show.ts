@@ -1,4 +1,22 @@
 
+export interface ShowSearchResults {
+  results: ShowSearchResult[]
+}
+
+export interface ShowSearchResult {
+  title: string
+  year: string
+  cover_url: string
+  full_cover_url: string
+  imdb_id: string
+  imdb_link: string
+  subscribed: boolean
+}
+
+export interface ShowSuccessfulSubscription {
+  imdb_id: string
+}
+
 export interface ShowInList {
   imdb_id: string
   title: string

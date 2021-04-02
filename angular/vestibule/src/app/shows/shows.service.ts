@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { ShowInList, ShowDetails, ShowProfile, ShowTorrents } from "./show";
+import {
+  ShowInList,
+  ShowDetails,
+  ShowProfile,
+  ShowTorrents,
+  ShowSearchResults,
+  ShowSuccessfulSubscription
+} from "./show";
 
 @Injectable({
   providedIn: 'root'
@@ -36,5 +43,13 @@ export class ShowsService {
 
   unsubscribeFromShow(imdb_id: string): Observable<any> {
     return this.http.delete<any>(`api/shows/${imdb_id}`)
+  }
+
+  subscribeToShow(imdb_id: string): Observable<ShowSuccessfulSubscription> {
+    return this.http.post<ShowSuccessfulSubscription>(`api/shows/subscribe`, {imdb_id: imdb_id})
+  }
+
+  searchShowByTitle(searchTerm: string): Observable<ShowSearchResults> {
+    return this.http.get<ShowSearchResults>(`api/shows/search/${searchTerm}`)
   }
 }

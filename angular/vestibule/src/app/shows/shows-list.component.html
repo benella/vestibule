@@ -1,8 +1,0 @@
-<section id="show-list">
-
-    <a *ngFor="let show of shows" [routerLink]="['/shows', show.imdb_id]"><div class="show">
-        <p class="show-title">{{ show.title }}</p>
-        <vestibule-poster-strip [paletteList]="show.palette_list"></vestibule-poster-strip>
-    </div></a>
-
-</section>
