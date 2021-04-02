@@ -210,7 +210,7 @@ class Show(models.Model):
             new_profile.save()
             self.profile = new_profile
 
-        self.update_show_meta_data()
+        self.update_show_meta_data(imdb_show_data)
 
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
@@ -322,9 +322,11 @@ class Show(models.Model):
     def _show_torrents_titles(self):
         return [torrent.title for torrent in self.torrents.all()]
 
-    def update_show_meta_data(self):
-        ia = IMDb()
-        imdb_show_data = ia.get_movie(self.imdb_id)
+    def update_show_meta_data(self, imdb_show_data=None):
+
+        if imdb_show_data is None:
+            ia = IMDb()
+            imdb_show_data = ia.get_movie(self.imdb_id)
 
         with TVDBVestibuleClient() as tvdb_client:
             self.network = tvdb_client.get_show_original_network(self.imdb_id)
@@ -351,20 +353,27 @@ class Show(models.Model):
         self.palette = str([list(color) for color in color_thief.get_palette(color_count=2)])
 
     def update_show_info(self):
-        self.update_show_meta_data()
-        self.map_seasons()
+        ia = IMDb()
+        imdb_show_data = ia.get_movie(self.imdb_id)
+
+        self.update_show_meta_data(imdb_show_data)
+        self.map_seasons(imdb_show_data)
 
         for torrent in self.torrents.all():
             self.match_torrent_to_season_and_episode(torrent)
 
-        # self.status_line = show_status
+        upcoming_episodes = self.show_episodes.all().filter(is_aired=False).order_by('air_time_code')
 
-        # if next_episode:
-        #     self.next_episode_time_code = next_episode.absolute_episode_air_time_code
-        #     self.next_episode = str(next_episode)
-        # else:
-        #     self.next_episode_time_code = "9999-99-99"
-        #     self.next_episode = ""
+        if upcoming_episodes:
+            self.status_line = f"{self.status}, has {len(upcoming_episodes)} upcoming episodes"
+            next_episode = upcoming_episodes[0]
+            self.next_episode_time_code = next_episode.air_time_code
+            self.next_episode = f"{str(next_episode.season.title)} Episode {next_episode.number} " \
+                                f"- '{next_episode.title}', {next_episode.air_status}"
+        else:
+            self.status_line = f"{self.status}, no upcoming episodes"
+            self.next_episode_time_code = "9999-99-99"
+            self.next_episode = ""
 
         self.save()
 
@@ -414,9 +423,12 @@ class Show(models.Model):
         torrent.episode_data = episode
         torrent.save()
 
-    def map_seasons(self):
+    def map_seasons(self, show_imdb_data=None):
         ia = IMDb()
-        show_imdb_data = ia.get_movie(self.imdb_id)
+
+        if show_imdb_data is None:
+            show_imdb_data = ia.get_movie(self.imdb_id)
+
         ia.update(show_imdb_data, "episodes")
 
         for season_number, season_episodes in show_imdb_data["episodes"].items():
