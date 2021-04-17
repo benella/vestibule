@@ -1,6 +1,14 @@
+import {Torrent, TorrentInList} from "../torrents/torrent";
 
 export interface ShowSearchResults {
   results: ShowSearchResult[]
+}
+
+export interface Palette {
+  primary: number[]
+  light: number[]
+  dark: number[]
+  secondary?: number[]
 }
 
 export interface ShowSearchResult {
@@ -24,7 +32,21 @@ export interface ShowInList {
   status: string
   network: string
   thumbnail_link: string
-  palette_list: number[][]
+  palette_list: Palette
+}
+
+export interface ShowInUpcomingEpisodes {
+  imdb_id: string
+  title: string
+  next_episode: string
+  next_episode_time_code: string
+  next_episode_season_status: string
+  imdb_url: string
+  poster_link: string
+  thumbnail_link: string
+  palette_list: Palette
+  recent_torrents_found: TorrentInList[]
+  recent_torrents_active: TorrentInList[]
 }
 
 export interface ShowProfile {
@@ -49,7 +71,7 @@ export interface ShowDetails {
   imdb_url: string
   poster_link: string
   thumbnail_link: string
-  palette_list: number[][]
+  palette_list: Palette
   profile: ShowProfile
   formatted_imdb_id: string
 }
@@ -81,20 +103,4 @@ export interface Episode {
   air_status: string
   matching_torrents: Torrent[]
   unmatching_torrents: Torrent[]
-}
-
-export interface Torrent {
-  id: number
-  created: string
-  modified: string
-  link: string
-  title: string
-  feed: string
-  publication_time: string
-  source_type: string
-  quality: string
-  download_status: string
-  percent_done: number
-  profile_match_score: number
-  profile_match: boolean
 }

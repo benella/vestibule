@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Torrent } from "../shows/show";
-import { TorrentDownloadResponse } from "./torrent";
+import { TorrentDownloadResponse, Torrent } from "./torrent";
 import { Observable } from "rxjs";
 
 @Injectable({

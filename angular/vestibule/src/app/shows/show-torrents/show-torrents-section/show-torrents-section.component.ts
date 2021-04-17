@@ -1,5 +1,6 @@
 import {Component, Input, OnChanges, OnInit} from '@angular/core';
-import {Episode, Season, ShowDetails, Torrent} from "../../show";
+import {Episode, Season, ShowDetails } from "../../show";
+import {Torrent} from "../../../torrents/torrent";
 
 @Component({
   selector: 'vestibule-show-torrents-section',

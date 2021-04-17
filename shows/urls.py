@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     url(r'^list$', views.ShowList.as_view(), name='list'),
+    url(r'^upcoming_episodes$', views.ShowsUpcomingEpisodes.as_view(), name='upcoming_episodes'),
     url(r'^subscribe$', views.ShowSubscribe.as_view(), name='list_create'),
     url(r'^search/(?P<title>.+)$', views.search_show, name='search-show'),
     url(r'^update_profile/(?P<imdb_id>.+)$', views.ShowProfileUpdate.as_view(), name='update_profile'),

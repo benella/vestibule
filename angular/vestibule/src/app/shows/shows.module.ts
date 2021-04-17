@@ -34,6 +34,9 @@ import { AddShowComponent } from './add-show/add-show.component';
     ShowsStatusGroupComponent,
     AddShowComponent
   ],
+  exports: [
+    PosterStripComponent
+  ],
   imports: [
     CommonModule,
     BrowserModule,

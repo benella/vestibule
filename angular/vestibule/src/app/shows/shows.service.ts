@@ -7,7 +7,8 @@ import {
   ShowProfile,
   ShowTorrents,
   ShowSearchResults,
-  ShowSuccessfulSubscription
+  ShowSuccessfulSubscription,
+  ShowInUpcomingEpisodes,
 } from "./show";
 
 @Injectable({
@@ -19,6 +20,10 @@ export class ShowsService {
 
   listShows(): Observable<ShowInList[]> {
     return this.http.get<ShowInList[]>('api/shows/list')
+  }
+
+  listShowsByUpcomingEpisodes(): Observable<ShowInUpcomingEpisodes[]> {
+    return this.http.get<ShowInUpcomingEpisodes[]>('api/shows/upcoming_episodes')
   }
 
   showDetails(imdb_id: string): Observable<ShowDetails> {

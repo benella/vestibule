@@ -28,3 +28,30 @@ class TorrentSerializer(serializers.ModelSerializer):
             'profile_match_score',
             'profile_match'
         ]
+
+
+class TorrentByShowSerializer(serializers.ModelSerializer):
+
+    created = serializers.DateTimeField(format=TIME_FORMAT)
+    modified = serializers.DateTimeField(format=TIME_FORMAT)
+    feed = serializers.CharField(source='feed.name')
+    download_status = serializers.CharField(source='get_download_status_display')
+
+    class Meta:
+        model = Torrent
+        fields = [
+            'season',
+            'episode',
+            'id',
+            'created',
+            'modified',
+            'title',
+            'feed',
+            'publication_time',
+            'source_type',
+            'quality',
+            'download_status',
+            'percent_done',
+            'profile_match_score',
+            'profile_match'
+        ]

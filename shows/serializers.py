@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Show, ShowProfile, Season, Episode
-from torrents.serializers import TorrentSerializer
+from torrents.serializers import TorrentSerializer, TorrentByShowSerializer
 
 
 class ShowProfileSerializer(serializers.ModelSerializer):
@@ -81,6 +81,27 @@ class ShowDetailsSerializer(serializers.ModelSerializer):
                   'palette_list',
                   'profile',
                   'formatted_imdb_id'
+                  ]
+
+
+class ShowUpcomingEpisodesSerializer(serializers.ModelSerializer):
+
+    recent_torrents_found = TorrentByShowSerializer(source='last_found_torrents', many=True)
+    recent_torrents_active = TorrentByShowSerializer(source='last_active_torrents', many=True)
+
+    class Meta:
+        model = Show
+        fields = ['imdb_id',
+                  'title',
+                  'next_episode',
+                  'next_episode_time_code',
+                  'next_episode_season_status',
+                  'imdb_url',
+                  'poster_link',
+                  'thumbnail_link',
+                  'palette_list',
+                  'recent_torrents_found',
+                  'recent_torrents_active'
                   ]
 
 

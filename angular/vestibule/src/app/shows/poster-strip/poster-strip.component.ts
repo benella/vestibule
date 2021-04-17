@@ -1,4 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Palette } from "../show";
 
 @Component({
   selector: 'vestibule-poster-strip',
@@ -6,33 +7,40 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./poster-strip.component.scss']
 })
 export class PosterStripComponent implements OnInit {
-  @Input() paletteList: number[][]
-  public mainColor: string
+  @Input() palette: Palette
+  @Input() width: string = '5rem'
+  public primaryColor: string
+  public lightColor: string
+  public darkColor: string
   public secondaryColor: string
-  public thirdColor: string
   constructor() { }
 
   ngOnInit(): void {
-    if (this.paletteList.length) {
-      this.mainColor = `rgb(${this.paletteList[0][0]}, ${this.paletteList[0][1]}, ${this.paletteList[0][2]})`
-      this.secondaryColor = `rgb(${this.paletteList[1][0]}, ${this.paletteList[1][1]}, ${this.paletteList[1][2]})`
-      this.thirdColor = `rgb(${this.paletteList[2][0]}, ${this.paletteList[2][1]}, ${this.paletteList[2][2]})`
+    if (this.palette) {
+      this.primaryColor = `rgb(${this.palette.primary[0]}, ${this.palette.primary[1]}, ${this.palette.primary[2]})`
+      this.lightColor = `rgb(${this.palette.light[0]}, ${this.palette.light[1]}, ${this.palette.light[2]})`
+      this.darkColor = `rgb(${this.palette.dark[0]}, ${this.palette.dark[1]}, ${this.palette.dark[2]})`
+      if (this.palette.secondary) {
+        this.secondaryColor = `rgb(${this.palette.secondary[0]}, ${this.palette.secondary[1]}, ${this.palette.secondary[2]})`
+      }
     } else {
-      this.mainColor = `rgb(93, 108, 172)`
-      this.secondaryColor = `rgb(189, 76, 98)`
-      this.thirdColor = `rgb(189, 76, 98)`
+      this.primaryColor = `rgb(93, 108, 172)`
+      this.lightColor = `rgb(93, 108, 172)`
+      this.darkColor = `rgb(93, 108, 172)`
+      this.secondaryColor = `rgb(93, 108, 172)`
     }
   }
 
   stripGradientBackground(): object {
     return {
-      background: `linear-gradient(90deg, ${this.mainColor} 0%, ${this.secondaryColor} 100%)`
+      background: `linear-gradient(90deg, ${this.primaryColor} 0%, ${this.secondaryColor} 100%)`
     }
   }
 
-  stripBackground(): object {
+  stripStyle(): object {
     return {
-      backgroundColor: this.mainColor
+      backgroundColor: this.primaryColor,
+      width: `${this.width}`
     }
   }
 }

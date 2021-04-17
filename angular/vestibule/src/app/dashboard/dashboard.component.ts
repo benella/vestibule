@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ShowsService } from "../shows/shows.service";
+import { ShowInUpcomingEpisodes } from "../shows/show";
 
 @Component({
   selector: 'vestibule-dashboard',
@@ -6,10 +8,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  upcomingEpisodesShows: ShowInUpcomingEpisodes[]
 
-  constructor() { }
+  constructor(private showsService: ShowsService) { }
 
   ngOnInit(): void {
+    this.showsService.listShowsByUpcomingEpisodes().subscribe(
+      data => this.upcomingEpisodesShows = data
+    )
   }
-
 }

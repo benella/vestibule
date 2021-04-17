@@ -1,1 +1,26 @@
-<p>dashboard works!</p>
+<div class="dashboard-model-wrapper">
+  <p class="dashboard-model-title">Upcoming Episodes</p>
+  <div class="dashboard-model-entries">
+    <a *ngFor="let show of upcomingEpisodesShows" [routerLink]="['/shows', show.imdb_id]">
+      <div class="dashboard-model-entry">
+        <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
+        <p class="show-title">{{show.title}}</p>
+        <p class="show-next-episode-line">
+          <span>{{show.next_episode}}</span>
+          <span class="bullet" style="color: rgb({{show.palette_list.primary.join(',')}})">•</span>
+          <span class="season-status">{{show.next_episode_season_status}}</span>
+        </p>
+
+        <div class="show-recent-activity-wrapper">
+          <p *ngFor="let torrent of show.recent_torrents_active"
+             class="show-recent-activity-line">
+            <span>S{{torrent.season}} </span>
+            <span *ngIf="torrent.episode">E{{torrent.episode}}</span>
+            <span class="bullet">•</span>
+            <span style="color: rgb({{show.palette_list.primary.join(',')}})">{{torrent.download_status}}</span>
+          </p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>

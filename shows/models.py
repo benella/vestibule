@@ -1,10 +1,8 @@
 import logging
 import re
-import requests
 from typing import Tuple, List
 from datetime import timedelta
 from collections import defaultdict
-from io import BytesIO
 
 from django.utils import timezone
 from django.db import models
@@ -12,7 +10,6 @@ from django.utils.text import slugify
 from django.contrib import messages
 
 import json
-from colorthief import ColorThief
 from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
@@ -21,6 +18,7 @@ from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import extract_episode_time
+from shows.show_info_update.poster_main_colors_util import get_poster_main_colors
 from api_feeds import search_feeds_by_imdb_id
 
 logger = logging.getLogger(__name__)
@@ -182,6 +180,7 @@ class Show(models.Model):
     status = models.CharField(max_length=256, default="", blank=True)
     status_line = models.CharField(max_length=256, default="", blank=True)
     next_episode = models.CharField(max_length=256, default="", blank=True)
+    next_episode_season_status = models.CharField(max_length=256, default="", blank=True)
     next_episode_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
     poster_link = models.URLField(default="", blank=True)
     thumbnail_link = models.URLField(default="", blank=True)
@@ -236,10 +235,18 @@ class Show(models.Model):
             return 0
 
     @property
-    def palette_list(self) -> List[List[int]]:
+    def palette_list(self) -> dict:
         if self.palette:
-            return json.loads(self.palette)
-        return []
+            palette = json.loads(self.palette)
+            base = {
+                "primary": palette[0],
+                "light": palette[1],
+                "dark": palette[2],
+            }
+            if len(palette) == 4:
+                base["secondary"] = palette[3]
+            return base
+        return {}
 
     def generate_lookup_names(self, imdb_show_data: dict):
         """
@@ -276,7 +283,7 @@ class Show(models.Model):
 
     @property
     def last_active_torrents(self):
-        return self.latest_torrents_activity(limit=3)
+        return self.latest_torrents_activity(limit=5)
 
     @property
     def last_torrent_activity(self):
@@ -291,7 +298,7 @@ class Show(models.Model):
 
     @property
     def last_found_torrents(self):
-        return self.latest_torrents_found(limit=3)
+        return self.latest_torrents_found(limit=5)
 
     @property
     def last_torrent_found(self):
@@ -332,9 +339,16 @@ class Show(models.Model):
             self.network = tvdb_client.get_show_original_network(self.imdb_id)
             self.status = tvdb_client.get_show_status(self.imdb_id)
 
-        self.poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
         self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
+        poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
+
+        self.poster_link = poster_link
         self.extract_palette()
+
+        # if not self.poster_link or self.poster_link != poster_link:
+        #     self.poster_link = poster_link
+        #     self.extract_palette()
+
         self.number_of_seasons = imdb_show_data.get("number of seasons")
         self.year = imdb_show_data.get("year", "Year Unknown")
         self.imdb_rating = imdb_show_data.get("rating", "Rating Unknown")
@@ -346,11 +360,10 @@ class Show(models.Model):
             pass
 
     def extract_palette(self):
-        if not self.thumbnail_link:
+        if not self.poster_link:
             return
-        response = requests.get(self.thumbnail_link)
-        color_thief = ColorThief(BytesIO(response.content))
-        self.palette = str([list(color) for color in color_thief.get_palette(color_count=2)])
+        main_colors = get_poster_main_colors(self.poster_link)
+        self.palette = str([color.raw for color in main_colors])
 
     def update_show_info(self):
         ia = IMDb()
@@ -367,6 +380,17 @@ class Show(models.Model):
         if upcoming_episodes:
             self.status_line = f"{self.status}, has {len(upcoming_episodes)} upcoming episodes"
             next_episode = upcoming_episodes[0]
+            count_upcoming_episodes_in_season = len(upcoming_episodes.filter(season=next_episode.season))
+
+            if next_episode.number == 1:
+                self.next_episode_season_status = "Show debut" if next_episode.season.number == 1 \
+                    else f"{next_episode.season.title} premier"
+            else:
+                if count_upcoming_episodes_in_season == 1:
+                    self.next_episode_season_status = f"{next_episode.season.title} finale"
+                else:
+                    self.next_episode_season_status = f"{count_upcoming_episodes_in_season} episodes left in season"
+
             self.next_episode_time_code = next_episode.air_time_code
             self.next_episode = f"{str(next_episode.season.title)} Episode {next_episode.number} " \
                                 f"- '{next_episode.title}', {next_episode.air_status}"
@@ -374,6 +398,7 @@ class Show(models.Model):
             self.status_line = f"{self.status}, no upcoming episodes"
             self.next_episode_time_code = "9999-99-99"
             self.next_episode = ""
+            self.next_episode_season_status = ""
 
         self.save()
 

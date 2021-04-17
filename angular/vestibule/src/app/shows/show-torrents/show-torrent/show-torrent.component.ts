@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ShowDetails, Torrent, Season, Episode } from "../../show";
+import { ShowDetails, Season, Episode } from "../../show";
 import { TorrentsService } from "../../../torrents/torrents.service";
-import {ServicesStatusService} from "../../../panel/services-status/services-status.service";
+import { ServicesStatusService } from "../../../panel/services-status/services-status.service";
+import { Torrent } from "../../../torrents/torrent";
 
 class TorrentDownloadStatus {
   public static NEVER_STARTED = 'Never Started'

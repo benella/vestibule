@@ -1,13 +1,12 @@
 from .models import Show, ShowProfile
-from django.views import generic
-from django.urls import reverse
 from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
 
 from .serializers import (
-    ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer, ShowProfileSerializer, ShowTorrentsSerializer
+    ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer, ShowProfileSerializer, ShowTorrentsSerializer,
+    ShowUpcomingEpisodesSerializer
 )
 
 from imdb import IMDb
@@ -40,6 +39,14 @@ def search_show(request, title):
 class ShowList(generics.ListAPIView):
     queryset = Show.objects.all()
     serializer_class = ShowListItemSerializer
+
+
+class ShowsUpcomingEpisodes(generics.ListAPIView):
+    serializer_class = ShowUpcomingEpisodesSerializer
+
+    def get_queryset(self):
+        return sorted(Show.objects.exclude(next_episode_time_code="9999-99-99"),
+                      key=lambda s: s.next_episode_order_value)
 
 
 class ShowSubscribe(generics.CreateAPIView):
