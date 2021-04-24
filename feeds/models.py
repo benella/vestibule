@@ -46,7 +46,7 @@ class Feed(models.Model):
         for item in root[0].findall("item"):
 
             feed_item = FeedItem(
-                raw_title=item.find("title").text,
+                raw_title=item.find("title").text.replace(" ", "."),
                 link=item.find("link").text,
                 publication_time=self._formatted_publication_time(item.find("pubDate").text),
                 feed=self
