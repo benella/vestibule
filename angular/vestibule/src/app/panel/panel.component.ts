@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PanelBackgroundService } from './panel-background/panel-background.service'
+import { Router } from "@angular/router";
+import { FormBuilder } from "@angular/forms";
 
 @Component({
   selector: 'vestibule-panel',
@@ -11,7 +13,11 @@ export class PanelComponent implements OnInit {
   defaultBackgroundURL: string
   isDynamicVisible = false
 
-  constructor(private panelBackgroundService: PanelBackgroundService) { }
+  findForm = this.fb.group({
+    term: ['', []]
+  })
+
+  constructor(private fb: FormBuilder, private panelBackgroundService: PanelBackgroundService, private router: Router) { }
 
   ngOnInit(): void {
     this.defaultBackgroundURL = this.panelBackgroundService.defaultBackgroundURL
@@ -23,6 +29,12 @@ export class PanelComponent implements OnInit {
         this.isDynamicVisible = true
       }
     })
+  }
+
+  onFindSubmit() {
+    const control = this.findForm.controls['term']
+    this.router.navigate(['/find/results'], {state: {data: {term: control.value }}})
+    control.setValue('')
   }
 
 }

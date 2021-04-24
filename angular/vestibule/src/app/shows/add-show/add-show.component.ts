@@ -3,7 +3,7 @@ import { ShowsService } from "../shows.service";
 import { switchMap } from "rxjs/operators";
 import { ShowSearchResult, ShowSearchResults } from "../show";
 import { Observable, Subject } from "rxjs";
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'vestibule-add-show',
@@ -33,10 +33,10 @@ export class AddShowComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSearchChange(searchTerm: string) {
+  onSearchChange(searchTerm: string): void {
     this.exitPreviewMode()
 
-    if (searchTerm.length < 3) {
+    if (searchTerm.length < 1) {
       this.searchResults = []
     } else {
       this.searchTerm.next(searchTerm)

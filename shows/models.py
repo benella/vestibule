@@ -214,6 +214,9 @@ class Show(models.Model):
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        self.profile.delete()
+
     @property
     def downloading_torrents(self):
         return self.torrents.filter(download_status=Torrent.DOWNLOADING)

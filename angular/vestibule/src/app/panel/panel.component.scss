@@ -39,6 +39,30 @@
     color: inherit;
 }
 
+.side-panel-input {
+  background: none;
+  border: none;
+  font-size: 1.1em;
+  max-width: 10rem;
+  color: #4e4e4e;
+  margin-top: -6px;
+
+  &::placeholder {
+    color: $black;
+  }
+}
+
+.side-panel-icon {
+  height: 1.2rem;
+  display: inline-block;
+  padding: 3px 5px 0 0;
+}
+
+.side-panel-input-form {
+  display: flex;
+  margin-top: 6px;
+}
+
 .side-panel-link:hover {
     color: #757575;
     transform: translate(4px, 0);

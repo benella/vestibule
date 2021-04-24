@@ -37,7 +37,7 @@ export class ShowDetailsComponent implements OnInit, OnDestroy {
           this.panelBackgroundService.changeBackground(this.show.thumbnail_link)
         }
       )
-    });
+    })
   }
 
   ngOnDestroy() {

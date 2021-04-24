@@ -11,7 +11,6 @@ import { ShowDetailsTabComponent } from './show-details/show-details-tab/show-de
 import { ShowDetailsTabsComponent } from './show-details/show-details-tabs/show-details-tabs.component';
 import { ShowProfileComponent } from './show-profile/show-profile.component';
 import { ReactiveFormsModule } from "@angular/forms";
-import { CookieModule } from 'ngx-cookie';
 import { SharedModule } from "../shared/shared.module";
 import { ShowTorrentsComponent } from './show-torrents/show-torrents.component';
 import { ShowTorrentComponent } from './show-torrents/show-torrent/show-torrent.component';
@@ -43,7 +42,6 @@ import { AddShowComponent } from './add-show/add-show.component';
     SharedModule,
     ShowsRoutingModule,
     ReactiveFormsModule,
-    CookieModule,
   ]
 })
 export class ShowsModule { }

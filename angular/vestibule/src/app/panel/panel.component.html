@@ -7,7 +7,7 @@
   <div id="main-links-box">
 
       <section class="side-panel-links">
-          <a [routerLink]="'/shows'" class="side-panel-link">Shows</a>
+          <a [routerLink]="'shows'" class="side-panel-link">Shows</a>
           <a href="/" class="side-panel-link">Feeds</a>
           <a href="/" class="side-panel-link">Torrents</a>
       </section>
@@ -15,7 +15,13 @@
       <div class="side-panel-divider"></div>
 
       <section class="side-panel-links">
-          <a [routerLink]="'shoes/add'" class="side-panel-link">Add Show</a>
+        <a [routerLink]="'shows/add'" class="side-panel-link">Add Show</a>
+        <form [formGroup]="findForm" (submit)="onFindSubmit()" class="side-panel-input-form">
+          <a [routerLink]="'find/results'">
+            <img class="side-panel-icon" alt="Find" src="/static/images/find_icon.svg">
+          </a>
+          <input formControlName="term" class="side-panel-input" type="text" placeholder="Find">
+        </form>
       </section>
 
   </div>

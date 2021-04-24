@@ -8229,366 +8229,6 @@ class TimeInterval {
 
 /***/ }),
 
-/***/ "4pnn":
-/*!*********************************************************************!*\
-  !*** ./node_modules/ngx-cookie/__ivy_ngcc__/fesm2015/ngx-cookie.js ***!
-  \*********************************************************************/
-/*! exports provided: COOKIE_OPTIONS, COOKIE_WRITER, CookieModule, CookieOptionsProvider, CookieService, CookieWriterService, buildCookieString, cookieServiceFactory, isEmpty, isNil, isPresent, isString, mergeOptions, parseCookieString, safeDecodeURIComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "COOKIE_OPTIONS", function() { return COOKIE_OPTIONS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "COOKIE_WRITER", function() { return COOKIE_WRITER; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CookieModule", function() { return CookieModule; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CookieOptionsProvider", function() { return CookieOptionsProvider; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CookieService", function() { return CookieService; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CookieWriterService", function() { return CookieWriterService; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buildCookieString", function() { return buildCookieString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cookieServiceFactory", function() { return cookieServiceFactory; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isEmpty", function() { return isEmpty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNil", function() { return isNil; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPresent", function() { return isPresent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mergeOptions", function() { return mergeOptions; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseCookieString", function() { return parseCookieString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "safeDecodeURIComponent", function() { return safeDecodeURIComponent; });
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "ofXK");
-
-
-
-
-const COOKIE_OPTIONS = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["InjectionToken"]('COOKIE_OPTIONS');
-const COOKIE_WRITER = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["InjectionToken"]('COOKIE_WRITER');
-
-// tslint:disable-next-line:no-any
-function isNil(obj) {
-    return obj === undefined || obj === null;
-}
-// tslint:disable-next-line:no-any
-function isPresent(obj) {
-    return !isNil(obj);
-}
-// tslint:disable-next-line:no-any
-function isString(obj) {
-    return typeof obj === 'string';
-}
-// noinspection JSUnusedGlobalSymbols
-// tslint:disable-next-line:no-any
-function isEmpty(value) {
-    if (isNil(value)) {
-        return true;
-    }
-    if (value === {}) {
-        return true;
-    }
-    if (Array.isArray(value) && value.length === 0) {
-        return true;
-    }
-    if (typeof value !== 'boolean' && !value) {
-        return true;
-    }
-    // noinspection RedundantIfStatementJS
-    if (Object.keys(value).length === 0 && value.constructor === Object) {
-        return true;
-    }
-    return false;
-}
-function mergeOptions(oldOptions, newOptions) {
-    if (!newOptions) {
-        return oldOptions;
-    }
-    return {
-        path: isPresent(newOptions.path) ? newOptions.path : oldOptions.path,
-        domain: isPresent(newOptions.domain) ? newOptions.domain : oldOptions.domain,
-        expires: isPresent(newOptions.expires) ? newOptions.expires : oldOptions.expires,
-        secure: isPresent(newOptions.secure) ? newOptions.secure : oldOptions.secure,
-        sameSite: isPresent(newOptions.sameSite) ? newOptions.sameSite : oldOptions.sameSite,
-        httpOnly: isPresent(newOptions.httpOnly) ? newOptions.httpOnly : oldOptions.httpOnly,
-        storeUnencoded: isPresent(newOptions.storeUnencoded) ? newOptions.storeUnencoded : oldOptions.storeUnencoded
-    };
-}
-function parseCookieString(currentCookieString) {
-    let lastCookies = {};
-    let lastCookieString = '';
-    let cookieArray;
-    let cookie;
-    let i;
-    let index;
-    let name;
-    if (currentCookieString !== lastCookieString) {
-        lastCookieString = currentCookieString;
-        cookieArray = lastCookieString.split('; ');
-        lastCookies = {};
-        for (i = 0; i < cookieArray.length; i++) {
-            cookie = cookieArray[i];
-            index = cookie.indexOf('=');
-            if (index > 0) { // ignore nameless cookies
-                name = safeDecodeURIComponent(cookie.substring(0, index));
-                // the first value that is seen for a cookie is the most
-                // specific one.  values for the same cookie name that
-                // follow are for less specific paths.
-                if (isNil((lastCookies)[name])) {
-                    lastCookies[name] = safeDecodeURIComponent(cookie.substring(index + 1));
-                }
-            }
-        }
-    }
-    return lastCookies;
-}
-function buildCookieString(name, value, options) {
-    let expires = options === null || options === void 0 ? void 0 : options.expires;
-    let val;
-    if (isNil(value)) {
-        expires = 'Thu, 01 Jan 1970 00:00:00 GMT';
-        val = '';
-    }
-    else {
-        val = value;
-    }
-    if (isString(expires)) {
-        expires = new Date(expires);
-    }
-    const cookieValue = (options === null || options === void 0 ? void 0 : options.storeUnencoded) ? value : encodeURIComponent(val);
-    let str = encodeURIComponent(name) + '=' + cookieValue;
-    str += (options === null || options === void 0 ? void 0 : options.path) ? ';path=' + options.path : '';
-    str += (options === null || options === void 0 ? void 0 : options.domain) ? ';domain=' + options.domain : '';
-    str += expires ? ';expires=' + expires.toUTCString() : '';
-    str += (options === null || options === void 0 ? void 0 : options.sameSite) ? '; SameSite=' + options.sameSite : '';
-    str += (options === null || options === void 0 ? void 0 : options.secure) ? ';secure' : '';
-    str += (options === null || options === void 0 ? void 0 : options.httpOnly) ? '; HttpOnly' : '';
-    // per http://www.ietf.org/rfc/rfc2109.txt browser must allow at minimum:
-    // - 300 cookies
-    // - 20 cookies per unique domain
-    // - 4096 bytes per cookie
-    const cookieLength = str.length + 1;
-    if (cookieLength > 4096) {
-        console.log(`Cookie \'${name}\' possibly not set or overflowed because it was too large (${cookieLength} > 4096 bytes)!`);
-    }
-    return str;
-}
-function safeDecodeURIComponent(str) {
-    try {
-        return decodeURIComponent(str);
-    }
-    catch (e) {
-        return str;
-    }
-}
-
-class CookieOptionsProvider {
-    constructor(options = {}, injector) {
-        this.injector = injector;
-        this.defaultOptions = {
-            path: this.injector.get(_angular_common__WEBPACK_IMPORTED_MODULE_1__["APP_BASE_HREF"], '/'),
-            domain: undefined,
-            expires: undefined,
-            secure: false,
-            httpOnly: false
-        };
-        this.options = mergeOptions(this.defaultOptions, options);
-    }
-}
-CookieOptionsProvider.ɵfac = function CookieOptionsProvider_Factory(t) { return new (t || CookieOptionsProvider)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](COOKIE_OPTIONS), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injector"])); };
-CookieOptionsProvider.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({ token: CookieOptionsProvider, factory: CookieOptionsProvider.ɵfac });
-CookieOptionsProvider.ctorParameters = () => [
-    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [COOKIE_OPTIONS,] }] },
-    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injector"] }
-];
-/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CookieOptionsProvider, [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
-    }], function () { return [{ type: undefined, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
-                args: [COOKIE_OPTIONS]
-            }] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injector"] }]; }, null); })();
-
-class CookieService {
-    constructor(document, optionsProvider, cookieWriterService) {
-        this.document = document;
-        this.optionsProvider = optionsProvider;
-        this.cookieWriterService = cookieWriterService;
-        this.options = this.optionsProvider.options;
-    }
-    /**
-     * @description
-     * Returns if the given cookie key exists or not.
-     *
-     * @param key Id to use for lookup.
-     * @returns true if key exists, otherwise false.
-     */
-    hasKey(key) {
-        const value = this.get(key);
-        return isPresent(value);
-    }
-    /**
-     * @description
-     * Returns the value of given cookie key.
-     *
-     * @param key Id to use for lookup.
-     * @returns Raw cookie value.
-     */
-    get(key) {
-        var _a;
-        return (_a = this.getAll()) === null || _a === void 0 ? void 0 : _a[key];
-    }
-    /**
-     * @description
-     * Returns the deserialized value of given cookie key.
-     *
-     * @param key Id to use for lookup.
-     * @returns Deserialized cookie value.
-     */
-    getObject(key) {
-        const value = this.get(key);
-        if (isNil(value)) {
-            return undefined;
-        }
-        else if (value === '') {
-            return {};
-        }
-        return JSON.parse(value);
-    }
-    /**
-     * @description
-     * Returns a key value object with all the cookies.
-     *
-     * @returns All cookies
-     */
-    getAll() {
-        const cookieString = this.cookieWriterService.readAllAsString();
-        return parseCookieString(cookieString);
-    }
-    /**
-     * @description
-     * Sets a value for given cookie key.
-     *
-     * @param key Id for the `value`.
-     * @param value Raw value to be stored.
-     * @param options (Optional) Options object.
-     */
-    put(key, value, options) {
-        const opts = mergeOptions(this.options, options);
-        this.cookieWriterService.write(key, value, opts);
-    }
-    /**
-     * @description
-     * Serializes and sets a value for given cookie key.
-     *
-     * @param key Id for the `value`.
-     * @param value Value to be stored.
-     * @param options (Optional) Options object.
-     */
-    putObject(key, value, options) {
-        this.put(key, JSON.stringify(value), options);
-    }
-    /**
-     * @description
-     * Remove given cookie.
-     *
-     * @param key Id of the key-value pair to delete.
-     * @param options (Optional) Options object.
-     */
-    remove(key, options) {
-        this.put(key, undefined, options);
-    }
-    /**
-     * @description
-     * Remove all cookies.
-     */
-    removeAll(options) {
-        const cookies = this.getAll();
-        Object.keys(cookies).forEach(key => this.remove(key, options));
-    }
-}
-CookieService.ɵfac = function CookieService_Factory(t) { return new (t || CookieService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](CookieOptionsProvider), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](COOKIE_WRITER)); };
-CookieService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({ token: CookieService, factory: CookieService.ɵfac });
-CookieService.ctorParameters = () => [
-    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"],] }] },
-    { type: CookieOptionsProvider },
-    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [COOKIE_WRITER,] }] }
-];
-/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CookieService, [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
-    }], function () { return [{ type: undefined, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
-                args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]]
-            }] }, { type: CookieOptionsProvider }, { type: undefined, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
-                args: [COOKIE_WRITER]
-            }] }]; }, null); })();
-
-class CookieWriterService {
-    constructor(document) {
-        this.document = document;
-    }
-    readAllAsString() {
-        return this.document.cookie || '';
-    }
-    write(name, value, options) {
-        this.document.cookie = buildCookieString(name, value, options);
-    }
-}
-CookieWriterService.ɵfac = function CookieWriterService_Factory(t) { return new (t || CookieWriterService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"])); };
-CookieWriterService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({ token: CookieWriterService, factory: CookieWriterService.ɵfac });
-CookieWriterService.ctorParameters = () => [
-    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"],] }] }
-];
-/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CookieWriterService, [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
-    }], function () { return [{ type: undefined, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
-                args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]]
-            }] }]; }, null); })();
-
-function cookieServiceFactory(document, cookieOptionsProvider, cookieWriterService) {
-    return new CookieService(document, cookieOptionsProvider, cookieWriterService);
-}
-
-class CookieModule {
-    /**
-     * Use this method in your root module to provide the CookieService
-     */
-    static forRoot(options = {}) {
-        return {
-            ngModule: CookieModule,
-            providers: [
-                { provide: COOKIE_OPTIONS, useValue: options },
-                { provide: COOKIE_WRITER, useClass: CookieWriterService },
-                { provide: CookieService, useFactory: cookieServiceFactory, deps: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"], CookieOptionsProvider, COOKIE_WRITER] }
-            ]
-        };
-    }
-    /**
-     * Use this method in your other (non root) modules to import the directive/pipe
-     */
-    static forChild(options = {}) {
-        return CookieModule.forRoot(options);
-    }
-}
-CookieModule.ɵmod = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"]({ type: CookieModule });
-CookieModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"]({ factory: function CookieModule_Factory(t) { return new (t || CookieModule)(); }, providers: [CookieOptionsProvider] });
-/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CookieModule, [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
-        args: [{
-                providers: [CookieOptionsProvider]
-            }]
-    }], null, null); })();
-
-/*
- * Public API Surface of ngx-cookie
- */
-
-/**
- * Generated bundle index. Do not edit.
- */
-
-
-
-//# sourceMappingURL=ngx-cookie.js.map
-
-/***/ }),
-
 /***/ "4yVj":
 /*!**************************************************************************!*\
   !*** ./node_modules/rxjs/_esm2015/internal/scheduled/schedulePromise.js ***!
@@ -13925,6 +13565,205 @@ function switchMapTo(innerObservable, resultSelector) {
     return resultSelector ? Object(_switchMap__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(() => innerObservable, resultSelector) : Object(_switchMap__WEBPACK_IMPORTED_MODULE_0__["switchMap"])(() => innerObservable);
 }
 //# sourceMappingURL=switchMapTo.js.map
+
+/***/ }),
+
+/***/ "b6Qw":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/ngx-cookie-service/__ivy_ngcc__/fesm2015/ngx-cookie-service.js ***!
+  \*************************************************************************************/
+/*! exports provided: CookieService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CookieService", function() { return CookieService; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "ofXK");
+
+
+
+// This service is based on the `ng2-cookies` package which sadly is not a service and does
+
+class CookieService {
+    constructor(
+    // The type `Document` may not be used here. Although a fix is on its way,
+    // we will go with `any` for now to support Angular 2.4.x projects.
+    // Issue: https://github.com/angular/angular/issues/12631
+    // Fix: https://github.com/angular/angular/pull/14894
+    document, 
+    // Get the `PLATFORM_ID` so we can check if we're in a browser.
+    platformId) {
+        this.document = document;
+        this.platformId = platformId;
+        this.documentIsAccessible = Object(_angular_common__WEBPACK_IMPORTED_MODULE_1__["isPlatformBrowser"])(this.platformId);
+    }
+    /**
+     * @param name Cookie name
+     * @returns boolean - whether cookie with specified name exists
+     */
+    check(name) {
+        if (!this.documentIsAccessible) {
+            return false;
+        }
+        name = encodeURIComponent(name);
+        const regExp = this.getCookieRegExp(name);
+        const exists = regExp.test(this.document.cookie);
+        return exists;
+    }
+    /**
+     * @param name Cookie name
+     * @returns property value
+     */
+    get(name) {
+        if (this.documentIsAccessible && this.check(name)) {
+            name = encodeURIComponent(name);
+            const regExp = this.getCookieRegExp(name);
+            const result = regExp.exec(this.document.cookie);
+            return this.safeDecodeURIComponent(result[1]);
+        }
+        else {
+            return '';
+        }
+    }
+    /**
+     * @returns all the cookies in json
+     */
+    getAll() {
+        if (!this.documentIsAccessible) {
+            return {};
+        }
+        const cookies = {};
+        const document = this.document;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach((currentCookie) => {
+                const [cookieName, cookieValue] = currentCookie.split('=');
+                cookies[this.safeDecodeURIComponent(cookieName.replace(/^ /, ''))] = this.safeDecodeURIComponent(cookieValue);
+            });
+        }
+        return cookies;
+    }
+    set(name, value, expiresOrOptions, path, domain, secure, sameSite) {
+        if (!this.documentIsAccessible) {
+            return;
+        }
+        if (typeof expiresOrOptions === 'number' || expiresOrOptions instanceof Date || path || domain || secure || sameSite) {
+            const optionsBody = {
+                expires: expiresOrOptions,
+                path,
+                domain,
+                secure,
+                sameSite: sameSite ? sameSite : 'Lax',
+            };
+            this.set(name, value, optionsBody);
+            return;
+        }
+        let cookieString = encodeURIComponent(name) + '=' + encodeURIComponent(value) + ';';
+        const options = expiresOrOptions ? expiresOrOptions : {};
+        if (options.expires) {
+            if (typeof options.expires === 'number') {
+                const dateExpires = new Date(new Date().getTime() + options.expires * 1000 * 60 * 60 * 24);
+                cookieString += 'expires=' + dateExpires.toUTCString() + ';';
+            }
+            else {
+                cookieString += 'expires=' + options.expires.toUTCString() + ';';
+            }
+        }
+        if (options.path) {
+            cookieString += 'path=' + options.path + ';';
+        }
+        if (options.domain) {
+            cookieString += 'domain=' + options.domain + ';';
+        }
+        if (options.secure === false && options.sameSite === 'None') {
+            options.secure = true;
+            console.warn(`[ngx-cookie-service] Cookie ${name} was forced with secure flag because sameSite=None.` +
+                `More details : https://github.com/stevermeister/ngx-cookie-service/issues/86#issuecomment-597720130`);
+        }
+        if (options.secure) {
+            cookieString += 'secure;';
+        }
+        if (!options.sameSite) {
+            options.sameSite = 'Lax';
+        }
+        cookieString += 'sameSite=' + options.sameSite + ';';
+        this.document.cookie = cookieString;
+    }
+    /**
+     * @param name   Cookie name
+     * @param path   Cookie path
+     * @param domain Cookie domain
+     */
+    delete(name, path, domain, secure, sameSite = 'Lax') {
+        if (!this.documentIsAccessible) {
+            return;
+        }
+        const expiresDate = new Date('Thu, 01 Jan 1970 00:00:01 GMT');
+        this.set(name, '', { expires: expiresDate, path, domain, secure, sameSite });
+    }
+    /**
+     * @param path   Cookie path
+     * @param domain Cookie domain
+     */
+    deleteAll(path, domain, secure, sameSite = 'Lax') {
+        if (!this.documentIsAccessible) {
+            return;
+        }
+        const cookies = this.getAll();
+        for (const cookieName in cookies) {
+            if (cookies.hasOwnProperty(cookieName)) {
+                this.delete(cookieName, path, domain, secure, sameSite);
+            }
+        }
+    }
+    /**
+     * @param name Cookie name
+     * @returns property RegExp
+     */
+    getCookieRegExp(name) {
+        const escapedName = name.replace(/([\[\]\{\}\(\)\|\=\;\+\?\,\.\*\^\$])/gi, '\\$1');
+        return new RegExp('(?:^' + escapedName + '|;\\s*' + escapedName + ')=(.*?)(?:;|$)', 'g');
+    }
+    safeDecodeURIComponent(encodedURIComponent) {
+        try {
+            return decodeURIComponent(encodedURIComponent);
+        }
+        catch (_a) {
+            // probably it is not uri encoded. return as is
+            return encodedURIComponent;
+        }
+    }
+}
+CookieService.ɵfac = function CookieService_Factory(t) { return new (t || CookieService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["PLATFORM_ID"])); };
+CookieService.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"])({ factory: function CookieService_Factory() { return new CookieService(Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"])(_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]), Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"])(_angular_core__WEBPACK_IMPORTED_MODULE_0__["PLATFORM_ID"])); }, token: CookieService, providedIn: "root" });
+CookieService.ctorParameters = () => [
+    { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"],] }] },
+    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["InjectionToken"], decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"], args: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["PLATFORM_ID"],] }] }
+];
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CookieService, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"],
+        args: [{
+                providedIn: 'root'
+            }]
+    }], function () { return [{ type: undefined, decorators: [{
+                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
+                args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]]
+            }] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["InjectionToken"], decorators: [{
+                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
+                args: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["PLATFORM_ID"]]
+            }] }]; }, null); })();
+
+/*
+ * Public API Surface of ngx-cookie-service
+ */
+
+/**
+ * Generated bundle index. Do not edit.
+ */
+
+
+
+//# sourceMappingURL=ngx-cookie-service.js.map
 
 /***/ }),
 
