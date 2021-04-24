@@ -66,6 +66,10 @@ class Torrent(models.Model):
     def update_download_status(self, new_status):
         self.download_status = new_status
         self.modified = timezone.now()
+
+        if new_status == Torrent.STOPPED:
+            self.transmission_torrent_id = None
+
         self.save()
 
     def update_percent_done(self, percent_done):
