@@ -283,7 +283,7 @@ class Show(models.Model):
 
     @property
     def last_active_torrents(self):
-        return self.latest_torrents_activity(limit=5)
+        return self.latest_torrents_activity(limit=3)
 
     @property
     def last_torrent_activity(self):
@@ -298,7 +298,7 @@ class Show(models.Model):
 
     @property
     def last_found_torrents(self):
-        return self.latest_torrents_found(limit=5)
+        return self.latest_torrents_found(limit=3)
 
     @property
     def last_torrent_found(self):
