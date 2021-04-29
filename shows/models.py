@@ -360,9 +360,12 @@ class Show(models.Model):
 
         for feed_item in feed_list:
 
-            if feed_item.raw_title in self._show_torrents_titles:
-                print("Torrent titled {} is not new".format(feed_item.raw_title))
+            try:
+                existing_torrent = self.torrents.all().get(title=feed_item.raw_title, feed=feed_item.feed)
+                print(f"Torrent titled '{existing_torrent.title}' from {existing_torrent.feed} is not new")
                 continue
+            except Torrent.DoesNotExist:
+                pass
 
             torrent = Torrent()
             torrent.title = feed_item.raw_title
