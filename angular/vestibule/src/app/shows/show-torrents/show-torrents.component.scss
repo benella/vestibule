@@ -8,6 +8,11 @@
   padding-right: 0.5rem;
   max-height: calc(100vh - 11rem);
   margin: 0 1rem 0 -1.6rem;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .season-cont {

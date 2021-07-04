@@ -1,31 +1,67 @@
-<form [formGroup]="findForm" class="find-form">
+<form [formGroup]="findForm" class="find-form" (mouseover)="searchMode = true">
   <img class="find-icon" alt="Find" src="/static/images/find_icon.svg">
   <input
+    #searchInput
     formControlName="term"
     placeholder="Find"
     (input)="onSearchChange($event.target.value)"
   >
 </form>
 
-<div class="search-results" *ngIf="searchResults.length else noResults">
-  <p class="title">Shows</p>
+<div class="search-results" *ngIf="searchMode && searchResults.length" (mouseleave)="searchMode = false">
+  <p class="title" *ngIf="searchResults.length">Shows</p>
   <div class="results">
-    <div *ngFor="let result of searchResults" class="search-result-wrapper">
+    <div *ngFor="let result of searchResults" class="search-result-wrapper" (click)="setPreviewShow(result)">
       <div class="poster-wrapper" style="background-image: url('{{result.cover_url}}')"></div>
       <div class="data">
         <p class="year">
           <span>{{result.year}}</span>
-          <a class="imdb_link" target="_blank" href="{{result.imdb_link}}">IMDB</a>
         </p>
-        <p class="title">{{result.title}}</p>
-        <p class="subscribe-status">
-          {{result.subscribed ? 'Already Subscribed' : 'Add Show'}}
-        </p>
+        <p class="show-title">{{result.title}}</p>
       </div>
     </div>
   </div>
+  <ng-template *ngIf="!searchResults.length">
+    <p *ngIf="!searchInput.value.length && !loading">
+      Type to search
+    </p>
+  </ng-template>
 </div>
 
-<ng-template #noResults>
-  Nothing here yet
-</ng-template>
+<div id="preview-selected-show" *ngIf="previewShow">
+  <div class="poster-wrap" style="background-image: url('{{previewShow.full_cover_url}}')"></div>
+  <div class="data">
+    <div class="year-imdb">
+      <span>{{previewShow.year}}</span>
+      <a class="imdb-link" target="_blank" href="{{previewShow.imdb_link}}">IMDB</a>
+      <span class="bullet">•</span>
+      <div class="loading-enriched" *ngIf="!previewShowEnriched">
+          <img src="/static/images/loading_circle.svg" alt="Loading">
+      </div>
+      <span *ngIf="previewShowEnriched?.network">
+        <span>{{ previewShowEnriched.network }}</span>
+      </span>
+    </div>
+    <p class="title">{{previewShow.title}}</p>
+
+    <div class="show-actions">
+        <ng-container *ngIf="!previewShow.subscribed else subscribed">
+          <p class="action subscription" (click)="subscribeToShow(previewShow)">Subscribe</p>
+          <span class="add-action" *ngIf="addAction">{{addAction}}</span>
+        </ng-container>
+        <ng-template #subscribed>
+          <a [routerLink]="['/shows', previewShow.imdb_id]">
+            <p class="action subscription">Subscribed</p>
+          </a>
+        </ng-template>
+      <p *ngIf="!addLoading" class="action fins-torrents">Find Torrents</p>
+    </div>
+
+    <div class="enriched-data">
+      <p class="tag" *ngIf="previewShowEnriched?.status">{{previewShowEnriched.status}}</p>
+      <p class="tag" *ngIf="previewShowEnriched?.number_of_seasons">
+        {{previewShowEnriched.number_of_seasons}} Seasons</p>
+    </div>
+  </div>
+
+</div>

@@ -1,5 +1,11 @@
 import {Torrent, TorrentInList} from "../torrents/torrent";
 
+export interface EnrichedShowInfo {
+  status: string
+  network: string
+  number_of_seasons: string
+}
+
 export interface ShowSearchResults {
   results: ShowSearchResult[]
 }

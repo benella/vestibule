@@ -18,10 +18,11 @@
 
   a {
     border: 2px solid;
-    padding: 0 5px;
+    padding: 0 5px 1px;
     margin-right: 5px;
     text-decoration: none;
     transition: 0.2s;
+    display: inline-block;
 
     &:hover {
       background-color: rgba(252, 214, 56, 0.6);

@@ -16,7 +16,6 @@ import { ShowTorrentsComponent } from './show-torrents/show-torrents.component';
 import { ShowTorrentComponent } from './show-torrents/show-torrent/show-torrent.component';
 import { ShowTorrentsSectionComponent } from './show-torrents/show-torrents-section/show-torrents-section.component';
 import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows-status-group.component';
-import { AddShowComponent } from './add-show/add-show.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +30,6 @@ import { AddShowComponent } from './add-show/add-show.component';
     ShowTorrentComponent,
     ShowTorrentsSectionComponent,
     ShowsStatusGroupComponent,
-    AddShowComponent
   ],
   exports: [
     PosterStripComponent

@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
+from common.tvdb_client import TVDBVestibuleClient
 
 from .serializers import (
     ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer, ShowProfileSerializer, ShowTorrentsSerializer,
@@ -10,17 +11,18 @@ from .serializers import (
 )
 
 from imdb import IMDb
+ia = IMDb()
 
 
 def search_show(request, title):
-    ia = IMDb()
     subscribed_shows_imdb_ids = [show.imdb_id for show in Show.objects.all()]
     results = ia.search_movie(title)
     filtered_results = list()
 
     for result in results:
-        if result.get("kind") not in ["tv series", "tv miniseries"]:
-            print("skipping {} (kind: {})".format(result.get("title"), result.get("kind")))
+        if result.get("kind") not in ["tv series", "tv miniseries", "tv mini series"]:
+            print("skipping [{}] {} (kind: {})".format(
+                result.getID(), result.get("title"), result.get("kind")))
             continue
 
         filtered_results.append({
@@ -34,6 +36,18 @@ def search_show(request, title):
         })
 
     return JsonResponse({"results": filtered_results})
+
+
+def show_enriched_info(request, imdb_id):
+    imdb_show_data = ia.get_movie(imdb_id)
+    enriched_info = dict()
+
+    with TVDBVestibuleClient() as tvdb_client:
+        enriched_info["network"] = tvdb_client.get_show_original_network(imdb_id)
+        enriched_info["status"] = tvdb_client.get_show_status(imdb_id)
+        enriched_info["number_of_seasons"] = imdb_show_data["number of seasons"]
+
+    return JsonResponse(enriched_info)
 
 
 class ShowList(generics.ListAPIView):
