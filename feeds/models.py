@@ -45,12 +45,15 @@ class Feed(models.Model):
         print(f"Reading {self.name} feed")
         for item in root[0].findall("item"):
 
-            feed_item = FeedItem(
-                raw_title=item.find("title").text.replace(" ", "."),
-                link=item.find("link").text,
-                publication_time=self._formatted_publication_time(item.find("pubDate").text),
-                feed=self
-            )
+            try:
+                feed_item = FeedItem(
+                    raw_title=item.find("title").text.replace(" ", "."),
+                    link=item.find("link").text,
+                    publication_time=self._formatted_publication_time(item.find("pubDate").text),
+                    feed=self
+                )
+            except AttributeError:
+                continue
 
             feed_item.parse_title()
 
