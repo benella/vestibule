@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from "@angular/forms";
 import { ShowsService } from "../../shows/shows.service";
-import { EnrichedShowInfo, ShowSearchResult, ShowSearchResults } from "../../shows/show";
+import { EnrichedShowInfo, PreviewShowTorrents, ShowSearchResult, ShowSearchResults } from "../../shows/show";
 import { Observable, Subject } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { Router } from "@angular/router";
+import {ShowTorrentDetails, TorrentDownloadStatus} from "../../torrents/torrent";
 
 @Component({
   selector: 'vestibule-find-results',
@@ -21,6 +22,7 @@ export class FindResultsComponent implements OnInit {
   searchMode = true
   previewShow?: ShowSearchResult
   previewShowEnriched?: EnrichedShowInfo
+  previewShowTorrents?: ShowTorrentDetails[]
   addLoading = false
   addError = false
   addAction?: string
@@ -66,9 +68,30 @@ export class FindResultsComponent implements OnInit {
 
     this.previewShow = show
     this.previewShowEnriched = undefined
+    this.previewShowTorrents = undefined
 
     this.showsService.enrichShowInfo(show.imdb_id).subscribe(
       data => this.previewShowEnriched = data
+    )
+  }
+
+  findPreviewShowTorrents(): void {
+    this.showsService.findPreviewShowTorrents(this.previewShow.imdb_id).subscribe(
+      data => this.previewShowTorrents = data.results.map(torrent => {
+        return {
+          showTitle: this.previewShow.title,
+          seasonNumber: torrent.season,
+          episodeNumber: torrent.episode,
+          publicationTime: `${torrent.publication_time}`,
+          feed: torrent.feed,
+          quality: torrent.video_quality,
+          sourceType: torrent.source,
+          torrentTitle: torrent.raw_title,
+          torrentLink: torrent.link,
+          isStandaloneTorrent: true,
+          downloadStatus: TorrentDownloadStatus.NEVER_STARTED
+        }
+      })
     )
   }
 

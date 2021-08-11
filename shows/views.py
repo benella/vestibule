@@ -4,7 +4,9 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
 from common.tvdb_client import TVDBVestibuleClient
-
+from feeds.models import Feed
+from api_feeds import search_feeds_by_imdb_id
+from shows.show_info_update.show_info_utils import generate_show_lookup_names
 from .serializers import (
     ShowListItemSerializer, ShowDetailsSerializer, ShowCreateSerializer, ShowProfileSerializer, ShowTorrentsSerializer,
     ShowUpcomingEpisodesSerializer
@@ -48,6 +50,24 @@ def show_enriched_info(request, imdb_id):
         enriched_info["number_of_seasons"] = imdb_show_data["number of seasons"]
 
     return JsonResponse(enriched_info)
+
+
+def find_preview_show_torrents(request, imdb_id):
+    imdb_show_data = ia.get_movie(imdb_id)
+    torrents = list()
+
+    for feed in Feed.objects.all():
+        torrents += feed.read_feed()
+
+    torrents += search_feeds_by_imdb_id(imdb_id=f"tt{imdb_id}")
+    lookup_names = generate_show_lookup_names(imdb_show_data=imdb_show_data)
+    relevant_items = list()
+
+    for item in torrents:
+        if item.parsed_values.show_title.lower() in lookup_names:
+            relevant_items.append(item)
+
+    return JsonResponse({"results": [relevant_item.__dict__() for relevant_item in relevant_items]})
 
 
 class ShowList(generics.ListAPIView):

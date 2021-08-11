@@ -8,7 +8,7 @@ import {
   ShowTorrents,
   ShowSearchResults,
   ShowSuccessfulSubscription,
-  ShowInUpcomingEpisodes, EnrichedShowInfo,
+  ShowInUpcomingEpisodes, EnrichedShowInfo, PreviewShowTorrents,
 } from "./show";
 
 @Injectable({
@@ -60,5 +60,9 @@ export class ShowsService {
 
   enrichShowInfo(imdb_id: string): Observable<EnrichedShowInfo> {
     return this.http.get<EnrichedShowInfo>(`api/shows/enrich/${imdb_id}`)
+  }
+
+  findPreviewShowTorrents(imdb_id: string): Observable<PreviewShowTorrents> {
+    return this.http.get<PreviewShowTorrents>(`api/shows/find_preview_show_torrents/${imdb_id}`)
   }
 }

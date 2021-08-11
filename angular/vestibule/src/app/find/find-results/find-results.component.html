@@ -54,7 +54,7 @@
             <p class="action subscription">Subscribed</p>
           </a>
         </ng-template>
-      <p *ngIf="!addLoading" class="action fins-torrents">Find Torrents</p>
+      <p *ngIf="!addLoading" class="action fins-torrents" (click)="findPreviewShowTorrents()">Find Torrents</p>
     </div>
 
     <div class="enriched-data">
@@ -63,5 +63,10 @@
         {{previewShowEnriched.number_of_seasons}} Seasons</p>
     </div>
   </div>
+</div>
 
+<div class="torrents-wrapper">
+  <div *ngFor="let torrent of previewShowTorrents">
+    <vestibule-show-torrent [torrent]="torrent"></vestibule-show-torrent>
+  </div>
 </div>

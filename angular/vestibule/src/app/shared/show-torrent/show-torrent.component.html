@@ -1,0 +1,48 @@
+<div class="torrent-cont">
+  <div class="torrent-title-cont">
+    <p>
+      <span class="torrent-title">{{torrent.showTitle}} S{{torrent.seasonNumber}}<span *ngIf="torrent.episodeNumber"> E{{torrent.episodeNumber}}</span></span>
+      <span class="torrent-publication-time">{{torrent.publicationTime}}</span>
+    </p>
+  </div>
+
+  <div class="torrent-details-cont">
+    <div class="torrent-actions-cont">
+      <div class="torrent-action action-download" (click)="downloadTorrents()">
+        <img src="/static/images/download_icon.svg">
+      </div>
+
+<!--      <div class="torrent-action action-plus" (click)="toggleMoreDetails()">-->
+<!--        <img src="/static/images/plus_icon.svg" [class.x-mode]="moreDetailsMode">-->
+<!--      </div>-->
+    </div>
+
+    <div class="torrent-info-cont">
+      <div class="torrent-tags">
+        <div *ngIf="torrent.feed" class="tag feed-tag">{{torrent.feed}}</div>
+        <div *ngIf="torrent.sourceType" class="tag source-type-tag">{{torrent.sourceType}}</div>
+      </div>
+
+      <div *ngIf="!moreDetailsMode else moreDetails"
+           class="torrent-base-details-cont" (click)="toggleMoreDetails()">
+        <div class="torrent-action action-plus">
+          <img src="/static/images/plus_icon.svg" [class.x-mode]="moreDetailsMode">
+        </div>
+        <div class="torrent-tags">
+          <div *ngIf="torrent.quality" class="tag quality-tag">{{torrent.quality}}</div>
+        </div>
+      </div>
+
+      <ng-template #moreDetails>
+        <div class="torrent-more-details-cont">
+          <div class="torrent-tags">
+            <div *ngIf="torrent.torrentLink" class="tag torrent-link">
+              <a target="_blank" href="{{torrent.torrentLink}}">Link</a>
+            </div>
+            <div *ngIf="torrent.torrentTitle" class="tag torrent-full-name">{{torrent.torrentTitle}}</div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -18,8 +18,6 @@ export class ServicesStatusComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.updateServicesStatus();
-    this.statusUpdater = interval(10000).subscribe(
-      () => this.updateServicesStatus())
   }
 
   updateServicesStatus(): void {

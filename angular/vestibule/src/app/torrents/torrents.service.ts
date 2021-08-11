@@ -10,7 +10,7 @@ export class TorrentsService {
 
   constructor(private http: HttpClient) { }
 
-  downloadTorrent(torrent: Torrent): Observable<TorrentDownloadResponse> {
-    return this.http.get<TorrentDownloadResponse>(`api/torrents/download/${torrent.id}`)
+  downloadShowTorrent(torrentID: number): Observable<TorrentDownloadResponse> {
+    return this.http.get<TorrentDownloadResponse>(`api/torrents/download/${torrentID}`)
   }
 }

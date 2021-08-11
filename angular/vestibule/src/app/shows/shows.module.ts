@@ -13,7 +13,6 @@ import { ShowProfileComponent } from './show-profile/show-profile.component';
 import { ReactiveFormsModule } from "@angular/forms";
 import { SharedModule } from "../shared/shared.module";
 import { ShowTorrentsComponent } from './show-torrents/show-torrents.component';
-import { ShowTorrentComponent } from './show-torrents/show-torrent/show-torrent.component';
 import { ShowTorrentsSectionComponent } from './show-torrents/show-torrents-section/show-torrents-section.component';
 import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows-status-group.component';
 
@@ -27,7 +26,6 @@ import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows
     ShowDetailsTabsComponent,
     ShowProfileComponent,
     ShowTorrentsComponent,
-    ShowTorrentComponent,
     ShowTorrentsSectionComponent,
     ShowsStatusGroupComponent,
   ],

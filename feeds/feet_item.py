@@ -1,4 +1,5 @@
 import re
+import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 from common import Quality, Source
@@ -25,9 +26,14 @@ class ShowTorrentValues:
                and self.source is not None \
                and self.video_quality is not None
 
-    def get_episode(self):
+    def get_episode(self) -> str:
         if self.episode is not None:
             return str(self.episode)
+        return ""
+
+    def get_season(self) -> str:
+        if self.season is not None:
+            return str(self.season)
         return ""
 
 
@@ -76,3 +82,19 @@ class FeedItem:
 
         self.parsed_values.other = match.group('source').replace(".", " ").strip()
         self.parsed_values.source = Source.pare_source_from_phrase(phrase=self.parsed_values.other)
+
+    def __dict__(self):
+        return {
+            "raw_title": self.raw_title,
+            "link": self.link,
+            "publication_time": self.publication_time,
+            "feed": self.feed.name,
+            "show_title": self.parsed_values.show_title,
+            "season": self.parsed_values.get_season(),
+            "episode": self.parsed_values.get_episode(),
+            "video_quality": self.parsed_values.video_quality,
+            "source": self.parsed_values.source,
+            "other": self.parsed_values.other,
+            "has_subtitles": self.feed.has_subtitles,
+            "full_season": self.parsed_values.is_full_season,
+        }

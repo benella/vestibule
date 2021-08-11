@@ -206,3 +206,9 @@
     }
   }
 }
+
+.torrents-wrapper {
+  margin: 3rem 3rem 0 0;
+  overflow-x: scroll;
+  height: calc(100vh - 30rem);
+}

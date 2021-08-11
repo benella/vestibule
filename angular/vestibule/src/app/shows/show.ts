@@ -1,4 +1,4 @@
-import {Torrent, TorrentInList} from "../torrents/torrent";
+import { Torrent, TorrentInList, PreviewShowTorrent } from "../torrents/torrent";
 
 export interface EnrichedShowInfo {
   status: string
@@ -8,6 +8,10 @@ export interface EnrichedShowInfo {
 
 export interface ShowSearchResults {
   results: ShowSearchResult[]
+}
+
+export interface PreviewShowTorrents {
+  results: PreviewShowTorrent[]
 }
 
 export interface Palette {

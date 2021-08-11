@@ -1,15 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ShowDetails, Season, Episode } from "../../show";
-import { TorrentsService } from "../../../torrents/torrents.service";
-import { ServicesStatusService } from "../../../panel/services-status/services-status.service";
-import { Torrent } from "../../../torrents/torrent";
-
-class TorrentDownloadStatus {
-  public static NEVER_STARTED = 'Never Started'
-  public static DOWNLOADING = 'Downloading'
-  public static READY = 'Ready'
-  public static STOPPED = 'Stopped'
-}
+import { TorrentsService } from "../../torrents/torrents.service";
+import { ServicesStatusService } from "../../panel/services-status/services-status.service";
+import { ShowTorrentDetails, TorrentDownloadStatus } from "../../torrents/torrent";
+import {take} from "rxjs/operators";
 
 @Component({
   selector: 'vestibule-show-torrent',
@@ -17,10 +10,7 @@ class TorrentDownloadStatus {
   styleUrls: ['./show-torrent.component.scss']
 })
 export class ShowTorrentComponent implements OnInit {
-  @Input() torrent: Torrent
-  @Input() show: ShowDetails
-  @Input() season: Season
-  @Input() episode?: Episode
+  @Input() torrent: ShowTorrentDetails
 
   moreDetailsMode = false
   canDownload = false
@@ -31,12 +21,12 @@ export class ShowTorrentComponent implements OnInit {
               private servicesStatusService: ServicesStatusService) { }
 
   ngOnInit(): void {
-    this.servicesStatusService.getServicesStatus().subscribe(
+    this.servicesStatusService.getServicesStatus().pipe(take(1)).subscribe(
       data => {
         if (!data.services["transmission"].up) {
           this.downloadMessage = "Transmission client seems to be down"
           this.canDownload = false
-        } else if (this.torrent.download_status === TorrentDownloadStatus.DOWNLOADING) {
+        } else if (this.torrent.downloadStatus === TorrentDownloadStatus.DOWNLOADING) {
           this.downloadMessage = "Torrents is already downloading"
           this.canDownload = false
         } else {
@@ -52,9 +42,10 @@ export class ShowTorrentComponent implements OnInit {
   }
 
   downloadTorrents(): void {
-    this.torrentsService.downloadTorrent(this.torrent).subscribe(
+    if (!this.torrent.isStandaloneTorrent) {
+      this.torrentsService.downloadShowTorrent(this.torrent.torrentId).subscribe(
       data => {
-        this.torrent = data.torrent
+        this.torrent.downloadStatus = data.torrent.download_status
         this.downloadMessage = data.message
         this.downloadSuccessful = data.successful
       },
@@ -63,10 +54,10 @@ export class ShowTorrentComponent implements OnInit {
         this.downloadMessage = error
       }
     )
+    }
   }
 
   showDownloadStatus(): boolean {
-    return this.torrent.download_status && this.torrent.download_status != TorrentDownloadStatus.NEVER_STARTED
+    return this.torrent.downloadStatus && this.torrent.downloadStatus != TorrentDownloadStatus.NEVER_STARTED
   }
-
 }

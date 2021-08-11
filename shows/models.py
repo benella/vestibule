@@ -17,7 +17,7 @@ from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
-from shows.show_info_update.show_info_utils import extract_episode_time
+from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names
 from shows.show_info_update.poster_main_colors_util import get_poster_main_colors
 from api_feeds import search_feeds_by_imdb_id
 
@@ -256,17 +256,7 @@ class Show(models.Model):
         Creates list of possible torrent show titles, and keeps it
         Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
         """
-        aliases = [self.title] + imdb_show_data.get("akas", [])
-        formatted_aliases = list()
-
-        for name in aliases:
-            formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
-            formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
-            formatted_name = re.sub("[:(),'?!]", "", formatted_name).lower()
-            formatted_name = re.sub("\.+", ".", formatted_name.strip())
-            formatted_aliases.append(formatted_name)
-            formatted_aliases.append(f"{formatted_name}.{self.year}")
-
+        formatted_aliases = generate_show_lookup_names(imdb_show_data)
         self.lookup_names = "\n".join(formatted_aliases)
 
     def get_lookup_names_list(self) -> List[str]:

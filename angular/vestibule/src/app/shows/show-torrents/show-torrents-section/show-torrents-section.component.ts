@@ -1,6 +1,6 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
-import {Episode, Season, ShowDetails } from "../../show";
-import {Torrent} from "../../../torrents/torrent";
+import { Component, Input, OnChanges, OnInit} from '@angular/core';
+import { Episode, Season, ShowDetails } from "../../show";
+import { ShowTorrentDetails, Torrent } from "../../../torrents/torrent";
 
 @Component({
   selector: 'vestibule-show-torrents-section',
@@ -31,5 +31,24 @@ export class ShowTorrentsSectionComponent implements OnInit, OnChanges {
 
   toggleListOpen(): void {
     this.openList = !this.openList
+  }
+
+  torrentsDetails(): ShowTorrentDetails[] {
+    return this.torrents.map((torrent) => {
+      return {
+        torrentId: torrent.id,
+        torrentTitle: torrent.title,
+        showTitle: this.show.title,
+        seasonNumber: `${this.season.number}`,
+        episodeNumber: this.episode ? `${this.episode.number}` : '',
+        publicationTime: torrent.publication_time,
+        feed: torrent.feed,
+        quality: torrent.quality,
+        sourceType: torrent.source_type,
+        torrentLink: torrent.link,
+        isStandaloneTorrent: false,
+        downloadStatus: torrent.download_status
+      }
+    })
   }
 }

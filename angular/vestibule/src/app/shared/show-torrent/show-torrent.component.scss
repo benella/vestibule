@@ -1,4 +1,4 @@
-@import "../../../../styling/variables";
+@import "../../../styling/variables";
 
 .torrent-cont {
   margin-bottom: 0.5rem;
@@ -11,42 +11,49 @@
   margin-right: 0.5rem;
 
   .torrent-action {
-    width: 2.5rem;
+    width: 2.6rem;
     height: 1.2rem;
     text-align: center;
     transition: 0.3s;
+    border-radius: 0.6rem;
 
     img {
       height: 100%;
       transition: 0.2s;
     }
-
-    &:first-child {
-      border-radius: 0.6rem 0 0 0.6rem;
-    }
-
-    &:last-child {
-      border-radius: 0 0.6rem 0.6rem 0;
-    }
   }
 
   .action-download {
     cursor: pointer;
-    background-color: #c8c9c0;
+    background-color: $torrent-green;
 
     &:hover {
-      background-color: $value-true;
+      background-color: $torrent-green-hover;
     }
   }
+}
 
-  .action-plus {
-    cursor: pointer;
-    background-color: #a4a5a0;
-  }
+.action-plus {
+  cursor: pointer;
+  background-color: #c8c9c0;
+  width: 2.6rem;
+  height: 1.2rem;
+  text-align: right;
+  transition: 0.3s;
+  border-radius: 0.6rem;
+  position: absolute;
+  right: -1.5rem;
+  z-index: -1;
+  padding-right: 0.25rem;
 
-  .x-mode {
-    transform: rotate(45deg);
+  img {
+    height: 100%;
+    transition: 0.2s;
   }
+}
+
+.x-mode {
+  transform: rotate(45deg);
 }
 
 .torrent-details-cont {
@@ -73,9 +80,18 @@
   color: $light-text;
 }
 
+.torrent-base-details-cont {
+  position: relative;
+}
+
 .torrent-tags {
   display: flex;
   height: 1.2rem;
+  margin-right: 0.5rem;
+
+  &:last-child {
+    margin-right: 0;
+  }
 }
 
 .tag {
@@ -96,15 +112,15 @@
   }
 
   &.feed-tag {
-    background-color: #38bbe8;
+    background-color: #c8c9c0;
   }
 
   &.quality-tag {
-    background-color: #ff7bac;
+    background-color: #29abe2;
   }
 
   &.source-type-tag {
-    background-color: #fca61d;
+    background-color: #a4a5a0;
   }
 
   &.download-status-tag {

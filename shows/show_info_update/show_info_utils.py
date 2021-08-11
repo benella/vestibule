@@ -1,3 +1,4 @@
+import re
 from typing import Tuple
 from imdb import Movie
 from datetime import datetime
@@ -143,3 +144,23 @@ def extract_episode_time(episode: Movie) -> Tuple[bool, EpisodeTimeData]:
         month_only=False,
         year_only=False,
     )
+
+
+def generate_show_lookup_names(imdb_show_data: dict):
+    """
+    Creates list of possible torrent show titles
+    Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
+    """
+    aliases = [imdb_show_data.get("title", "")] + imdb_show_data.get("akas", [])
+    year = imdb_show_data.get("year", "")
+    formatted_aliases = list()
+
+    for name in aliases:
+        formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
+        formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+        formatted_name = re.sub("[:(),'?!]", "", formatted_name).lower()
+        formatted_name = re.sub("\.+", ".", formatted_name.strip())
+        formatted_aliases.append(formatted_name)
+        formatted_aliases.append(f"{formatted_name}.{year}")
+
+    return formatted_aliases
