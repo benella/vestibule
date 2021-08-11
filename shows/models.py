@@ -225,6 +225,8 @@ class Show(models.Model):
             formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
             formatted_name = re.sub("[:(),'?]", "", formatted_name).lower()
             formatted_name = re.sub("\.+", ".", formatted_name.strip())
+            formatted_name = formatted_name.rstrip(".")
+
             formatted_aliases.append(formatted_name)
             formatted_aliases.append(f"{formatted_name}.{self.year}")
 
