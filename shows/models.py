@@ -218,11 +218,13 @@ class Show(models.Model):
         Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
         """
         aliases = [self.title] + imdb_show_data.get("akas", [])
+        additional_aliases = [alias.replace("-", " ") for alias in aliases if "-" in alias]
+        aliases += additional_aliases
         formatted_aliases = list()
 
         for name in aliases:
             formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
-            formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+            formatted_name = re.sub("[_\s,]", ".", formatted_name.strip())
             formatted_name = re.sub("[:(),'?]", "", formatted_name).lower()
             formatted_name = re.sub("\.+", ".", formatted_name.strip())
             formatted_name = formatted_name.rstrip(".")
