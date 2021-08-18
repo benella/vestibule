@@ -152,6 +152,8 @@ def generate_show_lookup_names(imdb_show_data: dict):
     Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
     """
     aliases = [imdb_show_data.get("title", "")] + imdb_show_data.get("akas", [])
+    additional_aliases = [alias.replace("-", " ") for alias in aliases if "-" in alias]
+    aliases += additional_aliases
     year = imdb_show_data.get("year", "")
     formatted_aliases = list()
 
