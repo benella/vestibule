@@ -18,6 +18,7 @@ export interface ShowTorrentDetails {
   torrentLink: string
   isStandaloneTorrent: boolean
   downloadStatus: string
+  percentDone: number
 }
 
 export interface Torrent {

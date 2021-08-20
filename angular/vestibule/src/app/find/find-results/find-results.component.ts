@@ -89,7 +89,8 @@ export class FindResultsComponent implements OnInit {
           torrentTitle: torrent.raw_title,
           torrentLink: torrent.link,
           isStandaloneTorrent: true,
-          downloadStatus: TorrentDownloadStatus.NEVER_STARTED
+          downloadStatus: TorrentDownloadStatus.NEVER_STARTED,
+          percentDone: 0
         }
       })
     )

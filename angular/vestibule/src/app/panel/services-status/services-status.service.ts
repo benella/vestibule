@@ -1,7 +1,7 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import { HttpClient} from "@angular/common/http";
-import { ServiceStatusResponse } from "./service-status";
-import { interval, Observable, Subject, Subscription } from "rxjs";
+import {INITIAL_STATUS, ServiceStatusResponse} from "./service-status";
+import {BehaviorSubject, interval, Observable, Subscription} from "rxjs";
 import { take } from "rxjs/operators";
 
 @Injectable({
@@ -9,7 +9,7 @@ import { take } from "rxjs/operators";
 })
 export class ServicesStatusService implements OnDestroy {
   private statusUpdater: Subscription
-  private status = new Subject<ServiceStatusResponse>()
+  private status = new BehaviorSubject<ServiceStatusResponse>(INITIAL_STATUS)
 
   constructor(private http: HttpClient) {
     this.updateServicesStatus();

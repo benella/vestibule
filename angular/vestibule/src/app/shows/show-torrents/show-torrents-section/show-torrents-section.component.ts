@@ -47,7 +47,8 @@ export class ShowTorrentsSectionComponent implements OnInit, OnChanges {
         sourceType: torrent.source_type,
         torrentLink: torrent.link,
         isStandaloneTorrent: false,
-        downloadStatus: torrent.download_status
+        downloadStatus: torrent.download_status,
+        percentDone: torrent.percent_done
       }
     })
   }

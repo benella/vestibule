@@ -8,13 +8,17 @@
 
   <div class="torrent-details-cont">
     <div class="torrent-actions-cont">
-      <div class="torrent-action action-download" (click)="downloadTorrents()">
-        <img src="/static/images/download_icon.svg">
+      <div class="torrent-action action-download"
+           [class]="{ download_disabled: !canDownload, downloading: isDownloading, done: isDone }"
+           (click)="downloadTorrent()">
+        <div class="icon-wrap">
+          <img src="/static/images/{{statusIconName}}_icon.svg">
+        </div>
+        <p class="download-status" *ngIf="isDone">{{torrent.downloadStatus}}</p>
+        <div class="download-progress" *ngIf="isDownloading">
+          <div class="bar" style="width: {{torrent.percentDone}}%"></div>
+        </div>
       </div>
-
-<!--      <div class="torrent-action action-plus" (click)="toggleMoreDetails()">-->
-<!--        <img src="/static/images/plus_icon.svg" [class.x-mode]="moreDetailsMode">-->
-<!--      </div>-->
     </div>
 
     <div class="torrent-info-cont">

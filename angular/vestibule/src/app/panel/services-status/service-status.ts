@@ -5,5 +5,18 @@ export interface ServiceStatusResponse {
 export interface ServiceStatus {
   name: string;
   up: boolean;
-  url: string;
+  url?: string;
+}
+
+export const INITIAL_STATUS: ServiceStatusResponse = {
+  services: {
+    plex: {
+      name: 'plex',
+      up: false
+    },
+    transmission: {
+      name: 'transmission',
+      up: false
+    }
+  }
 }

@@ -25,39 +25,45 @@
 .dashboard-model-entry {
   width: 14rem;
   margin-right: 1.1rem;
+  background-color: #d2d3c740;
 
   &:hover .show-title {
     transform: translate(4px, 0);
   }
 
-  .show-title {
-    font-size: 1.1em;
-    margin: 8px 0;
-    transition: 0.3s;
-  }
+  .show-data {
+    padding: 0.5rem;
 
-  .show-next-episode-line {
-    font-size: 0.85em;
-    font-weight: 300;
-    color: $unselected-dark;
-    margin-bottom: 1rem;
-
-    span {
-      color: inherit;
-      font-weight: inherit;
+    .show-title {
+      font-size: 1.1em;
+      margin: 0.5rem 0;
+      transition: 0.3s;
     }
 
-    .season-status {
-      font-weight: 200;
+    .show-next-episode-line {
+      font-size: 0.85em;
+      font-weight: 300;
+      color: $unselected-dark;
+      margin: 0.75rem 0 0.5rem;
+
+      span {
+        color: inherit;
+        font-weight: inherit;
+      }
+
+      .season-status {
+        font-weight: 200;
+      }
     }
   }
 
   .show-recent-activity-wrapper {
-    padding: 1rem 0;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    background-color: #babbb140;
   }
 
   .show-recent-activity-line {
-    border-left: 3px solid $unselected-dark;
     font-size: 0.85em;
     font-weight: 300;
     color: $unselected-dark;

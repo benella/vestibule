@@ -1,18 +1,16 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ServiceStatus} from "./service-status";
-import {interval, Subscription} from "rxjs";
-import {ServicesStatusService} from "./services-status.service";
+import { Component, OnInit } from '@angular/core';
+import { ServiceStatus } from "./service-status";
+import { ServicesStatusService } from "./services-status.service";
 
 @Component({
   selector: 'vestibule-services-status',
   templateUrl: './services-status.component.html',
   styleUrls: ['./services-status.component.scss']
 })
-export class ServicesStatusComponent implements OnInit, OnDestroy{
+export class ServicesStatusComponent implements OnInit {
 
   plexStatus: ServiceStatus;
   transmissionStatus: ServiceStatus;
-  private statusUpdater: Subscription
 
   constructor(private servicesStatusService: ServicesStatusService) { }
 
@@ -27,9 +25,5 @@ export class ServicesStatusComponent implements OnInit, OnDestroy{
         this.transmissionStatus = data.services["transmission"];
       }
     );
-  }
-
-  ngOnDestroy(): void {
-    this.statusUpdater.unsubscribe();
   }
 }
