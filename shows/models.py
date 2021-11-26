@@ -17,7 +17,8 @@ from torrents.models import Torrent
 from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
-from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names
+from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names, \
+    update_entity_torrents
 from shows.show_info_update.poster_main_colors_util import get_poster_main_colors
 from api_feeds import search_feeds_by_imdb_id
 
@@ -83,6 +84,8 @@ class ShowProfile(models.Model):
                 torrent.save()
 
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
+        logger.info(f'should_wait, first_torrent_created_at: {first_torrent_created_at}')
+
         if self.wait == ShowProfile.W_NONE:
             return False
 
@@ -111,6 +114,9 @@ class ShowProfile(models.Model):
             days = 7
 
         else:
+            return True
+
+        if not first_torrent_created_at:
             return True
 
         return timezone.now() < first_torrent_created_at + timedelta(days=days)
@@ -541,6 +547,7 @@ class Show(models.Model):
             else:
                 messages.add_message(request, messages.INFO, f"No new Torrents found for {self}")
 
+
     def update_show_downloads(self):
         """
         Update the show's torrents according to the installation profile.
@@ -551,51 +558,17 @@ class Show(models.Model):
             return
 
         logger.info(f"> Updating '{self}' Torrent Downloads")
-        for season, episodes in self.episodes_by_seasons.items():
-            for episode, torrents in episodes.items():
-                if not episode:
+
+        for season in self.seasons.all():
+            if season.downloadable:
+                downloaded = update_entity_torrents(season, self.profile)
+                if downloaded:
                     continue
-                self._update_episode_downloads(season=season, episode=episode, torrents=torrents)
 
-    def _update_episode_downloads(self, season: str, episode: str, torrents: List[Torrent]):
-        """
-        Check if an episode requires torrents downloads, according to profile.
-        """
-        logger.info(f"{season}-{episode} has {len(torrents)} torrents")
+            for episode in season.episodes.all():
+                if episode.downloadable:
+                    update_entity_torrents(episode, self.profile)
 
-        if len(torrents) == 0:
-            return
-
-        downloaded = [torrent for torrent in torrents if torrent.was_downloaded]
-
-        if len(downloaded) != 0:
-            logger.info(f"{len(downloaded)} torrents already downloaded - doing nothing")
-            return
-
-        matched = Torrent.objects.filter(
-            show=self, season=season, episode=episode, profile_match=True).order_by('-profile_match_score')
-        logger.info(f"{len(matched)} torrents match the profile")
-
-        if len(matched) == 0:
-
-            first_torrent_created_at = Torrent.objects.filter(
-                show=self, season=season, episode=episode).order_by('-created')[0].created
-
-            if self.profile.should_wait(first_torrent_created_at=first_torrent_created_at):
-                logger.info("Waiting for a profile match - doing nothing")
-                return
-
-            logger.info("Not waiting for match (profile setting) - downloading best available")
-            best_match = Torrent.objects.filter(
-                show=self, season=season, episode=episode).order_by('-profile_match_score')[0]
-
-        else:
-            best_match = matched[0]
-
-        with TransmissionClient() as transmission:
-            if transmission.is_up:
-                _, message = transmission.download_torrent(best_match)
-                logger.info(message)
 
 
 class Season(models.Model):
@@ -607,17 +580,41 @@ class Season(models.Model):
 
     @property
     def season_matching_torrents(self):
-        return self.torrents.filter(episode="", profile_match=True)
+        return self.torrents.filter(episode="", profile_match=True).order_by('-profile_match_score')
 
     @property
     def season_unmatching_torrents(self):
-        return self.torrents.filter(episode="", profile_match=False)
+        return self.torrents.filter(episode="", profile_match=False).order_by('-profile_match_score')
+
+    @property
+    def downloadable(self):
+        any_episodes_downloaded = any(episode.is_downloaded for episode in self.episodes.all())
+        return self.should_download and not self.downloaded and self.torrents and not any_episodes_downloaded
+
+    @property
+    def first_torrent_created_at(self):
+        if self.torrents.filter(episode=""):
+            return self.torrents.filter(episode="").order_by('-created')[0].created
+        return None
 
     def __str__(self):
         return f"{self.show} - {self.title}"
 
     class Meta:
         ordering = ('show', '-number', )
+
+    def prime_torrent(self, must_match_profile=True):
+        if self.season_matching_torrents:
+            return self.season_matching_torrents[0]
+
+        if not must_match_profile and self.season_unmatching_torrents:
+            return self.season_unmatching_torrents[0]
+
+        return None
+
+    def update_download_status(self, is_downloaded):
+        self.downloaded = is_downloaded
+        self.save()
 
 
 class Episode(models.Model):
@@ -633,14 +630,37 @@ class Episode(models.Model):
 
     @property
     def matching_torrents(self):
-        return self.torrents.filter(profile_match=True)
+        return self.torrents.filter(profile_match=True).order_by('-profile_match_score')
 
     @property
     def unmatching_torrents(self):
-        return self.torrents.filter(profile_match=False)
+        return self.torrents.filter(profile_match=False).order_by('-profile_match_score')
+
+    @property
+    def downloadable(self):
+        return self.should_download and not self.is_downloaded and self.torrents
+
+    @property
+    def first_torrent_created_at(self):
+        if self.torrents.all():
+            return self.torrents.order_by('-created')[0].created
+        return None
 
     def __str__(self):
         return f"{self.season} - Episode {self.number} - {self.title}"
 
     class Meta:
         ordering = ('show', '-season', '-number', )
+
+    def prime_torrent(self, must_match_profile=True):
+        if self.matching_torrents:
+            return self.matching_torrents[0]
+
+        if not must_match_profile and self.unmatching_torrents:
+            return self.unmatching_torrents[0]
+
+        return None
+
+    def update_download_status(self, is_downloaded):
+        self.is_downloaded = is_downloaded
+        self.save()

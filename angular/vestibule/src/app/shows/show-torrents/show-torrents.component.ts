@@ -71,6 +71,34 @@ export class ShowTorrentsComponent implements OnInit, OnDestroy {
     return episode.is_aired ? 'Should Download' : 'Not Aired Yet'
   }
 
+  updateEpisodeDownloadStatus(episode: Episode): void {
+    this.showsService.updateShowTorrents(
+      this.show.imdb_id,
+      { episode: { id: episode.id, should_download: !episode.should_download }}).subscribe(
+        data => {
+          this.seasons = data
+          this.updateSelected()
+        }
+    )
+  }
+
+  updateSeasonDownloadStatus(season: Season): void {
+    this.showsService.updateShowTorrents(
+      this.show.imdb_id,
+      { season: { id: season.id, should_download: !season.should_download }}).subscribe(
+        data => {
+          this.seasons = data
+          this.updateSelected()
+        }
+    )
+  }
+
+  private updateSelected(): void {
+    this.selectedSeason = this.seasons.seasons.find(season => season.id === this.selectedSeason.id)
+    this.selectedEpisode = this.selectedSeason.episodes.find(episode => episode.id === this.selectedEpisode.id)
+    console.log('updateSelected', this.selectedSeason, this.selectedEpisode)
+  }
+
   chooseEpisode(season: Season, episode: Episode): void {
     this.selectedSeason = season
     this.selectedEpisode = episode

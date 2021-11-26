@@ -8,8 +8,9 @@
           <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
           <p class="show-next-episode-line">
             <span>{{show.next_episode}}</span>
-            <span class="bullet" style="color: rgb({{show.palette_list.primary.join(',')}})">•</span>
-            <span class="season-status">{{show.next_episode_season_status}}</span>
+            <span class="season-status"
+            style="background-color: rgba({{show.palette_list.primary.join(',')}}, 0.6)"
+            >{{show.next_episode_season_status}}</span>
           </p>
         </div>
 

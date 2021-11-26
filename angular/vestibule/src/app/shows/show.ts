@@ -114,3 +114,14 @@ export interface Episode {
   matching_torrents: Torrent[]
   unmatching_torrents: Torrent[]
 }
+
+export interface UpdateTorrents {
+  season?: {
+    id: number,
+    should_download: boolean
+  }
+  episode?: {
+    id: number,
+    should_download: boolean
+  }
+}

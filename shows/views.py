@@ -129,6 +129,37 @@ class ShowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "imdb_id"
 
 
+class ShowTorrentsUpdate(generics.UpdateAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowTorrentsSerializer
+    lookup_field = "imdb_id"
+
+    def update(self, request, *args, **kwargs):
+        show = self.get_object()
+
+        if "season" in request.data:
+            update_data = request.data["season"]
+            season = show.seasons.get(id=update_data["id"])
+            if season:
+                season.should_download = update_data["should_download"]
+                season.save()
+
+                for episode in season.episodes.all():
+                    episode.should_download = update_data["should_download"]
+                    episode.save()
+
+        if "episode" in request.data:
+            update_data = request.data["episode"]
+            episode = show.show_episodes.get(id=update_data["id"])
+
+            if episode:
+                episode.should_download = update_data["should_download"]
+                episode.save()
+
+        serializer = self.get_serializer(show)
+        return Response(serializer.data)
+
+
 class ShowTorrentsRetrieve(generics.RetrieveAPIView):
     queryset = Show.objects.all()
     serializer_class = ShowTorrentsSerializer

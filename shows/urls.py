@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^find_torrents/(?P<imdb_id>.+)$', views.ShowFindTorrents.as_view(), name='find-torrents'),
 
     url(r'^torrents/(?P<imdb_id>.+)$', views.ShowTorrentsRetrieve.as_view(), name='torrents'),
+    url(r'^update_torrents/(?P<imdb_id>.+)$', views.ShowTorrentsUpdate.as_view(), name='update-torrents'),
     url(r'^(?P<imdb_id>.+)$', views.ShowRetrieveUpdateDestroy.as_view(), name='detail'),
 ]

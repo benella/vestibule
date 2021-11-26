@@ -1,8 +1,15 @@
+import logging
 import re
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple, Union
 from imdb import Movie
 from datetime import datetime
 from dataclasses import dataclass
+
+if TYPE_CHECKING:
+    from shows.models import Season, Episode, ShowProfile
+from torrents_manager.transmission_client import TransmissionClient
+
+logger = logging.getLogger(__name__)
 
 
 def get_today():
@@ -166,3 +173,20 @@ def generate_show_lookup_names(imdb_show_data: dict):
         formatted_aliases.append(f"{formatted_name}.{year}")
 
     return formatted_aliases
+
+
+def update_entity_torrents(entity: Union['Season', 'Episode'], showProfile: 'ShowProfile') -> bool:
+    should_wait = showProfile.should_wait(entity.first_torrent_created_at)
+    prime_torrent = entity.prime_torrent(must_match_profile=should_wait)
+
+    if prime_torrent:
+        logger.info(f'{entity} - Prime torrent found - {prime_torrent}')
+        with TransmissionClient() as transmission:
+            if transmission.is_up:
+                downloaded, message = transmission.download_torrent(prime_torrent)
+                entity.update_download_status(downloaded)
+                logger.info(message)
+                return downloaded
+
+    logger.info(f'{entity} - Could not download prime torrent')
+    return False
