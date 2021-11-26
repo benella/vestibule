@@ -78,7 +78,7 @@ class Torrent(models.Model):
         self.modified = timezone.now()
 
         if new_status == Torrent.STOPPED:
-            self.transmission_torrent_id = None
+            self.transmission_torrent_id = 0
 
         self.save()
 
