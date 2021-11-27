@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from tvdb_api_client import TVDBClient
 from vestibule_configurations.models import VestibuleConfiguration
 
@@ -63,3 +63,15 @@ class TVDBVestibuleClient:
 
         except LookupError:
             return ""
+
+    def search_show(self, term) -> List[dict]:
+        results = []
+
+        try:
+            shows_list = self.client.find_series_by_name(term)
+            for show in shows_list:
+                results.append(self.client.get_series_by_id(show['tvdb_id']))
+        except ConnectionRefusedError as e:
+            print("Failed connecting to tvdb: ", e)
+
+        return results

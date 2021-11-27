@@ -341,12 +341,9 @@ class Show(models.Model):
         self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
         poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
 
-        self.poster_link = poster_link
-        self.extract_palette()
-
-        # if not self.poster_link or self.poster_link != poster_link:
-        #     self.poster_link = poster_link
-        #     self.extract_palette()
+        if not self.poster_link or self.poster_link != poster_link:
+            self.poster_link = poster_link
+            self.extract_palette()
 
         self.number_of_seasons = imdb_show_data.get("number of seasons")
         self.year = imdb_show_data.get("year", "Year Unknown")

@@ -42,15 +42,17 @@
         </div>
 
         <div class="episode-download-status-actions">
-          <div class="episode-download-status-action" (click)="updateEpisodeDownloadStatus(selectedEpisode)">
+          <div class="episode-download-status-action skip-action" (click)="updateEpisodeDownloadStatus(selectedEpisode)">
             <span>{{ selectedEpisode.should_download ? 'Skip' : 'Un-skip' }} this Episode</span>
           </div>
 
-          <div class="episode-download-status-action" (click)="updateSeasonDownloadStatus(selectedSeason)">
+          <div class="episode-download-status-action skip-action" (click)="updateSeasonDownloadStatus(selectedSeason)">
             <span>{{ selectedSeason.should_download ? 'Skip' : 'Un-skip' }} this Season</span>
           </div>
 
-          <div class="episode-download-status-action">
+          <div class="episode-download-status-action download-action"
+               [ngClass]="{ disabled: !canDownload || this.showNoTorrentsMessage() }"
+               (click)="downloadEpisodeBestMatch(selectedEpisode)">
             <span>Download Best Match</span>
           </div>
         </div>

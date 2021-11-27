@@ -12,6 +12,7 @@ import {
   EnrichedShowInfo,
   PreviewShowTorrents,
   UpdateTorrents,
+  DownloadEpisodeBestMatch,
 } from "./show";
 
 @Injectable({
@@ -71,5 +72,9 @@ export class ShowsService {
 
   updateShowTorrents(imdb_id: string, updateTorrents: UpdateTorrents): Observable<ShowTorrents> {
     return this.http.put<ShowTorrents>(`api/shows/update_torrents/${imdb_id}`, updateTorrents)
+  }
+
+  downloadEpisodeBestMatch(imdb_id: string, downloadEpisodeBestMatch: DownloadEpisodeBestMatch): Observable<ShowTorrents> {
+    return this.http.put<ShowTorrents>(`api/shows/download_current_best/${imdb_id}`, downloadEpisodeBestMatch)
   }
 }

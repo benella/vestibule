@@ -1,7 +1,8 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ShowsService } from "../shows.service";
-import {Season, Episode, ShowTorrents, ShowDetails} from "../show";
-import {Observable, Subscription} from "rxjs";
+import { Season, Episode, ShowTorrents, ShowDetails } from "../show";
+import { Observable, Subscription } from "rxjs";
+import { ServicesStatusService } from "../../panel/services-status/services-status.service";
 
 class EpisodeStatusColors {
   public static SKIP = '#c78415'
@@ -21,15 +22,19 @@ export class ShowTorrentsComponent implements OnInit, OnDestroy {
 
   private showUpdatedSubscription: Subscription
 
+  canDownload = false
   seasons: ShowTorrents
   selectedSeason: Season
   selectedEpisode: Episode
 
-  constructor(private showsService: ShowsService) { }
+  constructor(private showsService: ShowsService, private servicesStatusService: ServicesStatusService) { }
 
   ngOnInit(): void {
     this.updateShowTorrents()
     this.showUpdatedSubscription = this.showUpdated$.subscribe(() => this.updateShowTorrents())
+        this.servicesStatusService.getServicesStatus().subscribe(
+      data => this.canDownload = data.services["transmission"]?.up
+    )
   }
 
   updateShowTorrents(): void {
@@ -93,10 +98,30 @@ export class ShowTorrentsComponent implements OnInit, OnDestroy {
     )
   }
 
+  downloadEpisodeBestMatch(episode: Episode): void {
+    if (this.showNoTorrentsMessage()) {
+      console.log('Episode has no torrents')
+      return
+    }
+
+    if (!this.canDownload) {
+      console.log('Transmission is down')
+      return
+    }
+
+    this.showsService.downloadEpisodeBestMatch(
+      this.show.imdb_id,
+      { episode: { id: episode.id }}).subscribe(
+        data => {
+          this.seasons = data
+          this.updateSelected()
+        }
+    )
+  }
+
   private updateSelected(): void {
     this.selectedSeason = this.seasons.seasons.find(season => season.id === this.selectedSeason.id)
     this.selectedEpisode = this.selectedSeason.episodes.find(episode => episode.id === this.selectedEpisode.id)
-    console.log('updateSelected', this.selectedSeason, this.selectedEpisode)
   }
 
   chooseEpisode(season: Season, episode: Episode): void {

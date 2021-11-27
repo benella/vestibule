@@ -204,12 +204,32 @@
       transition: 0.2s;
 
       &:hover {
-        background-color: $skip;
         cursor: pointer;
       }
 
       &:last-child {
         border-radius: 0 0.9rem 0.9rem 0;
+      }
+
+      &.skip-action {
+        &:hover {
+          background-color: $skip;
+        }
+      }
+
+      &.download-action {
+        &:hover {
+          background-color: $torrent-green;
+        }
+      }
+
+      &.disabled {
+        opacity: 0.3;
+
+        &:hover {
+          cursor: default;
+          background-color: transparent;
+        }
       }
     }
   }

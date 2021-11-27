@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from "@angular/forms";
 import { ShowsService } from "../../shows/shows.service";
-import { EnrichedShowInfo, PreviewShowTorrents, ShowSearchResult, ShowSearchResults } from "../../shows/show";
-import { Observable, Subject } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { EnrichedShowInfo, ShowSearchResult, ShowSearchResults } from "../../shows/show";
+import { interval, Observable, Subject } from "rxjs";
+import { debounce, switchMap } from "rxjs/operators";
 import { Router } from "@angular/router";
-import {ShowTorrentDetails, TorrentDownloadStatus} from "../../torrents/torrent";
+import { ShowTorrentDetails, TorrentDownloadStatus } from "../../torrents/torrent";
 
 @Component({
   selector: 'vestibule-find-results',
@@ -35,6 +35,7 @@ export class FindResultsComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchOutput = this.searchTerm$.pipe(
+      debounce(() => interval(600)),
       switchMap((searchTerm: string) => {
         return this.showsService.searchShowByTitle(searchTerm);
       }),

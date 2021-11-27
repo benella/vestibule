@@ -125,3 +125,9 @@ export interface UpdateTorrents {
     should_download: boolean
   }
 }
+
+export interface DownloadEpisodeBestMatch {
+  episode: {
+    id: number,
+  }
+}

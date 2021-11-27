@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
+from torrents_manager.transmission_client import TransmissionClient
 from common.tvdb_client import TVDBVestibuleClient
 from feeds.models import Feed
 from api_feeds import search_feeds_by_imdb_id
@@ -19,6 +20,17 @@ ia = IMDb()
 def search_show(request, title):
     subscribed_shows_imdb_ids = [show.imdb_id for show in Show.objects.all()]
     results = ia.search_movie(title)
+
+    with TVDBVestibuleClient() as tvdb_client:
+        tvdb_results = tvdb_client.search_show(title)
+
+        for tvdb_result in tvdb_results[:5]:
+            try:
+                imdb_id_number = int(tvdb_result.get("imdbId", "").replace("tt", ""))
+                results.insert(0, ia.get_movie(imdb_id_number))
+            except ValueError:
+                continue
+
     filtered_results = list()
 
     for result in results:
@@ -155,6 +167,32 @@ class ShowTorrentsUpdate(generics.UpdateAPIView):
             if episode:
                 episode.should_download = update_data["should_download"]
                 episode.save()
+
+        serializer = self.get_serializer(show)
+        return Response(serializer.data)
+
+
+class ShowTorrentsDownloadCurrentBest(generics.UpdateAPIView):
+    queryset = Show.objects.all()
+    serializer_class = ShowTorrentsSerializer
+    lookup_field = "imdb_id"
+
+    def update(self, request, *args, **kwargs):
+        show = self.get_object()
+
+        if "episode" in request.data:
+            update_data = request.data["episode"]
+            episode = show.show_episodes.get(id=update_data["id"])
+
+            if episode:
+                prime_torrent = episode.prime_torrent(must_match_profile=False)
+
+                if prime_torrent:
+                    if prime_torrent.download_status != prime_torrent.DOWNLOADING:
+
+                        with TransmissionClient() as transmission:
+                            if transmission.is_up:
+                                transmission.download_torrent(prime_torrent)
 
         serializer = self.get_serializer(show)
         return Response(serializer.data)
