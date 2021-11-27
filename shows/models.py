@@ -14,7 +14,6 @@ from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
 from torrents.models import Torrent
-from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
 from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names, \
@@ -345,7 +344,7 @@ class Show(models.Model):
             self.poster_link = poster_link
             self.extract_palette()
 
-        self.number_of_seasons = imdb_show_data.get("number of seasons")
+        self.number_of_seasons = imdb_show_data.get("number of seasons", "Unknown")
         self.year = imdb_show_data.get("year", "Year Unknown")
         self.imdb_rating = imdb_show_data.get("rating", "Rating Unknown")
         self.generate_lookup_names(imdb_show_data)
@@ -388,7 +387,7 @@ class Show(models.Model):
                     self.next_episode_season_status = f"{count_upcoming_episodes_in_season} episodes left in season"
 
             self.next_episode_time_code = next_episode.air_time_code
-            self.next_episode = f"{str(next_episode.season.title)} Episode {next_episode.number} " \
+            self.next_episode = f"S{next_episode.season.number} E{next_episode.number} " \
                                 f"- '{next_episode.title}', {next_episode.air_status}"
         else:
             self.status_line = f"{self.status}, no upcoming episodes"
@@ -452,6 +451,9 @@ class Show(models.Model):
 
         ia.update(show_imdb_data, "episodes")
 
+        if "episodes" not in show_imdb_data:
+            return
+
         for season_number, season_episodes in show_imdb_data["episodes"].items():
             try:
                 season = self.seasons.get(number=season_number)
@@ -478,6 +480,15 @@ class Show(models.Model):
                 episode.air_time_code = episode_time_data.absolute_episode_air_time_code
                 episode.air_status = episode_time_data.airs
                 episode.save()
+
+            # Looking for dead episodes
+            for saved_episode in season.episodes.all():
+                if saved_episode.number not in season_episodes.keys():
+                    print(f"Saved Episode {saved_episode} ({saved_episode.number}) not found in {season_episodes.keys()}")
+                    if not saved_episode.torrents.all():
+                        print(f"It have no torrents {saved_episode.torrents.all()}, deleting it")
+                        saved_episode.delete()
+
 
     def find_show_torrents(self, request=None, torrents: List[FeedItem] = None):
         """

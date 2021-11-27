@@ -59,7 +59,7 @@ def show_enriched_info(request, imdb_id):
     with TVDBVestibuleClient() as tvdb_client:
         enriched_info["network"] = tvdb_client.get_show_original_network(imdb_id)
         enriched_info["status"] = tvdb_client.get_show_status(imdb_id)
-        enriched_info["number_of_seasons"] = imdb_show_data["number of seasons"]
+        enriched_info["number_of_seasons"] = imdb_show_data.get("number of seasons", "Unknown Number")
 
     return JsonResponse(enriched_info)
 

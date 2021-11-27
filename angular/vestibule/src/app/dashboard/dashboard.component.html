@@ -4,24 +4,12 @@
     <a *ngFor="let show of upcomingEpisodesShows" [routerLink]="['/shows', show.imdb_id]">
       <div class="dashboard-model-entry">
         <div class="show-data">
-          <p class="show-title">{{show.title}}</p>
           <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
-          <p class="show-next-episode-line">
-            <span>{{show.next_episode}}</span>
-            <span class="season-status"
-            style="background-color: rgba({{show.palette_list.primary.join(',')}}, 0.6)"
-            >{{show.next_episode_season_status}}</span>
-          </p>
-        </div>
-
-        <div class="show-recent-activity-wrapper" *ngIf="show.recent_torrents_active.length">
-          <p *ngFor="let torrent of show.recent_torrents_active"
-             class="show-recent-activity-line">
-            <span>S{{torrent.season}} </span>
-            <span *ngIf="torrent.episode">E{{torrent.episode}}</span>
-            <span class="bullet">•</span>
-            <span>{{torrent.download_status}}</span>
-          </p>
+          <p class="show-title">{{show.title}}</p>
+          <div class="show-next-episode-line">
+            <p>{{show.next_episode}}</p>
+            <p class="season-status">{{show.next_episode_season_status}}</p>
+          </div>
         </div>
       </div>
     </a>
