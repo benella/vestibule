@@ -1,14 +1,17 @@
+<vestibule-show-preview [previewShow]="showInPreview">
+
+</vestibule-show-preview>
+
 <div class="dashboard-model-wrapper">
   <p class="dashboard-model-title">Upcoming Episodes</p>
   <div class="dashboard-model-entries">
-    <a *ngFor="let show of upcomingEpisodesShows" [routerLink]="['/shows', show.imdb_id]">
+    <a *ngFor="let show of upcomingEpisodesShows" [routerLink]="['/shows', show.imdb_id]" (mouseenter)="showInPreview=show">
       <div class="dashboard-model-entry">
         <div class="show-data">
           <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
           <p class="show-title">{{show.title}}</p>
           <div class="show-next-episode-line">
             <p>{{show.next_episode}}</p>
-            <p class="season-status">{{show.next_episode_season_status}}</p>
           </div>
         </div>
       </div>

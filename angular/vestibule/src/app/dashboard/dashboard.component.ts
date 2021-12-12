@@ -9,12 +9,16 @@ import { ShowInUpcomingEpisodes } from "../shows/show";
 })
 export class DashboardComponent implements OnInit {
   upcomingEpisodesShows: ShowInUpcomingEpisodes[]
+  showInPreview: ShowInUpcomingEpisodes
 
   constructor(private showsService: ShowsService) { }
 
   ngOnInit(): void {
     this.showsService.listShowsByUpcomingEpisodes().subscribe(
-      data => this.upcomingEpisodesShows = data
+      data => {
+        this.upcomingEpisodesShows = data
+        this.showInPreview = this.upcomingEpisodesShows[0]
+      }
     )
   }
 }

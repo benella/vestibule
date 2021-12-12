@@ -13,23 +13,27 @@ import { TokenInterceptor } from "./authentication/token.interceptor";
 import { TorrentsModule } from "./torrents/torrents.module";
 import { FindModule } from "./find/find.module";
 import {ReactiveFormsModule} from "@angular/forms";
+import { ShowPreviewComponent } from './dashboard/show-preview/show-preview.component';
+import {SharedModule} from "./shared/shared.module";
 
 @NgModule({
   declarations: [
     AppComponent,
     PanelComponent,
     ServicesStatusComponent,
-    DashboardComponent
+    DashboardComponent,
+    ShowPreviewComponent
   ],
-  imports: [
-    BrowserModule,
-    ShowsModule,
-    FindModule,
-    TorrentsModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-  ],
+    imports: [
+        BrowserModule,
+        ShowsModule,
+        FindModule,
+        TorrentsModule,
+        AppRoutingModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        SharedModule,
+    ],
   providers: [
     CookieService,
     {

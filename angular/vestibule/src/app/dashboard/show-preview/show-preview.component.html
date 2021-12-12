@@ -1,0 +1,23 @@
+<div id="preview-wrap">
+  <div class="poster-wrap">
+    <div class="poster" style="background-image: url('{{show.poster_link}}')"></div>
+  </div>
+
+  <div class="details-wrap">
+    <p class="show-title">{{show.title}}</p>
+
+    <div class="details">
+      <div class="status">
+        <p class="next-episode-line">{{show.next_episode}}</p>
+        <p class="season-status-line">{{show.next_episode_season_status}}</p>
+      </div>
+
+      <div class="torrents">
+            <div *ngFor="let torrent of show.recent_torrents_active">
+      <p>S{{torrent.season}} E{{torrent.episode}} {{torrent.download_status}}</p>
+    </div>
+      </div>
+    </div>
+
+  </div>
+</div>
