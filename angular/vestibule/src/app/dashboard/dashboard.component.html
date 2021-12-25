@@ -5,7 +5,7 @@
 <div class="dashboard-model-wrapper">
   <p class="dashboard-model-title">Upcoming Episodes</p>
   <div class="dashboard-model-entries">
-    <a *ngFor="let show of upcomingEpisodesShows" [routerLink]="['/shows', show.imdb_id]" (mouseenter)="showInPreview=show">
+    <div *ngFor="let show of upcomingEpisodesShows" (click)="showInPreview=show">
       <div class="dashboard-model-entry">
         <div class="show-data">
           <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
@@ -15,6 +15,6 @@
           </div>
         </div>
       </div>
-    </a>
+    </div>
   </div>
 </div>

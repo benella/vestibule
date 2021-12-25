@@ -22,8 +22,8 @@
     <vestibule-show-torrents [show]="show" [showUpdated$]="showUpdated.asObservable()"></vestibule-show-torrents>
   </vestibule-show-details-tab>
 
-  <vestibule-show-details-tab tabTitle="Subscription Profile">
-    <vestibule-show-profile [showProfile]="show.profile" [showImdbID]="show.imdb_id"></vestibule-show-profile>
+  <vestibule-show-details-tab tabTitle="Subscription Settings">
+    <vestibule-show-profile [showProfile]="show.profile" [showImdbID]="show.imdb_id" [showCustomLookupNames]="show.custom_lookup_names"></vestibule-show-profile>
   </vestibule-show-details-tab>
 
   <vestibule-show-details-tab tabTitle="Actions">

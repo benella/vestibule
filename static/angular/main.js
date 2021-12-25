@@ -672,8 +672,8 @@ function ShowProfileComponent_option_16_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](waitTime_r4.name);
 } }
-function ShowProfileComponent_p_57_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "p", 13);
+function ShowProfileComponent_p_63_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "p", 14);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "Failed to save changes");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } }
@@ -691,6 +691,7 @@ class ShowProfileComponent {
             high_quality_source: ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
             download_automatically: ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
             wait: ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
+            custom_lookup_names: ['']
         });
         this.qualities = [
             '720P',
@@ -716,6 +717,7 @@ class ShowProfileComponent {
             high_quality_source: this.showProfile.high_quality_source,
             download_automatically: this.showProfile.download_automatically,
             wait: this.showProfile.wait,
+            custom_lookup_names: this.showCustomLookupNames
         });
         this.profileForm.valueChanges.subscribe(val => {
             this.hasSaveError = false;
@@ -723,23 +725,39 @@ class ShowProfileComponent {
         });
     }
     onSubmit() {
+        let settingsLoading = true;
+        let profileLoading = true;
         this.isLoading = true;
         this.hasSaveError = false;
+        const customLookupName = this.profileForm.get('custom_lookup_names').value;
+        if (customLookupName) {
+            this.showsService.updateShowSettings(this.showImdbID, { imdb_id: this.showImdbID, custom_lookup_names: customLookupName }).subscribe(showDetails => {
+                settingsLoading = false;
+                this.showCustomLookupNames = showDetails.custom_lookup_names;
+                this.updateIsChanged();
+                this.isLoading = profileLoading && settingsLoading;
+            });
+        }
+        else {
+            settingsLoading = false;
+        }
         this.showsService.updateShowProfile(this.showImdbID, this.profileForm.value).subscribe(data => {
             this.showProfile = data;
             this.updateIsChanged();
-            this.isLoading = false;
+            profileLoading = false;
+            this.isLoading = profileLoading && settingsLoading;
         }, () => {
-            this.isLoading = false;
+            profileLoading = false;
+            this.isLoading = profileLoading && settingsLoading;
             this.hasSaveError = true;
         });
     }
     updateIsChanged() {
-        this.isChanged = JSON.stringify(this.profileForm.value) !== JSON.stringify(this.showProfile);
+        this.isChanged = JSON.stringify(this.profileForm.value) !== JSON.stringify(Object.assign(Object.assign({}, this.showProfile), { custom_lookup_names: this.showCustomLookupNames }));
     }
 }
 ShowProfileComponent.ɵfac = function ShowProfileComponent_Factory(t) { return new (t || ShowProfileComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormBuilder"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shows_service__WEBPACK_IMPORTED_MODULE_2__["ShowsService"])); };
-ShowProfileComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowProfileComponent, selectors: [["vestibule-show-profile"]], inputs: { showProfile: "showProfile", showImdbID: "showImdbID" }, decls: 58, vars: 16, consts: [[3, "formGroup", "ngSubmit"], [1, "profile-form-field"], [1, "bullet"], ["formControlName", "quality", 1, "profile-form-option-select"], [3, "ngValue", 4, "ngFor", "ngForOf"], [1, "profile-option-description"], ["formControlName", "wait", 1, "profile-form-option-select"], ["formControlName", "download_automatically", 1, "profile-form-option-select"], [3, "ngValue"], ["formControlName", "subtitles", 1, "profile-form-option-select"], ["formControlName", "high_quality_source", 1, "profile-form-option-select"], ["type", "submit", 1, "profile-form-submit", 3, "disabled", "ngClass"], ["class", "save-error-text", 4, "ngIf"], [1, "save-error-text"]], template: function ShowProfileComponent_Template(rf, ctx) { if (rf & 1) {
+ShowProfileComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowProfileComponent, selectors: [["vestibule-show-profile"]], inputs: { showProfile: "showProfile", showImdbID: "showImdbID", showCustomLookupNames: "showCustomLookupNames" }, decls: 64, vars: 16, consts: [[3, "formGroup", "ngSubmit"], [1, "profile-form-field"], [1, "bullet"], ["formControlName", "quality", 1, "profile-form-option-select"], [3, "ngValue", 4, "ngFor", "ngForOf"], [1, "profile-option-description"], ["formControlName", "wait", 1, "profile-form-option-select"], ["formControlName", "download_automatically", 1, "profile-form-option-select"], [3, "ngValue"], ["formControlName", "subtitles", 1, "profile-form-option-select"], ["formControlName", "high_quality_source", 1, "profile-form-option-select"], ["formControlName", "custom_lookup_names", "rows", "5", "cols", "20"], ["type", "submit", 1, "profile-form-submit", 3, "disabled", "ngClass"], ["class", "save-error-text", 4, "ngIf"], [1, "save-error-text"]], template: function ShowProfileComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "form", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("ngSubmit", function ShowProfileComponent_Template_form_ngSubmit_0_listener() { return ctx.onSubmit(); });
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
@@ -827,10 +845,19 @@ ShowProfileComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](54, " Should favor torrents from high quality sources, like Web or BlueRay ");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](55, "button", 11);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](56, "Save");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](55, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](56, "p");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](57, "Custom Lookup Names");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](57, ShowProfileComponent_p_57_Template, 2, 0, "p", 12);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](58, "p", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](59, " User-defined values used to find show torrents (will be added to auto-generated values) ");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](60, "textarea", 11);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](61, "button", 12);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](62, "Save");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](63, ShowProfileComponent_p_63_Template, 2, 0, "p", 13);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("formGroup", ctx.profileForm);
@@ -850,11 +877,11 @@ ShowProfileComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngValue", true);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngValue", false);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](10);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", !ctx.profileForm.valid || !ctx.profileForm.dirty || !ctx.isChanged)("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction3"](12, _c0, !ctx.profileForm.valid || !ctx.profileForm.dirty || !ctx.isChanged, ctx.isLoading, ctx.hasSaveError));
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.hasSaveError);
-    } }, directives: [_angular_forms__WEBPACK_IMPORTED_MODULE_1__["ɵangular_packages_forms_forms_y"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatusGroup"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormGroupDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["SelectControlValueAccessor"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatus"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormControlName"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgSelectOption"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["ɵangular_packages_forms_forms_x"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgClass"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgIf"]], styles: [".profile-form-field[_ngcontent-%COMP%] {\n  margin-bottom: 1.5rem;\n}\n\n.profile-option-description[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 100;\n  color: #a4a5a0;\n}\n\n.profile-form-option-select[_ngcontent-%COMP%] {\n  border: none;\n  background: none;\n  color: #3f9359;\n}\n\n@keyframes flash_border {\n  0% {\n    border-color: #3f9359;\n  }\n  50% {\n    border-color: #206f38;\n  }\n  100% {\n    border-color: #3f9359;\n  }\n}\n\n.profile-form-submit[_ngcontent-%COMP%] {\n  color: #3f9359;\n  font-size: 1em;\n  margin-top: 1rem;\n  padding-bottom: 5px;\n  border: none;\n  background: none;\n  transition: 0.2s;\n  cursor: pointer;\n}\n\n.profile-form-submit[_ngcontent-%COMP%]:hover {\n  color: #206f38;\n}\n\n.profile-form-submit.disabled[_ngcontent-%COMP%] {\n  color: #a4a5a0;\n  cursor: auto;\n}\n\n.profile-form-submit.loading[_ngcontent-%COMP%] {\n  border-bottom: solid #3f9359 3px;\n  animation-name: flash_border;\n  animation-duration: 2s;\n  animation-timing-function: linear;\n  animation-iteration-count: infinite;\n}\n\n.profile-form-submit.error[_ngcontent-%COMP%] {\n  color: #AF4F68;\n}\n\n.save-error-text[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  color: #a4a5a0;\n}\n\n.value-true[_ngcontent-%COMP%] {\n  color: #3f9359;\n}\n\n.value-false[_ngcontent-%COMP%] {\n  color: #AF4F68;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hvd3Mvc2hvdy1wcm9maWxlL3Nob3ctcHJvZmlsZS5jb21wb25lbnQuc2NzcyIsInNyYy9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UscUJBQUE7QUFERjs7QUFJQTtFQUNFLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ0tXO0FETmI7O0FBSUE7RUFDRSxZQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ1JXO0FET2I7O0FBSUE7RUFDRTtJQUNFLHFCQ2JTO0VEWVg7RUFHQTtJQUNFLHFCQ2pCZTtFRGdCakI7RUFHQTtJQUNFLHFCQ25CUztFRGtCWDtBQUNGOztBQUlBO0VBQ0UsY0N4Qlc7RUR5QlgsY0FBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0VBQ0EsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGVBQUE7QUFGRjs7QUFJRTtFQUNFLGNDbkNlO0FEaUNuQjs7QUFLRTtFQUNFLGNDL0JTO0VEZ0NULFlBQUE7QUFISjs7QUFNRTtFQUNFLGdDQUFBO0VBQ0EsNEJBQUE7RUFDQSxzQkFBQTtFQUNBLGlDQUFBO0VBQ0EsbUNBQUE7QUFKSjs7QUFPRTtFQUNFLGNDbERVO0FENkNkOztBQVNBO0VBQ0UsZ0JBQUE7RUFDQSxjQ2xEVztBRDRDYjs7QUFTQTtFQUNFLGNDN0RXO0FEdURiOztBQVNBO0VBQ0UsY0NoRVk7QUQwRGQiLCJmaWxlIjoic3JjL2FwcC9zaG93cy9zaG93LXByb2ZpbGUvc2hvdy1wcm9maWxlLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiQGltcG9ydCBcIi4uLy4uLy4uL3N0eWxpbmcvdmFyaWFibGVzXCI7XG5cbi5wcm9maWxlLWZvcm0tZmllbGQge1xuICBtYXJnaW4tYm90dG9tOiAxLjVyZW07XG59XG5cbi5wcm9maWxlLW9wdGlvbi1kZXNjcmlwdGlvbiB7XG4gIGZvbnQtc2l6ZTogMC45ZW07XG4gIGZvbnQtd2VpZ2h0OiAxMDA7XG4gIGNvbG9yOiAkdW5zZWxlY3RlZDtcbn1cblxuLnByb2ZpbGUtZm9ybS1vcHRpb24tc2VsZWN0IHtcbiAgYm9yZGVyOiBub25lO1xuICBiYWNrZ3JvdW5kOiBub25lO1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG59XG5cbkBrZXlmcmFtZXMgZmxhc2hfYm9yZGVyIHtcbiAgMCUge1xuICAgIGJvcmRlci1jb2xvcjogJHZhbHVlLXRydWU7XG4gIH1cbiAgNTAlIHtcbiAgICBib3JkZXItY29sb3I6ICR2YWx1ZS10cnVlLWhvdmVyO1xuICB9XG4gIDEwMCUge1xuICAgIGJvcmRlci1jb2xvcjogJHZhbHVlLXRydWU7XG4gIH1cbn1cblxuLnByb2ZpbGUtZm9ybS1zdWJtaXQge1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG4gIGZvbnQtc2l6ZTogMWVtO1xuICBtYXJnaW4tdG9wOiAxcmVtO1xuICBwYWRkaW5nLWJvdHRvbTogNXB4O1xuICBib3JkZXI6IG5vbmU7XG4gIGJhY2tncm91bmQ6IG5vbmU7XG4gIHRyYW5zaXRpb246IDAuMnM7XG4gIGN1cnNvcjogcG9pbnRlcjtcblxuICAmOmhvdmVyIHtcbiAgICBjb2xvcjogJHZhbHVlLXRydWUtaG92ZXI7XG4gIH1cblxuICAmLmRpc2FibGVkIHtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQ7XG4gICAgY3Vyc29yOiBhdXRvO1xuICB9XG5cbiAgJi5sb2FkaW5nIHtcbiAgICBib3JkZXItYm90dG9tOiBzb2xpZCAkdmFsdWUtdHJ1ZSAzcHg7XG4gICAgYW5pbWF0aW9uLW5hbWU6IGZsYXNoX2JvcmRlcjtcbiAgICBhbmltYXRpb24tZHVyYXRpb246IDJzO1xuICAgIGFuaW1hdGlvbi10aW1pbmctZnVuY3Rpb246IGxpbmVhcjtcbiAgICBhbmltYXRpb24taXRlcmF0aW9uLWNvdW50OiBpbmZpbml0ZTtcbiAgfVxuXG4gICYuZXJyb3Ige1xuICAgIGNvbG9yOiAkdmFsdWUtZmFsc2U7XG4gIH1cbn1cblxuLnNhdmUtZXJyb3ItdGV4dCB7XG4gIGZvbnQtc2l6ZTogMC45ZW07XG4gIGNvbG9yOiAkdW5zZWxlY3RlZDtcbn1cblxuLnZhbHVlLXRydWUge1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG59XG5cbi52YWx1ZS1mYWxzZSB7XG4gIGNvbG9yOiAkdmFsdWUtZmFsc2U7XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
+    } }, directives: [_angular_forms__WEBPACK_IMPORTED_MODULE_1__["ɵangular_packages_forms_forms_y"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatusGroup"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormGroupDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["SelectControlValueAccessor"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatus"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormControlName"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgSelectOption"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["ɵangular_packages_forms_forms_x"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["DefaultValueAccessor"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgClass"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgIf"]], styles: [".profile-form-field[_ngcontent-%COMP%] {\n  margin-bottom: 1.5rem;\n}\n\n.profile-option-description[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 100;\n  color: #a4a5a0;\n}\n\n.profile-form-option-select[_ngcontent-%COMP%] {\n  border: none;\n  background: none;\n  color: #3f9359;\n}\n\n@keyframes flash_border {\n  0% {\n    border-color: #3f9359;\n  }\n  50% {\n    border-color: #206f38;\n  }\n  100% {\n    border-color: #3f9359;\n  }\n}\n\n.profile-form-submit[_ngcontent-%COMP%] {\n  color: #3f9359;\n  font-size: 1em;\n  margin-top: 1rem;\n  padding-bottom: 5px;\n  border: none;\n  background: none;\n  transition: 0.2s;\n  cursor: pointer;\n}\n\n.profile-form-submit[_ngcontent-%COMP%]:hover {\n  color: #206f38;\n}\n\n.profile-form-submit.disabled[_ngcontent-%COMP%] {\n  color: #a4a5a0;\n  cursor: auto;\n}\n\n.profile-form-submit.loading[_ngcontent-%COMP%] {\n  border-bottom: solid #3f9359 3px;\n  animation-name: flash_border;\n  animation-duration: 2s;\n  animation-timing-function: linear;\n  animation-iteration-count: infinite;\n}\n\n.profile-form-submit.error[_ngcontent-%COMP%] {\n  color: #AF4F68;\n}\n\n.save-error-text[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  color: #a4a5a0;\n}\n\n.value-true[_ngcontent-%COMP%] {\n  color: #3f9359;\n}\n\n.value-false[_ngcontent-%COMP%] {\n  color: #AF4F68;\n}\n\ntextarea[_ngcontent-%COMP%] {\n  font-size: 1em;\n  width: 24rem;\n  border: none;\n  border-radius: 0.3rem;\n  margin-top: 0.5rem;\n  background-color: rgba(164, 165, 160, 0.2);\n  padding: 0.5em;\n  font-weight: 300;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hvd3Mvc2hvdy1wcm9maWxlL3Nob3ctcHJvZmlsZS5jb21wb25lbnQuc2NzcyIsInNyYy9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UscUJBQUE7QUFERjs7QUFJQTtFQUNFLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ0tXO0FETmI7O0FBSUE7RUFDRSxZQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ1JXO0FET2I7O0FBSUE7RUFDRTtJQUNFLHFCQ2JTO0VEWVg7RUFHQTtJQUNFLHFCQ2pCZTtFRGdCakI7RUFHQTtJQUNFLHFCQ25CUztFRGtCWDtBQUNGOztBQUlBO0VBQ0UsY0N4Qlc7RUR5QlgsY0FBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0VBQ0EsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGVBQUE7QUFGRjs7QUFJRTtFQUNFLGNDbkNlO0FEaUNuQjs7QUFLRTtFQUNFLGNDL0JTO0VEZ0NULFlBQUE7QUFISjs7QUFNRTtFQUNFLGdDQUFBO0VBQ0EsNEJBQUE7RUFDQSxzQkFBQTtFQUNBLGlDQUFBO0VBQ0EsbUNBQUE7QUFKSjs7QUFPRTtFQUNFLGNDbERVO0FENkNkOztBQVNBO0VBQ0UsZ0JBQUE7RUFDQSxjQ2xEVztBRDRDYjs7QUFTQTtFQUNFLGNDN0RXO0FEdURiOztBQVNBO0VBQ0UsY0NoRVk7QUQwRGQ7O0FBU0E7RUFDRSxjQUFBO0VBQ0EsWUFBQTtFQUNBLFlBQUE7RUFDQSxxQkFBQTtFQUNBLGtCQUFBO0VBQ0EsMENDakV1QjtFRGtFdkIsY0FBQTtFQUNBLGdCQUFBO0FBTkYiLCJmaWxlIjoic3JjL2FwcC9zaG93cy9zaG93LXByb2ZpbGUvc2hvdy1wcm9maWxlLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiQGltcG9ydCBcIi4uLy4uLy4uL3N0eWxpbmcvdmFyaWFibGVzXCI7XG5cbi5wcm9maWxlLWZvcm0tZmllbGQge1xuICBtYXJnaW4tYm90dG9tOiAxLjVyZW07XG59XG5cbi5wcm9maWxlLW9wdGlvbi1kZXNjcmlwdGlvbiB7XG4gIGZvbnQtc2l6ZTogMC45ZW07XG4gIGZvbnQtd2VpZ2h0OiAxMDA7XG4gIGNvbG9yOiAkdW5zZWxlY3RlZDtcbn1cblxuLnByb2ZpbGUtZm9ybS1vcHRpb24tc2VsZWN0IHtcbiAgYm9yZGVyOiBub25lO1xuICBiYWNrZ3JvdW5kOiBub25lO1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG59XG5cbkBrZXlmcmFtZXMgZmxhc2hfYm9yZGVyIHtcbiAgMCUge1xuICAgIGJvcmRlci1jb2xvcjogJHZhbHVlLXRydWU7XG4gIH1cbiAgNTAlIHtcbiAgICBib3JkZXItY29sb3I6ICR2YWx1ZS10cnVlLWhvdmVyO1xuICB9XG4gIDEwMCUge1xuICAgIGJvcmRlci1jb2xvcjogJHZhbHVlLXRydWU7XG4gIH1cbn1cblxuLnByb2ZpbGUtZm9ybS1zdWJtaXQge1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG4gIGZvbnQtc2l6ZTogMWVtO1xuICBtYXJnaW4tdG9wOiAxcmVtO1xuICBwYWRkaW5nLWJvdHRvbTogNXB4O1xuICBib3JkZXI6IG5vbmU7XG4gIGJhY2tncm91bmQ6IG5vbmU7XG4gIHRyYW5zaXRpb246IDAuMnM7XG4gIGN1cnNvcjogcG9pbnRlcjtcblxuICAmOmhvdmVyIHtcbiAgICBjb2xvcjogJHZhbHVlLXRydWUtaG92ZXI7XG4gIH1cblxuICAmLmRpc2FibGVkIHtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQ7XG4gICAgY3Vyc29yOiBhdXRvO1xuICB9XG5cbiAgJi5sb2FkaW5nIHtcbiAgICBib3JkZXItYm90dG9tOiBzb2xpZCAkdmFsdWUtdHJ1ZSAzcHg7XG4gICAgYW5pbWF0aW9uLW5hbWU6IGZsYXNoX2JvcmRlcjtcbiAgICBhbmltYXRpb24tZHVyYXRpb246IDJzO1xuICAgIGFuaW1hdGlvbi10aW1pbmctZnVuY3Rpb246IGxpbmVhcjtcbiAgICBhbmltYXRpb24taXRlcmF0aW9uLWNvdW50OiBpbmZpbml0ZTtcbiAgfVxuXG4gICYuZXJyb3Ige1xuICAgIGNvbG9yOiAkdmFsdWUtZmFsc2U7XG4gIH1cbn1cblxuLnNhdmUtZXJyb3ItdGV4dCB7XG4gIGZvbnQtc2l6ZTogMC45ZW07XG4gIGNvbG9yOiAkdW5zZWxlY3RlZDtcbn1cblxuLnZhbHVlLXRydWUge1xuICBjb2xvcjogJHZhbHVlLXRydWU7XG59XG5cbi52YWx1ZS1mYWxzZSB7XG4gIGNvbG9yOiAkdmFsdWUtZmFsc2U7XG59XG5cbnRleHRhcmVhIHtcbiAgZm9udC1zaXplOiAxZW07XG4gIHdpZHRoOiAyNHJlbTtcbiAgYm9yZGVyOiBub25lO1xuICBib3JkZXItcmFkaXVzOiAwLjNyZW07XG4gIG1hcmdpbi10b3A6IDAuNXJlbTtcbiAgYmFja2dyb3VuZC1jb2xvcjogJHVuc2VsZWN0ZWQtdHJhbnNwYXJlbnQ7XG4gIHBhZGRpbmc6IDAuNWVtO1xuICBmb250LXdlaWdodDogMzAwO1xufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ShowProfileComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -865,6 +892,8 @@ ShowProfileComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
     }], function () { return [{ type: _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormBuilder"] }, { type: _shows_service__WEBPACK_IMPORTED_MODULE_2__["ShowsService"] }]; }, { showProfile: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
         }], showImdbID: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], showCustomLookupNames: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
         }] }); })();
 
@@ -939,6 +968,9 @@ class ShowsService {
     }
     updateShowProfile(imdb_id, profile) {
         return this.http.put(`api/shows/update_profile/${imdb_id}`, profile);
+    }
+    updateShowSettings(imdb_id, settings) {
+        return this.http.put(`api/shows/${imdb_id}`, settings);
     }
     updateShowInfo(imdb_id) {
         return this.http.get(`api/shows/update_info/${imdb_id}`);
@@ -1271,11 +1303,11 @@ function ShowDetailsComponent_ng_container_0_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("show", ctx_r0.show)("showUpdated$", ctx_r0.showUpdated.asObservable());
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("showProfile", ctx_r0.show.profile)("showImdbID", ctx_r0.show.imdb_id);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("showProfile", ctx_r0.show.profile)("showImdbID", ctx_r0.show.imdb_id)("showCustomLookupNames", ctx_r0.show.custom_lookup_names);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction2"](15, _c0, ctx_r0.updateShowInfoStatus === "loading", ctx_r0.updateShowInfoStatus === "error"));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction2"](16, _c0, ctx_r0.updateShowInfoStatus === "loading", ctx_r0.updateShowInfoStatus === "error"));
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction2"](18, _c0, ctx_r0.findShowTorrentsStatus === "loading", ctx_r0.findShowTorrentsStatus === "error"));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction2"](19, _c0, ctx_r0.findShowTorrentsStatus === "loading", ctx_r0.findShowTorrentsStatus === "error"));
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](8);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.unsubscribeShowStatus === "confirm");
 } }
@@ -1345,8 +1377,8 @@ class ShowDetailsComponent {
     }
 }
 ShowDetailsComponent.ɵfac = function ShowDetailsComponent_Factory(t) { return new (t || ShowDetailsComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_3__["ActivatedRoute"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shows_service__WEBPACK_IMPORTED_MODULE_4__["ShowsService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_panel_panel_background_panel_background_service__WEBPACK_IMPORTED_MODULE_5__["PanelBackgroundService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"])); };
-ShowDetailsComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowDetailsComponent, selectors: [["vestibule-show-details"]], decls: 1, vars: 1, consts: [[4, "ngIf"], [1, "show-title"], ["tabTitle", "Status", "active", "true"], [1, "show-title-tags"], [1, "show-status-line"], ["class", "show-next-episode-line", 4, "ngIf"], [1, "show-imdb-link"], ["target", "_blank", 3, "href"], ["tabTitle", "Episodes + Torrents"], [3, "show", "showUpdated$"], ["tabTitle", "Subscription Profile"], [3, "showProfile", "showImdbID"], ["tabTitle", "Actions"], [3, "ngClass", "click"], [1, "danger-zone-actions"], [1, "danger-zone-button", 3, "click"], ["class", "danger-zone-confirm", 4, "ngIf"], [1, "bullet"], [1, "show-next-episode-line"], [1, "danger-zone-confirm"], [1, "danger-zone-text"], [1, "danger-zone-confirm-yes", 3, "click"], [1, "danger-zone-confirm-cancel", 3, "click"]], template: function ShowDetailsComponent_Template(rf, ctx) { if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, ShowDetailsComponent_ng_container_0_Template, 35, 21, "ng-container", 0);
+ShowDetailsComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowDetailsComponent, selectors: [["vestibule-show-details"]], decls: 1, vars: 1, consts: [[4, "ngIf"], [1, "show-title"], ["tabTitle", "Status", "active", "true"], [1, "show-title-tags"], [1, "show-status-line"], ["class", "show-next-episode-line", 4, "ngIf"], [1, "show-imdb-link"], ["target", "_blank", 3, "href"], ["tabTitle", "Episodes + Torrents"], [3, "show", "showUpdated$"], ["tabTitle", "Subscription Settings"], [3, "showProfile", "showImdbID", "showCustomLookupNames"], ["tabTitle", "Actions"], [3, "ngClass", "click"], [1, "danger-zone-actions"], [1, "danger-zone-button", 3, "click"], ["class", "danger-zone-confirm", 4, "ngIf"], [1, "bullet"], [1, "show-next-episode-line"], [1, "danger-zone-confirm"], [1, "danger-zone-text"], [1, "danger-zone-confirm-yes", 3, "click"], [1, "danger-zone-confirm-cancel", 3, "click"]], template: function ShowDetailsComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, ShowDetailsComponent_ng_container_0_Template, 35, 22, "ng-container", 0);
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.show);
     } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _show_details_tabs_show_details_tabs_component__WEBPACK_IMPORTED_MODULE_7__["ShowDetailsTabsComponent"], _show_details_tab_show_details_tab_component__WEBPACK_IMPORTED_MODULE_8__["ShowDetailsTabComponent"], _show_torrents_show_torrents_component__WEBPACK_IMPORTED_MODULE_9__["ShowTorrentsComponent"], _show_profile_show_profile_component__WEBPACK_IMPORTED_MODULE_10__["ShowProfileComponent"], _shared_loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_11__["LoadingButtonComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_6__["NgClass"]], pipes: [_pipes_plural_pipe_pipe__WEBPACK_IMPORTED_MODULE_12__["PluralPipePipe"]], styles: [".show-title[_ngcontent-%COMP%] {\n  font-size: 2.3em;\n  font-weight: 500;\n}\n\n.show-title-tags[_ngcontent-%COMP%] {\n  margin-bottom: 1.5rem;\n}\n\n.show-status-line[_ngcontent-%COMP%] {\n  font-weight: 100;\n}\n\n.show-imdb-link[_ngcontent-%COMP%] {\n  margin-top: 1.5rem;\n}\n\n.show-imdb-link[_ngcontent-%COMP%]   a[_ngcontent-%COMP%] {\n  border: 2px solid;\n  padding: 0 5px 1px;\n  margin-right: 5px;\n  text-decoration: none;\n  transition: 0.2s;\n  display: inline-block;\n}\n\n.show-imdb-link[_ngcontent-%COMP%]   a[_ngcontent-%COMP%]:hover {\n  background-color: rgba(252, 214, 56, 0.6);\n}\n\n.danger-zone-actions[_ngcontent-%COMP%] {\n  margin-top: 1.5rem;\n}\n\n.danger-zone-actions[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  color: #AF4F68;\n  margin-bottom: 5px;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%] {\n  margin-left: 1rem;\n  border-left: 3px solid #a4a5a0;\n  padding-left: 10px;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-text[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  color: #333333;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-text[_ngcontent-%COMP%]   p[_ngcontent-%COMP%]   b[_ngcontent-%COMP%] {\n  color: #AF4F68;\n  font-weight: 500;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-yes[_ngcontent-%COMP%], .danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-cancel[_ngcontent-%COMP%] {\n  border: none;\n  background: none;\n  font-size: 0.9em;\n  margin-right: 15px;\n  font-weight: 500;\n  border-bottom: 3px solid;\n  margin-top: 10px;\n  padding-bottom: 3px;\n  transition: 0.2s;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-yes[_ngcontent-%COMP%] {\n  color: #AF4F68;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-yes[_ngcontent-%COMP%]:hover {\n  color: #972945;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-cancel[_ngcontent-%COMP%] {\n  color: #3f9359;\n}\n\n.danger-zone-confirm[_ngcontent-%COMP%]   .danger-zone-confirm-cancel[_ngcontent-%COMP%]:hover {\n  color: #206f38;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hvd3Mvc2hvdy1kZXRhaWxzL3Nob3ctZGV0YWlscy5jb21wb25lbnQuc2NzcyIsInNyYy9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtBQURGOztBQUlBO0VBQ0UscUJBQUE7QUFERjs7QUFJQTtFQUNFLGdCQUFBO0FBREY7O0FBSUE7RUFDRSxrQkFBQTtBQURGOztBQUdFO0VBQ0UsaUJBQUE7RUFDQSxrQkFBQTtFQUNBLGlCQUFBO0VBQ0EscUJBQUE7RUFDQSxnQkFBQTtFQUNBLHFCQUFBO0FBREo7O0FBR0k7RUFDRSx5Q0FBQTtBQUROOztBQU1BO0VBRUUsa0JBQUE7QUFKRjs7QUFNRTtFQUNFLGdCQUFBO0VBQ0EsY0M5QlU7RUQrQlYsa0JBQUE7QUFKSjs7QUFRQTtFQUNFLGlCQUFBO0VBQ0EsOEJBQUE7RUFDQSxrQkFBQTtBQUxGOztBQU9FO0VBQ0UsY0FBQTtBQUxKOztBQU9JO0VBQ0UsY0M1Q1E7RUQ2Q1IsZ0JBQUE7QUFMTjs7QUFTRTs7RUFFRSxZQUFBO0VBQ0EsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGtCQUFBO0VBQ0EsZ0JBQUE7RUFDQSx3QkFBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7RUFDQSxnQkFBQTtBQVBKOztBQVVFO0VBQ0UsY0MvRFU7QUR1RGQ7O0FBVUk7RUFDRSxjQ2pFYztBRHlEcEI7O0FBWUU7RUFDRSxjQ3hFUztBRDhEYjs7QUFZSTtFQUNFLGNDNUVhO0FEa0VuQiIsImZpbGUiOiJzcmMvYXBwL3Nob3dzL3Nob3ctZGV0YWlscy9zaG93LWRldGFpbHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuLnNob3ctdGl0bGUge1xuICBmb250LXNpemU6IDIuM2VtO1xuICBmb250LXdlaWdodDogNTAwO1xufVxuXG4uc2hvdy10aXRsZS10YWdzIHtcbiAgbWFyZ2luLWJvdHRvbTogMS41cmVtO1xufVxuXG4uc2hvdy1zdGF0dXMtbGluZSB7XG4gIGZvbnQtd2VpZ2h0OiAxMDA7XG59XG5cbi5zaG93LWltZGItbGluayB7XG4gIG1hcmdpbi10b3A6IDEuNXJlbTtcblxuICBhIHtcbiAgICBib3JkZXI6IDJweCBzb2xpZDtcbiAgICBwYWRkaW5nOiAwIDVweCAxcHg7XG4gICAgbWFyZ2luLXJpZ2h0OiA1cHg7XG4gICAgdGV4dC1kZWNvcmF0aW9uOiBub25lO1xuICAgIHRyYW5zaXRpb246IDAuMnM7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuXG4gICAgJjpob3ZlciB7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDI1MiwgMjE0LCA1NiwgMC42KTtcbiAgICB9XG4gIH1cbn1cblxuLmRhbmdlci16b25lLWFjdGlvbnMge1xuXG4gIG1hcmdpbi10b3A6IDEuNXJlbTtcblxuICBwIHtcbiAgICBmb250LXNpemU6IDAuOWVtO1xuICAgIGNvbG9yOiAkdmFsdWUtZmFsc2U7XG4gICAgbWFyZ2luLWJvdHRvbTogNXB4O1xuICB9XG59XG5cbi5kYW5nZXItem9uZS1jb25maXJtIHtcbiAgbWFyZ2luLWxlZnQ6IDFyZW07XG4gIGJvcmRlci1sZWZ0OiAzcHggc29saWQgJHVuc2VsZWN0ZWQ7XG4gIHBhZGRpbmctbGVmdDogMTBweDtcblxuICAuZGFuZ2VyLXpvbmUtdGV4dCBwIHtcbiAgICBjb2xvcjogIzMzMzMzMztcblxuICAgIGIge1xuICAgICAgY29sb3I6ICR2YWx1ZS1mYWxzZTtcbiAgICAgIGZvbnQtd2VpZ2h0OiA1MDA7XG4gICAgfVxuICB9XG5cbiAgLmRhbmdlci16b25lLWNvbmZpcm0teWVzLFxuICAuZGFuZ2VyLXpvbmUtY29uZmlybS1jYW5jZWwge1xuICAgIGJvcmRlcjogbm9uZTtcbiAgICBiYWNrZ3JvdW5kOiBub25lO1xuICAgIGZvbnQtc2l6ZTogMC45ZW07XG4gICAgbWFyZ2luLXJpZ2h0OiAxNXB4O1xuICAgIGZvbnQtd2VpZ2h0OiA1MDA7XG4gICAgYm9yZGVyLWJvdHRvbTogM3B4IHNvbGlkO1xuICAgIG1hcmdpbi10b3A6IDEwcHg7XG4gICAgcGFkZGluZy1ib3R0b206IDNweDtcbiAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICB9XG5cbiAgLmRhbmdlci16b25lLWNvbmZpcm0teWVzIHtcbiAgICBjb2xvcjogJHZhbHVlLWZhbHNlO1xuXG4gICAgJjpob3ZlciB7XG4gICAgICBjb2xvcjogJHZhbHVlLWZhbHNlLWhvdmVyO1xuICAgIH1cbiAgfVxuXG4gIC5kYW5nZXItem9uZS1jb25maXJtLWNhbmNlbCB7XG4gICAgY29sb3I6ICR2YWx1ZS10cnVlO1xuXG4gICAgJjpob3ZlciB7XG4gICAgICBjb2xvcjogJHZhbHVlLXRydWUtaG92ZXI7XG4gICAgfVxuICB9XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
@@ -1566,6 +1598,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "ofXK");
 /* harmony import */ var _loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./loading-button/loading-button.component */ "+fDI");
 /* harmony import */ var _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./show-torrent/show-torrent.component */ "vYL3");
+/* harmony import */ var _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./torrent-download-status/torrent-download-status.component */ "ijB9");
+
 
 
 
@@ -1578,18 +1612,22 @@ SharedModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjec
             _angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"]
         ]] });
 (function () { (typeof ngJitMode === "undefined" || ngJitMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsetNgModuleScope"](SharedModule, { declarations: [_loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__["LoadingButtonComponent"],
-        _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"]], imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"]], exports: [_loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__["LoadingButtonComponent"],
-        _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"]] }); })();
+        _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"],
+        _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__["TorrentDownloadStatusComponent"]], imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"]], exports: [_loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__["LoadingButtonComponent"],
+        _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"],
+        _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__["TorrentDownloadStatusComponent"]] }); })();
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](SharedModule, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
         args: [{
                 declarations: [
                     _loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__["LoadingButtonComponent"],
-                    _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"]
+                    _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"],
+                    _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__["TorrentDownloadStatusComponent"]
                 ],
                 exports: [
                     _loading_button_loading_button_component__WEBPACK_IMPORTED_MODULE_2__["LoadingButtonComponent"],
-                    _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"]
+                    _show_torrent_show_torrent_component__WEBPACK_IMPORTED_MODULE_3__["ShowTorrentComponent"],
+                    _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__["TorrentDownloadStatusComponent"]
                 ],
                 imports: [
                     _angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"]
@@ -1614,20 +1652,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _shows_shows_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../shows/shows.service */ "9gd4");
 /* harmony import */ var _show_preview_show_preview_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./show-preview/show-preview.component */ "nayn");
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common */ "ofXK");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ "tyNb");
-/* harmony import */ var _shows_poster_strip_poster_strip_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../shows/poster-strip/poster-strip.component */ "AX8S");
+/* harmony import */ var _shows_poster_strip_poster_strip_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../shows/poster-strip/poster-strip.component */ "AX8S");
 
 
 
 
 
 
-
-const _c0 = function (a1) { return ["/shows", a1]; };
-function DashboardComponent_a_5_Template(rf, ctx) { if (rf & 1) {
+function DashboardComponent_div_5_Template(rf, ctx) { if (rf & 1) {
     const _r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "a", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("mouseenter", function DashboardComponent_a_5_Template_a_mouseenter_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r3); const show_r1 = ctx.$implicit; const ctx_r2 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r2.showInPreview = show_r1; });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function DashboardComponent_div_5_Template_div_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r3); const show_r1 = ctx.$implicit; const ctx_r2 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r2.showInPreview = show_r1; });
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 6);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 7);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](3, "vestibule-poster-strip", 8);
@@ -1644,7 +1679,6 @@ function DashboardComponent_a_5_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const show_r1 = ctx.$implicit;
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("routerLink", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](5, _c0, show_r1.imdb_id));
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("palette", show_r1.palette_list)("width", "100%");
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
@@ -1664,21 +1698,21 @@ class DashboardComponent {
     }
 }
 DashboardComponent.ɵfac = function DashboardComponent_Factory(t) { return new (t || DashboardComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shows_shows_service__WEBPACK_IMPORTED_MODULE_1__["ShowsService"])); };
-DashboardComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: DashboardComponent, selectors: [["vestibule-dashboard"]], decls: 6, vars: 2, consts: [[3, "previewShow"], [1, "dashboard-model-wrapper"], [1, "dashboard-model-title"], [1, "dashboard-model-entries"], [3, "routerLink", "mouseenter", 4, "ngFor", "ngForOf"], [3, "routerLink", "mouseenter"], [1, "dashboard-model-entry"], [1, "show-data"], [3, "palette", "width"], [1, "show-title"], [1, "show-next-episode-line"]], template: function DashboardComponent_Template(rf, ctx) { if (rf & 1) {
+DashboardComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: DashboardComponent, selectors: [["vestibule-dashboard"]], decls: 6, vars: 2, consts: [[3, "previewShow"], [1, "dashboard-model-wrapper"], [1, "dashboard-model-title"], [1, "dashboard-model-entries"], [3, "click", 4, "ngFor", "ngForOf"], [3, "click"], [1, "dashboard-model-entry"], [1, "show-data"], [3, "palette", "width"], [1, "show-title"], [1, "show-next-episode-line"]], template: function DashboardComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "vestibule-show-preview", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "p", 2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](3, "Upcoming Episodes");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "div", 3);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, DashboardComponent_a_5_Template, 9, 7, "a", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, DashboardComponent_div_5_Template, 9, 4, "div", 4);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("previewShow", ctx.showInPreview);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](5);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx.upcomingEpisodesShows);
-    } }, directives: [_show_preview_show_preview_component__WEBPACK_IMPORTED_MODULE_2__["ShowPreviewComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], _angular_router__WEBPACK_IMPORTED_MODULE_4__["RouterLinkWithHref"], _shows_poster_strip_poster_strip_component__WEBPACK_IMPORTED_MODULE_5__["PosterStripComponent"]], styles: [".bullet[_ngcontent-%COMP%] {\n  margin: 0 8px;\n}\n\n.dashboard-model-wrapper[_ngcontent-%COMP%] {\n  margin: 1rem 0 5rem;\n}\n\n.dashboard-model-title[_ngcontent-%COMP%] {\n  margin-bottom: 1rem;\n  color: #a4a5a0;\n}\n\n.dashboard-model-entries[_ngcontent-%COMP%] {\n  display: flex;\n  overflow-x: scroll;\n}\n\n.dashboard-model-entries[_ngcontent-%COMP%]::-webkit-scrollbar {\n  display: none;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%] {\n  width: 16rem;\n  margin-right: 1.2rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]:hover   .show-title[_ngcontent-%COMP%] {\n  transform: translate(4px, 0);\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-title[_ngcontent-%COMP%] {\n  font-size: 1.1em;\n  margin: 0.7rem 0;\n  transition: 0.3s;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%] {\n  font-size: 0.85em;\n  font-weight: 400;\n  color: #747470;\n  margin: 0 0 0.5rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  color: inherit;\n  font-weight: inherit;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%]   .season-status[_ngcontent-%COMP%] {\n  font-weight: 200;\n  display: inline-block;\n  height: 1.2rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-wrapper[_ngcontent-%COMP%] {\n  padding: 0.5rem;\n  margin-top: 0.5rem;\n  background-color: #babbb140;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%] {\n  font-size: 0.85em;\n  font-weight: 300;\n  color: #747470;\n  padding: 0.2rem 0.5rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  color: inherit;\n  font-weight: inherit;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%]   .season-status[_ngcontent-%COMP%] {\n  font-weight: 200;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZGFzaGJvYXJkL2Rhc2hib2FyZC5jb21wb25lbnQuc2NzcyIsInNyYy9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UsYUFBQTtBQURGOztBQUlBO0VBQ0UsbUJBQUE7QUFERjs7QUFJQTtFQUNFLG1CQUFBO0VBQ0EsY0NFVztBREhiOztBQUlBO0VBQ0UsYUFBQTtFQUNBLGtCQUFBO0FBREY7O0FBR0U7RUFDRSxhQUFBO0FBREo7O0FBS0E7RUFDRSxZQUFBO0VBQ0Esb0JBQUE7QUFGRjs7QUFJRTtFQUNFLDRCQUFBO0FBRko7O0FBT0k7RUFDRSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7QUFMTjs7QUFRSTtFQUNFLGlCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQzVCWTtFRDZCWixrQkFBQTtBQU5OOztBQVFNO0VBQ0UsY0FBQTtFQUNBLG9CQUFBO0FBTlI7O0FBU007RUFDRSxnQkFBQTtFQUNBLHFCQUFBO0VBQ0EsY0FBQTtBQVBSOztBQVlFO0VBQ0UsZUFBQTtFQUNBLGtCQUFBO0VBQ0EsMkJBQUE7QUFWSjs7QUFhRTtFQUNFLGlCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ3JEYztFRHNEZCxzQkFBQTtBQVhKOztBQWFJO0VBQ0UsY0FBQTtFQUNBLG9CQUFBO0FBWE47O0FBY0k7RUFDRSxnQkFBQTtBQVpOIiwiZmlsZSI6InNyYy9hcHAvZGFzaGJvYXJkL2Rhc2hib2FyZC5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIkBpbXBvcnQgXCIuLi8uLi9zdHlsaW5nL3ZhcmlhYmxlc1wiO1xuXG4uYnVsbGV0IHtcbiAgbWFyZ2luOiAwIDhweDtcbn1cblxuLmRhc2hib2FyZC1tb2RlbC13cmFwcGVyIHtcbiAgbWFyZ2luOiAxcmVtIDAgNXJlbTtcbn1cblxuLmRhc2hib2FyZC1tb2RlbC10aXRsZSB7XG4gIG1hcmdpbi1ib3R0b206IDFyZW07XG4gIGNvbG9yOiAkdW5zZWxlY3RlZDs7XG59XG5cbi5kYXNoYm9hcmQtbW9kZWwtZW50cmllcyB7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIG92ZXJmbG93LXg6IHNjcm9sbDtcblxuICAmOjotd2Via2l0LXNjcm9sbGJhciB7XG4gICAgZGlzcGxheTogbm9uZTtcbiAgfVxufVxuXG4uZGFzaGJvYXJkLW1vZGVsLWVudHJ5IHtcbiAgd2lkdGg6IDE2cmVtO1xuICBtYXJnaW4tcmlnaHQ6IDEuMnJlbTtcblxuICAmOmhvdmVyIC5zaG93LXRpdGxlIHtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSg0cHgsIDApO1xuICB9XG5cbiAgLnNob3ctZGF0YSB7XG5cbiAgICAuc2hvdy10aXRsZSB7XG4gICAgICBmb250LXNpemU6IDEuMWVtO1xuICAgICAgbWFyZ2luOiAwLjdyZW0gMDtcbiAgICAgIHRyYW5zaXRpb246IDAuM3M7XG4gICAgfVxuXG4gICAgLnNob3ctbmV4dC1lcGlzb2RlLWxpbmUge1xuICAgICAgZm9udC1zaXplOiAwLjg1ZW07XG4gICAgICBmb250LXdlaWdodDogNDAwO1xuICAgICAgY29sb3I6ICR1bnNlbGVjdGVkLWRhcms7XG4gICAgICBtYXJnaW46IDAgMCAwLjVyZW07XG5cbiAgICAgIHAge1xuICAgICAgICBjb2xvcjogaW5oZXJpdDtcbiAgICAgICAgZm9udC13ZWlnaHQ6IGluaGVyaXQ7XG4gICAgICB9XG5cbiAgICAgIC5zZWFzb24tc3RhdHVzIHtcbiAgICAgICAgZm9udC13ZWlnaHQ6IDIwMDtcbiAgICAgICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgICAgICBoZWlnaHQ6IDEuMnJlbTtcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICAuc2hvdy1yZWNlbnQtYWN0aXZpdHktd3JhcHBlciB7XG4gICAgcGFkZGluZzogMC41cmVtO1xuICAgIG1hcmdpbi10b3A6IDAuNXJlbTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYmFiYmIxNDA7XG4gIH1cblxuICAuc2hvdy1yZWNlbnQtYWN0aXZpdHktbGluZSB7XG4gICAgZm9udC1zaXplOiAwLjg1ZW07XG4gICAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcbiAgICBwYWRkaW5nOiAwLjJyZW0gMC41cmVtO1xuXG4gICAgc3BhbiB7XG4gICAgICBjb2xvcjogaW5oZXJpdDtcbiAgICAgIGZvbnQtd2VpZ2h0OiBpbmhlcml0O1xuICAgIH1cblxuICAgIC5zZWFzb24tc3RhdHVzIHtcbiAgICAgIGZvbnQtd2VpZ2h0OiAyMDA7XG4gICAgfVxuICB9XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
+    } }, directives: [_show_preview_show_preview_component__WEBPACK_IMPORTED_MODULE_2__["ShowPreviewComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], _shows_poster_strip_poster_strip_component__WEBPACK_IMPORTED_MODULE_4__["PosterStripComponent"]], styles: [".bullet[_ngcontent-%COMP%] {\n  margin: 0 8px;\n}\n\n.dashboard-model-wrapper[_ngcontent-%COMP%] {\n  margin: 4rem 0 5rem;\n}\n\n.dashboard-model-title[_ngcontent-%COMP%] {\n  margin-bottom: 1rem;\n  color: #a4a5a0;\n}\n\n.dashboard-model-entries[_ngcontent-%COMP%] {\n  display: flex;\n  overflow-x: scroll;\n}\n\n.dashboard-model-entries[_ngcontent-%COMP%]::-webkit-scrollbar {\n  display: none;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%] {\n  cursor: pointer;\n  width: 16rem;\n  margin-right: 1.2rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]:hover   .show-title[_ngcontent-%COMP%] {\n  transform: translate(4px, 0);\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-title[_ngcontent-%COMP%] {\n  font-size: 1.1em;\n  margin: 0.7rem 0;\n  transition: 0.3s;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%] {\n  font-size: 0.85em;\n  font-weight: 400;\n  color: #747470;\n  margin: 0 0 0.5rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  color: inherit;\n  font-weight: inherit;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-data[_ngcontent-%COMP%]   .show-next-episode-line[_ngcontent-%COMP%]   .season-status[_ngcontent-%COMP%] {\n  font-weight: 200;\n  display: inline-block;\n  height: 1.2rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-wrapper[_ngcontent-%COMP%] {\n  padding: 0.5rem;\n  margin-top: 0.5rem;\n  background-color: #babbb140;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%] {\n  font-size: 0.85em;\n  font-weight: 300;\n  color: #747470;\n  padding: 0.2rem 0.5rem;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  color: inherit;\n  font-weight: inherit;\n}\n\n.dashboard-model-entry[_ngcontent-%COMP%]   .show-recent-activity-line[_ngcontent-%COMP%]   .season-status[_ngcontent-%COMP%] {\n  font-weight: 200;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZGFzaGJvYXJkL2Rhc2hib2FyZC5jb21wb25lbnQuc2NzcyIsInNyYy9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UsYUFBQTtBQURGOztBQUlBO0VBQ0UsbUJBQUE7QUFERjs7QUFJQTtFQUNFLG1CQUFBO0VBQ0EsY0NFVztBREhiOztBQUlBO0VBQ0UsYUFBQTtFQUNBLGtCQUFBO0FBREY7O0FBR0U7RUFDRSxhQUFBO0FBREo7O0FBS0E7RUFDRSxlQUFBO0VBQ0EsWUFBQTtFQUNBLG9CQUFBO0FBRkY7O0FBSUU7RUFDRSw0QkFBQTtBQUZKOztBQU9JO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGdCQUFBO0FBTE47O0FBUUk7RUFDRSxpQkFBQTtFQUNBLGdCQUFBO0VBQ0EsY0M3Qlk7RUQ4Qlosa0JBQUE7QUFOTjs7QUFRTTtFQUNFLGNBQUE7RUFDQSxvQkFBQTtBQU5SOztBQVNNO0VBQ0UsZ0JBQUE7RUFDQSxxQkFBQTtFQUNBLGNBQUE7QUFQUjs7QUFZRTtFQUNFLGVBQUE7RUFDQSxrQkFBQTtFQUNBLDJCQUFBO0FBVko7O0FBYUU7RUFDRSxpQkFBQTtFQUNBLGdCQUFBO0VBQ0EsY0N0RGM7RUR1RGQsc0JBQUE7QUFYSjs7QUFhSTtFQUNFLGNBQUE7RUFDQSxvQkFBQTtBQVhOOztBQWNJO0VBQ0UsZ0JBQUE7QUFaTiIsImZpbGUiOiJzcmMvYXBwL2Rhc2hib2FyZC9kYXNoYm9hcmQuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuLmJ1bGxldCB7XG4gIG1hcmdpbjogMCA4cHg7XG59XG5cbi5kYXNoYm9hcmQtbW9kZWwtd3JhcHBlciB7XG4gIG1hcmdpbjogNHJlbSAwIDVyZW07XG59XG5cbi5kYXNoYm9hcmQtbW9kZWwtdGl0bGUge1xuICBtYXJnaW4tYm90dG9tOiAxcmVtO1xuICBjb2xvcjogJHVuc2VsZWN0ZWQ7O1xufVxuXG4uZGFzaGJvYXJkLW1vZGVsLWVudHJpZXMge1xuICBkaXNwbGF5OiBmbGV4O1xuICBvdmVyZmxvdy14OiBzY3JvbGw7XG5cbiAgJjo6LXdlYmtpdC1zY3JvbGxiYXIge1xuICAgIGRpc3BsYXk6IG5vbmU7XG4gIH1cbn1cblxuLmRhc2hib2FyZC1tb2RlbC1lbnRyeSB7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgd2lkdGg6IDE2cmVtO1xuICBtYXJnaW4tcmlnaHQ6IDEuMnJlbTtcblxuICAmOmhvdmVyIC5zaG93LXRpdGxlIHtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSg0cHgsIDApO1xuICB9XG5cbiAgLnNob3ctZGF0YSB7XG5cbiAgICAuc2hvdy10aXRsZSB7XG4gICAgICBmb250LXNpemU6IDEuMWVtO1xuICAgICAgbWFyZ2luOiAwLjdyZW0gMDtcbiAgICAgIHRyYW5zaXRpb246IDAuM3M7XG4gICAgfVxuXG4gICAgLnNob3ctbmV4dC1lcGlzb2RlLWxpbmUge1xuICAgICAgZm9udC1zaXplOiAwLjg1ZW07XG4gICAgICBmb250LXdlaWdodDogNDAwO1xuICAgICAgY29sb3I6ICR1bnNlbGVjdGVkLWRhcms7XG4gICAgICBtYXJnaW46IDAgMCAwLjVyZW07XG5cbiAgICAgIHAge1xuICAgICAgICBjb2xvcjogaW5oZXJpdDtcbiAgICAgICAgZm9udC13ZWlnaHQ6IGluaGVyaXQ7XG4gICAgICB9XG5cbiAgICAgIC5zZWFzb24tc3RhdHVzIHtcbiAgICAgICAgZm9udC13ZWlnaHQ6IDIwMDtcbiAgICAgICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgICAgICBoZWlnaHQ6IDEuMnJlbTtcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICAuc2hvdy1yZWNlbnQtYWN0aXZpdHktd3JhcHBlciB7XG4gICAgcGFkZGluZzogMC41cmVtO1xuICAgIG1hcmdpbi10b3A6IDAuNXJlbTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYmFiYmIxNDA7XG4gIH1cblxuICAuc2hvdy1yZWNlbnQtYWN0aXZpdHktbGluZSB7XG4gICAgZm9udC1zaXplOiAwLjg1ZW07XG4gICAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcbiAgICBwYWRkaW5nOiAwLjJyZW0gMC41cmVtO1xuXG4gICAgc3BhbiB7XG4gICAgICBjb2xvcjogaW5oZXJpdDtcbiAgICAgIGZvbnQtd2VpZ2h0OiBpbmhlcml0O1xuICAgIH1cblxuICAgIC5zZWFzb24tc3RhdHVzIHtcbiAgICAgIGZvbnQtd2VpZ2h0OiAyMDA7XG4gICAgfVxuICB9XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](DashboardComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -2196,6 +2230,147 @@ ShowsStatusGroupComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵ
 
 /***/ }),
 
+/***/ "ijB9":
+/*!*************************************************************************************!*\
+  !*** ./src/app/shared/torrent-download-status/torrent-download-status.component.ts ***!
+  \*************************************************************************************/
+/*! exports provided: TorrentDownloadStatusComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TorrentDownloadStatusComponent", function() { return TorrentDownloadStatusComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
+/* harmony import */ var _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../torrents/torrent */ "edMa");
+/* harmony import */ var _torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../torrents/torrents.service */ "sc8Y");
+/* harmony import */ var _panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../panel/services-status/services-status.service */ "4Kh+");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ "ofXK");
+
+
+
+
+
+
+function TorrentDownloadStatusComponent_p_3_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "p", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r0.torrent.downloadStatus);
+} }
+function TorrentDownloadStatusComponent_div_4_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "div", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleMapInterpolate1"]("width: ", ctx_r1.torrent.percentDone, "%");
+} }
+const _c0 = function (a0, a1, a2) { return { download_disabled: a0, downloading: a1, done: a2 }; };
+class TorrentDownloadStatusComponent {
+    constructor(torrentsService, servicesStatusService) {
+        this.torrentsService = torrentsService;
+        this.servicesStatusService = servicesStatusService;
+        this.torrentChanged = false;
+        this.canDownload = false;
+        this.isDone = false;
+        this.isDownloading = false;
+    }
+    set showTorrent(showTorrent) {
+        if (!this.torrentChanged) {
+            this.torrent = showTorrent;
+            this.updateTorrentStatus();
+        }
+    }
+    ngOnInit() {
+        this.servicesStatusService.getServicesStatus().subscribe(data => {
+            if (!data.services["transmission"].up) {
+                this.downloadMessage = "Transmission client seems to be down";
+                this.canDownload = false;
+            }
+            else if (this.torrent.downloadStatus !== _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].NEVER_STARTED) {
+                this.downloadMessage = "Torrents is already active";
+                this.canDownload = false;
+            }
+            else {
+                this.canDownload = true;
+                this.downloadMessage = undefined;
+            }
+        });
+    }
+    updateTorrentStatus() {
+        switch (this.torrent.downloadStatus) {
+            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].STOPPED:
+                this.statusIconName = 'stopped';
+                this.isDone = true;
+                break;
+            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].READY:
+                this.statusIconName = 'upload';
+                this.isDone = true;
+                break;
+            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].DOWNLOADING:
+                this.statusIconName = 'download';
+                this.isDownloading = true;
+                break;
+            default:
+                this.statusIconName = 'download';
+        }
+    }
+    downloadTorrent() {
+        if (!this.canDownload) {
+            return;
+        }
+        if (!this.torrent.isStandaloneTorrent) {
+            this.torrentsService.downloadShowTorrent(this.torrent.torrentId).subscribe(data => {
+                this.torrentChanged = true;
+                this.torrent.downloadStatus = data.torrent.download_status;
+                this.torrent.percentDone = data.torrent.percent_done;
+                this.updateTorrentStatus();
+                this.downloadMessage = data.message;
+                this.downloadSuccessful = data.successful;
+            }, error => {
+                this.downloadSuccessful = false;
+                this.downloadMessage = error;
+            });
+        }
+    }
+}
+TorrentDownloadStatusComponent.ɵfac = function TorrentDownloadStatusComponent_Factory(t) { return new (t || TorrentDownloadStatusComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__["TorrentsService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__["ServicesStatusService"])); };
+TorrentDownloadStatusComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: TorrentDownloadStatusComponent, selectors: [["vestibule-torrent-download-status"]], inputs: { showTorrent: "showTorrent" }, decls: 5, vars: 9, consts: [[1, "torrent-action", "action-download", 3, "click"], [1, "icon-wrap"], [3, "src"], ["class", "download-status", 4, "ngIf"], ["class", "download-progress", 4, "ngIf"], [1, "download-status"], [1, "download-progress"], [1, "bar"]], template: function TorrentDownloadStatusComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function TorrentDownloadStatusComponent_Template_div_click_0_listener() { return ctx.downloadTorrent(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "img", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, TorrentDownloadStatusComponent_p_3_Template, 2, 1, "p", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, TorrentDownloadStatusComponent_div_4_Template, 2, 3, "div", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassMap"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction3"](5, _c0, !ctx.canDownload, ctx.isDownloading, ctx.isDone));
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpropertyInterpolate1"]("src", "/static/images/", ctx.statusIconName, "_icon.svg", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"]);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.isDone);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.isDownloading);
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"]], styles: [".torrent-action[_ngcontent-%COMP%] {\n  min-width: 2.6rem;\n  height: 1.2rem;\n  text-align: center;\n  transition: 0.3s;\n  border-radius: 0.6rem;\n}\n.torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%] {\n  padding: 0 0.3rem;\n}\n.torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%]   img[_ngcontent-%COMP%] {\n  height: 100%;\n  transition: 0.2s;\n}\n.action-download[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: center;\n  cursor: pointer;\n  background-color: #50ad6f;\n}\n.action-download[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n.action-download.download_disabled[_ngcontent-%COMP%] {\n  cursor: not-allowed;\n  background-color: #a4a5a0;\n}\n.action-download.download_disabled[_ngcontent-%COMP%]:hover {\n  background-color: #972945;\n}\n.action-download.downloading[_ngcontent-%COMP%] {\n  width: 6rem;\n  cursor: auto;\n  background-color: #50ad6f;\n}\n.action-download.downloading[_ngcontent-%COMP%]:hover {\n  background-color: #50ad6f;\n}\n.action-download.done[_ngcontent-%COMP%] {\n  cursor: auto;\n  background-color: #2e7243;\n}\n.action-download.done[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n.action-download[_ngcontent-%COMP%]   .download-status[_ngcontent-%COMP%] {\n  font-size: 0.8em;\n  padding: 0 0.6rem 0 0;\n  color: #e3e4db;\n}\n.action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%] {\n  width: 4rem;\n  height: 0.3rem;\n  margin: 0.5rem 0.5rem 0 0;\n  background-color: #e3e4db;\n  border-radius: 0.15rem;\n  position: relative;\n}\n.action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%]   .bar[_ngcontent-%COMP%] {\n  position: absolute;\n  height: 100%;\n  border-radius: inherit;\n  background-color: #2e7243;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL3RvcnJlbnQtZG93bmxvYWQtc3RhdHVzL3RvcnJlbnQtZG93bmxvYWQtc3RhdHVzLmNvbXBvbmVudC5zY3NzIiwic3JjL3N0eWxpbmcvdmFyaWFibGVzLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBRUE7RUFDRSxpQkFBQTtFQUNBLGNBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EscUJBQUE7QUFERjtBQUdFO0VBQ0UsaUJBQUE7QUFESjtBQUVJO0VBQ0UsWUFBQTtFQUNBLGdCQUFBO0FBQU47QUFLQTtFQUNFLGFBQUE7RUFDQSx1QkFBQTtFQUNBLGVBQUE7RUFDQSx5QkNsQmM7QURnQmhCO0FBSUU7RUFDRSx5QkNwQmtCO0FEa0J0QjtBQUtFO0VBQ0UsbUJBQUE7RUFDQSx5QkNoQlM7QURhYjtBQUtJO0VBQ0UseUJDeEJjO0FEcUJwQjtBQU9FO0VBQ0UsV0FBQTtFQUNBLFlBQUE7RUFDQSx5QkNwQ1k7QUQrQmhCO0FBT0k7RUFDRSx5QkN2Q1U7QURrQ2hCO0FBU0U7RUFDRSxZQUFBO0VBQ0EseUJDNUNrQjtBRHFDdEI7QUFTSTtFQUNFLHlCQy9DZ0I7QUR3Q3RCO0FBV0U7RUFDRSxnQkFBQTtFQUNBLHFCQUFBO0VBQ0EsY0NoRFE7QUR1Q1o7QUFZRTtFQUNFLFdBQUE7RUFDQSxjQUFBO0VBQ0EseUJBQUE7RUFDQSx5QkFBQTtFQUNBLHNCQUFBO0VBQ0Esa0JBQUE7QUFWSjtBQVlJO0VBQ0Usa0JBQUE7RUFDQSxZQUFBO0VBQ0Esc0JBQUE7RUFDQSx5QkNyRWdCO0FEMkR0QiIsImZpbGUiOiJzcmMvYXBwL3NoYXJlZC90b3JyZW50LWRvd25sb2FkLXN0YXR1cy90b3JyZW50LWRvd25sb2FkLXN0YXR1cy5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIkBpbXBvcnQgXCIuLi8uLi8uLi9zdHlsaW5nL3ZhcmlhYmxlc1wiO1xuXG4udG9ycmVudC1hY3Rpb24ge1xuICBtaW4td2lkdGg6IDIuNnJlbTtcbiAgaGVpZ2h0OiAxLjJyZW07XG4gIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgdHJhbnNpdGlvbjogMC4zcztcbiAgYm9yZGVyLXJhZGl1czogMC42cmVtO1xuXG4gIC5pY29uLXdyYXAge1xuICAgIHBhZGRpbmc6IDAgMC4zcmVtO1xuICAgIGltZyB7XG4gICAgICBoZWlnaHQ6IDEwMCU7XG4gICAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICAgIH1cbiAgfVxufVxuXG4uYWN0aW9uLWRvd25sb2FkIHtcbiAgZGlzcGxheTogZmxleDtcbiAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW47XG5cbiAgJjpob3ZlciB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gIH1cblxuICAmLmRvd25sb2FkX2Rpc2FibGVkIHtcbiAgICBjdXJzb3I6IG5vdC1hbGxvd2VkO1xuICAgIGJhY2tncm91bmQtY29sb3I6ICR1bnNlbGVjdGVkO1xuXG4gICAgJjpob3ZlciB7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdmFsdWUtZmFsc2UtaG92ZXI7XG4gICAgfVxuICB9XG5cbiAgJi5kb3dubG9hZGluZyB7XG4gICAgd2lkdGg6IDZyZW07XG4gICAgY3Vyc29yOiBhdXRvO1xuICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuO1xuXG4gICAgJjpob3ZlciB7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdG9ycmVudC1ncmVlbjtcbiAgICB9XG4gIH1cblxuICAmLmRvbmUge1xuICAgIGN1cnNvcjogYXV0bztcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdG9ycmVudC1ncmVlbi1ob3ZlcjtcblxuICAgICY6aG92ZXIge1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gICAgfVxuICB9XG5cbiAgLmRvd25sb2FkLXN0YXR1cyB7XG4gICAgZm9udC1zaXplOiAwLjhlbTtcbiAgICBwYWRkaW5nOiAwIDAuNnJlbSAwIDA7XG4gICAgY29sb3I6ICRtYWluLWJhY2s7XG4gIH1cblxuICAuZG93bmxvYWQtcHJvZ3Jlc3Mge1xuICAgIHdpZHRoOiA0cmVtO1xuICAgIGhlaWdodDogMC4zcmVtO1xuICAgIG1hcmdpbjogMC41cmVtIDAuNXJlbSAwIDA7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogI2UzZTRkYjtcbiAgICBib3JkZXItcmFkaXVzOiAwLjE1cmVtO1xuICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcblxuICAgIC5iYXIge1xuICAgICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgICAgaGVpZ2h0OiAxMDAlO1xuICAgICAgYm9yZGVyLXJhZGl1czogaW5oZXJpdDtcbiAgICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuLWhvdmVyXG4gICAgfVxuICB9XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](TorrentDownloadStatusComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'vestibule-torrent-download-status',
+                templateUrl: './torrent-download-status.component.html',
+                styleUrls: ['./torrent-download-status.component.scss']
+            }]
+    }], function () { return [{ type: _torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__["TorrentsService"] }, { type: _panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__["ServicesStatusService"] }]; }, { showTorrent: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+
+/***/ }),
+
 /***/ "jnt5":
 /*!**********************************************************!*\
   !*** ./src/app/shows/shows-list/shows-list.component.ts ***!
@@ -2682,22 +2857,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ShowPreviewComponent", function() { return ShowPreviewComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
 /* harmony import */ var _panel_panel_background_panel_background_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../panel/panel-background/panel-background.service */ "FF8+");
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common */ "ofXK");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "tyNb");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common */ "ofXK");
+/* harmony import */ var _shared_torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../shared/torrent-download-status/torrent-download-status.component */ "ijB9");
 
 
 
 
-function ShowPreviewComponent_div_13_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div");
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "p");
+
+
+function ShowPreviewComponent_div_15_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 12);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "p", 13);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](3, "vestibule-torrent-download-status", 14);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const torrent_r1 = ctx.$implicit;
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate3"]("S", torrent_r1.season, " E", torrent_r1.episode, " ", torrent_r1.download_status, "");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate2"]("S", torrent_r1.season, " E", torrent_r1.episode, "");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("showTorrent", ctx_r0.torrentToShowTorrent(torrent_r1));
 } }
+const _c0 = function (a1) { return ["/shows", a1]; };
 class ShowPreviewComponent {
     constructor(panelBackgroundService) {
         this.panelBackgroundService = panelBackgroundService;
@@ -2706,9 +2890,11 @@ class ShowPreviewComponent {
         this.show = newShow;
         if (this.show) {
             this.panelBackgroundService.changeBackground(this.show.poster_link);
+            this.primaryColor = `rgb(${this.show.palette_list.primary.join(',')})`;
         }
         else {
             this.panelBackgroundService.defaultBackground();
+            this.primaryColor = undefined;
         }
     }
     get color() {
@@ -2716,9 +2902,26 @@ class ShowPreviewComponent {
     }
     ngOnInit() {
     }
+    torrentToShowTorrent(torrent) {
+        return {
+            torrentId: torrent.id,
+            showTitle: this.show.title,
+            seasonNumber: torrent.season,
+            episodeNumber: torrent.episode,
+            publicationTime: torrent.publication_time,
+            feed: torrent.feed,
+            quality: torrent.quality,
+            sourceType: torrent.source_type,
+            torrentTitle: torrent.title,
+            torrentLink: torrent.title,
+            isStandaloneTorrent: false,
+            downloadStatus: torrent.download_status,
+            percentDone: torrent.percent_done
+        };
+    }
 }
 ShowPreviewComponent.ɵfac = function ShowPreviewComponent_Factory(t) { return new (t || ShowPreviewComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_panel_panel_background_panel_background_service__WEBPACK_IMPORTED_MODULE_1__["PanelBackgroundService"])); };
-ShowPreviewComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowPreviewComponent, selectors: [["vestibule-show-preview"]], inputs: { previewShow: "previewShow" }, decls: 14, vars: 7, consts: [["id", "preview-wrap"], [1, "poster-wrap"], [1, "poster"], [1, "details-wrap"], [1, "show-title"], [1, "details"], [1, "status"], [1, "next-episode-line"], [1, "season-status-line"], [1, "torrents"], [4, "ngFor", "ngForOf"]], template: function ShowPreviewComponent_Template(rf, ctx) { if (rf & 1) {
+ShowPreviewComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowPreviewComponent, selectors: [["vestibule-show-preview"]], inputs: { previewShow: "previewShow" }, decls: 16, vars: 16, consts: [["id", "preview-wrap"], [1, "poster-wrap"], [1, "poster"], [1, "details-wrap"], [1, "show-title"], [1, "details"], [1, "status"], [1, "next-episode-line"], [1, "season-status-line"], [1, "subscription-link", 3, "routerLink"], [1, "torrents"], ["class", "torrent-wrap", 4, "ngFor", "ngForOf"], [1, "torrent-wrap"], [1, "title"], [3, "showTorrent"]], template: function ShowPreviewComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "div", 2);
@@ -2735,15 +2938,20 @@ ShowPreviewComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "p", 8);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](11);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "a", 9);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](13, "See Subscription");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "div", 9);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](13, ShowPreviewComponent_div_13_Template, 3, 3, "div", 10);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](14, "div", 10);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](15, ShowPreviewComponent_div_15_Template, 4, 3, "div", 11);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleMapInterpolate1"]("background-color: ", ctx.primaryColor, "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleMapInterpolate1"]("background-image: url('", ctx.show.poster_link, "')");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.show.title);
@@ -2751,9 +2959,12 @@ ShowPreviewComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.show.next_episode);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.show.next_episode_season_status);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleMapInterpolate1"]("border-bottom: 3px solid ", ctx.primaryColor, "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("routerLink", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](14, _c0, ctx.show.imdb_id));
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx.show.recent_torrents_active);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_2__["NgForOf"]], styles: ["#preview-wrap[_ngcontent-%COMP%] {\n  display: flex;\n  padding-top: 0.9rem;\n  margin-bottom: 3rem;\n}\n\n.poster-wrap[_ngcontent-%COMP%] {\n  position: relative;\n}\n\n.poster-wrap[_ngcontent-%COMP%]   .poster[_ngcontent-%COMP%] {\n  width: 10rem;\n  height: 15rem;\n  background-repeat: no-repeat;\n  background-size: cover;\n  background-position: center;\n  border-radius: 0.1rem;\n}\n\n.details-wrap[_ngcontent-%COMP%] {\n  padding-left: 3rem;\n  padding-top: 1.5rem;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .show-title[_ngcontent-%COMP%] {\n  font-size: 2em;\n  font-weight: 400;\n  margin-bottom: 1.5rem;\n  word-break: break-word;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%] {\n  display: flex;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%] {\n  margin-right: 3rem;\n  width: 17rem;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%]   .next-episode-line[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 400;\n  color: #747470;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%]   .season-status-line[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 200;\n  color: #747470;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .torrents[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  color: #747470;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZGFzaGJvYXJkL3Nob3ctcHJldmlldy9zaG93LXByZXZpZXcuY29tcG9uZW50LnNjc3MiLCJzcmMvc3R5bGluZy92YXJpYWJsZXMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTtFQUNFLGFBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0FBREY7O0FBSUE7RUFDRSxrQkFBQTtBQURGOztBQUdFO0VBQ0UsWUFBQTtFQUNBLGFBQUE7RUFDQSw0QkFBQTtFQUNBLHNCQUFBO0VBQ0EsMkJBQUE7RUFDQSxxQkFBQTtBQURKOztBQUtBO0VBQ0Usa0JBQUE7RUFDQSxtQkFBQTtBQUZGOztBQUlFO0VBQ0UsY0FBQTtFQUNBLGdCQUFBO0VBQ0EscUJBQUE7RUFDQSxzQkFBQTtBQUZKOztBQUtFO0VBQ0UsYUFBQTtBQUhKOztBQUtJO0VBQ0Usa0JBQUE7RUFDQSxZQUFBO0FBSE47O0FBS007RUFDRSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0EsY0MzQlU7QUR3QmxCOztBQU1NO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGNDakNVO0FENkJsQjs7QUFRSTtFQUNFLGdCQUFBO0VBQ0EsY0N2Q1k7QURpQ2xCIiwiZmlsZSI6InNyYy9hcHAvZGFzaGJvYXJkL3Nob3ctcHJldmlldy9zaG93LXByZXZpZXcuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuI3ByZXZpZXctd3JhcCB7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIHBhZGRpbmctdG9wOiAwLjlyZW07XG4gIG1hcmdpbi1ib3R0b206IDNyZW07XG59XG5cbi5wb3N0ZXItd3JhcCB7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcblxuICAucG9zdGVyIHtcbiAgICB3aWR0aDogMTByZW07XG4gICAgaGVpZ2h0OiAxNXJlbTtcbiAgICBiYWNrZ3JvdW5kLXJlcGVhdDogbm8tcmVwZWF0O1xuICAgIGJhY2tncm91bmQtc2l6ZTogY292ZXI7XG4gICAgYmFja2dyb3VuZC1wb3NpdGlvbjogY2VudGVyO1xuICAgIGJvcmRlci1yYWRpdXM6IDAuMXJlbTtcbiAgfVxufVxuXG4uZGV0YWlscy13cmFwIHtcbiAgcGFkZGluZy1sZWZ0OiAzcmVtO1xuICBwYWRkaW5nLXRvcDogMS41cmVtO1xuXG4gIC5zaG93LXRpdGxlIHtcbiAgICBmb250LXNpemU6IDJlbTtcbiAgICBmb250LXdlaWdodDogNDAwO1xuICAgIG1hcmdpbi1ib3R0b206IDEuNXJlbTtcbiAgICB3b3JkLWJyZWFrOiBicmVhay13b3JkO1xuICB9XG5cbiAgLmRldGFpbHMge1xuICAgIGRpc3BsYXk6IGZsZXg7XG5cbiAgICAuc3RhdHVzIHtcbiAgICAgIG1hcmdpbi1yaWdodDogM3JlbTtcbiAgICAgIHdpZHRoOiAxN3JlbTtcblxuICAgICAgLm5leHQtZXBpc29kZS1saW5lIHtcbiAgICAgICAgZm9udC1zaXplOiAwLjllbTtcbiAgICAgICAgZm9udC13ZWlnaHQ6IDQwMDtcbiAgICAgICAgY29sb3I6ICR1bnNlbGVjdGVkLWRhcms7XG4gICAgICB9XG5cbiAgICAgIC5zZWFzb24tc3RhdHVzLWxpbmUge1xuICAgICAgICBmb250LXNpemU6IDAuOWVtO1xuICAgICAgICBmb250LXdlaWdodDogMjAwO1xuICAgICAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcbiAgICAgIH1cbiAgICB9XG5cbiAgICAudG9ycmVudHMge1xuICAgICAgZm9udC1zaXplOiAwLjllbTtcbiAgICAgIGNvbG9yOiAkdW5zZWxlY3RlZC1kYXJrO1xuICAgIH1cbiAgfVxufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"] });
+    } }, directives: [_angular_router__WEBPACK_IMPORTED_MODULE_2__["RouterLinkWithHref"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], _shared_torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_4__["TorrentDownloadStatusComponent"]], styles: ["#preview-wrap[_ngcontent-%COMP%] {\n  display: flex;\n  padding-top: 0.9rem;\n  margin-bottom: 3rem;\n}\n\n.poster-wrap[_ngcontent-%COMP%] {\n  transition: background-color 0.1s linear;\n  position: relative;\n  border-radius: 0.2rem;\n}\n\n.poster-wrap[_ngcontent-%COMP%]   .poster[_ngcontent-%COMP%] {\n  width: 12rem;\n  height: 18rem;\n  background-repeat: no-repeat;\n  background-size: cover;\n  background-position: center;\n  border-radius: 0.2rem;\n}\n\n.details-wrap[_ngcontent-%COMP%] {\n  padding-left: 3rem;\n  padding-top: 1.5rem;\n  position: relative;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .show-title[_ngcontent-%COMP%] {\n  font-size: 2em;\n  font-weight: 400;\n  margin-bottom: 1.5rem;\n  word-break: break-word;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%] {\n  display: flex;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .subscription-link[_ngcontent-%COMP%] {\n  color: #a4a5a0;\n  position: absolute;\n  bottom: 2rem;\n  border-bottom: 3px solid #a4a5a0;\n  padding-bottom: 5px;\n  opacity: 0.6;\n  transition: 0.3s linear;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .subscription-link[_ngcontent-%COMP%]:hover {\n  opacity: 1;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%] {\n  margin-right: 3rem;\n  width: 17rem;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%]   .next-episode-line[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 400;\n  color: #747470;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .status[_ngcontent-%COMP%]   .season-status-line[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  font-weight: 200;\n  color: #747470;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .torrents[_ngcontent-%COMP%] {\n  font-size: 0.9em;\n  color: #747470;\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .torrents[_ngcontent-%COMP%]   .torrent-wrap[_ngcontent-%COMP%] {\n  display: flex;\n  margin-bottom: 0.3rem;\n  border-radius: 0.6rem;\n  background-color: rgba(164, 165, 160, 0.2);\n}\n\n.details-wrap[_ngcontent-%COMP%]   .details[_ngcontent-%COMP%]   .torrents[_ngcontent-%COMP%]   .torrent-wrap[_ngcontent-%COMP%]   .title[_ngcontent-%COMP%] {\n  cursor: default;\n  width: 3.5rem;\n  font-size: 0.9em;\n  padding: 0 0.4rem;\n  text-align: center;\n  color: #747470;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvZGFzaGJvYXJkL3Nob3ctcHJldmlldy9zaG93LXByZXZpZXcuY29tcG9uZW50LnNjc3MiLCJzcmMvc3R5bGluZy92YXJpYWJsZXMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTtFQUNFLGFBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0FBREY7O0FBSUE7RUFDRSx3Q0FBQTtFQUNBLGtCQUFBO0VBQ0EscUJBQUE7QUFERjs7QUFHRTtFQUNFLFlBQUE7RUFDQSxhQUFBO0VBQ0EsNEJBQUE7RUFDQSxzQkFBQTtFQUNBLDJCQUFBO0VBQ0EscUJBQUE7QUFESjs7QUFLQTtFQUNFLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxrQkFBQTtBQUZGOztBQUlFO0VBQ0UsY0FBQTtFQUNBLGdCQUFBO0VBQ0EscUJBQUE7RUFDQSxzQkFBQTtBQUZKOztBQUtFO0VBQ0UsYUFBQTtBQUhKOztBQUtJO0VBQ0UsY0N6Qk87RUQwQlAsa0JBQUE7RUFDQSxZQUFBO0VBQ0EsZ0NBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSx1QkFBQTtBQUhOOztBQUtNO0VBQ0UsVUFBQTtBQUhSOztBQU9JO0VBQ0Usa0JBQUE7RUFDQSxZQUFBO0FBTE47O0FBT007RUFDRSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0EsY0M1Q1U7QUR1Q2xCOztBQVFNO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGNDbERVO0FENENsQjs7QUFVSTtFQUNFLGdCQUFBO0VBQ0EsY0N4RFk7QURnRGxCOztBQVVNO0VBQ0UsYUFBQTtFQUNBLHFCQUFBO0VBQ0EscUJBQUE7RUFDQSwwQ0M3RGlCO0FEcUR6Qjs7QUFVUTtFQUNFLGVBQUE7RUFDQSxhQUFBO0VBQ0EsZ0JBQUE7RUFDQSxpQkFBQTtFQUNBLGtCQUFBO0VBQ0EsY0N0RVE7QUQ4RGxCIiwiZmlsZSI6InNyYy9hcHAvZGFzaGJvYXJkL3Nob3ctcHJldmlldy9zaG93LXByZXZpZXcuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuI3ByZXZpZXctd3JhcCB7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIHBhZGRpbmctdG9wOiAwLjlyZW07XG4gIG1hcmdpbi1ib3R0b206IDNyZW07XG59XG5cbi5wb3N0ZXItd3JhcCB7XG4gIHRyYW5zaXRpb246IGJhY2tncm91bmQtY29sb3IgMC4xcyBsaW5lYXI7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuXG4gIC5wb3N0ZXIge1xuICAgIHdpZHRoOiAxMnJlbTtcbiAgICBoZWlnaHQ6IDE4cmVtO1xuICAgIGJhY2tncm91bmQtcmVwZWF0OiBuby1yZXBlYXQ7XG4gICAgYmFja2dyb3VuZC1zaXplOiBjb3ZlcjtcbiAgICBiYWNrZ3JvdW5kLXBvc2l0aW9uOiBjZW50ZXI7XG4gICAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuICB9XG59XG5cbi5kZXRhaWxzLXdyYXAge1xuICBwYWRkaW5nLWxlZnQ6IDNyZW07XG4gIHBhZGRpbmctdG9wOiAxLjVyZW07XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcblxuICAuc2hvdy10aXRsZSB7XG4gICAgZm9udC1zaXplOiAyZW07XG4gICAgZm9udC13ZWlnaHQ6IDQwMDtcbiAgICBtYXJnaW4tYm90dG9tOiAxLjVyZW07XG4gICAgd29yZC1icmVhazogYnJlYWstd29yZDtcbiAgfVxuXG4gIC5kZXRhaWxzIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuXG4gICAgLnN1YnNjcmlwdGlvbi1saW5rIHtcbiAgICAgIGNvbG9yOiAkdW5zZWxlY3RlZDtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGJvdHRvbTogMnJlbTtcbiAgICAgIGJvcmRlci1ib3R0b206IDNweCBzb2xpZCAkdW5zZWxlY3RlZDtcbiAgICAgIHBhZGRpbmctYm90dG9tOiA1cHg7XG4gICAgICBvcGFjaXR5OiAwLjY7XG4gICAgICB0cmFuc2l0aW9uOiAwLjNzIGxpbmVhcjtcblxuICAgICAgJjpob3ZlciB7XG4gICAgICAgIG9wYWNpdHk6IDE7XG4gICAgICB9XG4gICAgfVxuXG4gICAgLnN0YXR1cyB7XG4gICAgICBtYXJnaW4tcmlnaHQ6IDNyZW07XG4gICAgICB3aWR0aDogMTdyZW07XG5cbiAgICAgIC5uZXh0LWVwaXNvZGUtbGluZSB7XG4gICAgICAgIGZvbnQtc2l6ZTogMC45ZW07XG4gICAgICAgIGZvbnQtd2VpZ2h0OiA0MDA7XG4gICAgICAgIGNvbG9yOiAkdW5zZWxlY3RlZC1kYXJrO1xuICAgICAgfVxuXG4gICAgICAuc2Vhc29uLXN0YXR1cy1saW5lIHtcbiAgICAgICAgZm9udC1zaXplOiAwLjllbTtcbiAgICAgICAgZm9udC13ZWlnaHQ6IDIwMDtcbiAgICAgICAgY29sb3I6ICR1bnNlbGVjdGVkLWRhcms7XG4gICAgICB9XG4gICAgfVxuXG4gICAgLnRvcnJlbnRzIHtcbiAgICAgIGZvbnQtc2l6ZTogMC45ZW07XG4gICAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcblxuICAgICAgLnRvcnJlbnQtd3JhcCB7XG4gICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgIG1hcmdpbi1ib3R0b206IDAuM3JlbTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogMC42cmVtO1xuICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdW5zZWxlY3RlZC10cmFuc3BhcmVudDtcblxuICAgICAgICAudGl0bGUge1xuICAgICAgICAgIGN1cnNvcjogZGVmYXVsdDtcbiAgICAgICAgICB3aWR0aDogMy41cmVtO1xuICAgICAgICAgIGZvbnQtc2l6ZTogMC45ZW07XG4gICAgICAgICAgcGFkZGluZzogMCAwLjRyZW07XG4gICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgICAgIGNvbG9yOiAkdW5zZWxlY3RlZC1kYXJrO1xuICAgICAgICB9XG4gICAgICB9XG4gICAgfVxuICB9XG59XG4iLCIkbWFpbi1jb2xvcjogI2UzZTRkYjtcbiRzZWNvbmRhcnktY29sb3I6ICNDOEM5QzA7XG4kdHJhbnNwYXJlbnQtbGlnaHQ6ICNlMWUyZDY2NjtcbiR0cmFuc3BhcmVudC1zZW1pLWxpZ2h0OiByZ2JhKDIyNSwgMjI2LCAyMTQsIDAuNjUpO1xuJHRvcnJlbnQtZ3JlZW46ICM1MGFkNmY7XG4kdG9ycmVudC1ncmVlbi1ob3ZlcjogIzJlNzI0MztcbiR2YWx1ZS10cnVlLWhvdmVyOiAjMjA2ZjM4O1xuJHZhbHVlLXRydWU6ICMzZjkzNTk7XG4kdmFsdWUtZmFsc2U6ICNBRjRGNjg7XG4kdmFsdWUtZmFsc2UtaG92ZXI6ICM5NzI5NDU7XG4kdmFsdWUtbmV1dHJhbDogIzAwNzFiYztcbiRtYWluLWJhY2s6ICNlM2U0ZGI7XG4kbWFpbi1iYWNrLWRhcms6ICNiZmJmYjg7XG4kbWFpbi1iYWNrLWRhcmstdHJhbnNwYXJlbnQ6IHJnYmEoMTkxLCAxOTEsIDE4NCwgMC41KTtcbiR1bnNlbGVjdGVkOiAjYTRhNWEwO1xuJHVuc2VsZWN0ZWQtZGFyazogIzc0NzQ3MDtcbiR1bnNlbGVjdGVkLXRyYW5zcGFyZW50OiByZ2JhKDE2NCwgMTY1LCAxNjAsIDAuMik7XG4kc2tpcDogI2VkYmYzYjtcbiRibGFjazogIzMzMztcbiRsaWdodC10ZXh0OiAjZDJkM2M3O1xuIl19 */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ShowPreviewComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -2892,12 +3103,8 @@ AppRoutingModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineI
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ShowTorrentComponent", function() { return ShowTorrentComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
-/* harmony import */ var _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../torrents/torrent */ "edMa");
-/* harmony import */ var _torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../torrents/torrents.service */ "sc8Y");
-/* harmony import */ var _panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../panel/services-status/services-status.service */ "4Kh+");
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ "ofXK");
-
-
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "ofXK");
+/* harmony import */ var _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../torrent-download-status/torrent-download-status.component */ "ijB9");
 
 
 
@@ -2911,178 +3118,98 @@ function ShowTorrentComponent_span_5_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"](" E", ctx_r0.torrent.episodeNumber, "");
 } }
-function ShowTorrentComponent_p_13_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "p", 18);
+function ShowTorrentComponent_div_13_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 14);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r1.torrent.downloadStatus);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r1.torrent.feed);
 } }
 function ShowTorrentComponent_div_14_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 19);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "div", 20);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const ctx_r2 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleMapInterpolate1"]("width: ", ctx_r2.torrent.percentDone, "%");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r2.torrent.sourceType);
 } }
-function ShowTorrentComponent_div_17_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 21);
+function ShowTorrentComponent_div_15_div_4_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 20);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r6.torrent.quality);
+} }
+function ShowTorrentComponent_div_15_Template(rf, ctx) { if (rf & 1) {
+    const _r8 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 16);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ShowTorrentComponent_div_15_Template_div_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r8); const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r7.toggleMoreDetails(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 17);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "img", 18);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, ShowTorrentComponent_div_15_div_4_Template, 2, 1, "div", 19);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r3.torrent.feed);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassProp"]("x-mode", ctx_r3.moreDetailsMode);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r3.torrent.quality);
 } }
-function ShowTorrentComponent_div_18_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 22);
+function ShowTorrentComponent_ng_template_16_div_2_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 24);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "a", 25);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "Link");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r9 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpropertyInterpolate"]("href", ctx_r9.torrent.torrentLink, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"]);
+} }
+function ShowTorrentComponent_ng_template_16_div_3_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 26);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
-    const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    const ctx_r10 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r4.torrent.sourceType);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r10.torrent.torrentTitle);
 } }
-function ShowTorrentComponent_div_19_div_4_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 27);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-} if (rf & 2) {
-    const ctx_r8 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r8.torrent.quality);
-} }
-function ShowTorrentComponent_div_19_Template(rf, ctx) { if (rf & 1) {
-    const _r10 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 23);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ShowTorrentComponent_div_19_Template_div_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r10); const ctx_r9 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r9.toggleMoreDetails(); });
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 24);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "img", 25);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 13);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, ShowTorrentComponent_div_19_div_4_Template, 2, 1, "div", 26);
+function ShowTorrentComponent_ng_template_16_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 21);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, ShowTorrentComponent_ng_template_16_div_2_Template, 3, 1, "div", 22);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, ShowTorrentComponent_ng_template_16_div_3_Template, 2, 1, "div", 23);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 } if (rf & 2) {
     const ctx_r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassProp"]("x-mode", ctx_r5.moreDetailsMode);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r5.torrent.quality);
-} }
-function ShowTorrentComponent_ng_template_20_div_2_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 31);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "a", 32);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, "Link");
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-} if (rf & 2) {
-    const ctx_r11 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r5.torrent.torrentLink);
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpropertyInterpolate"]("href", ctx_r11.torrent.torrentLink, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"]);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r5.torrent.torrentTitle);
 } }
-function ShowTorrentComponent_ng_template_20_div_3_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 33);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-} if (rf & 2) {
-    const ctx_r12 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx_r12.torrent.torrentTitle);
-} }
-function ShowTorrentComponent_ng_template_20_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 28);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 13);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, ShowTorrentComponent_ng_template_20_div_2_Template, 3, 1, "div", 29);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, ShowTorrentComponent_ng_template_20_div_3_Template, 2, 1, "div", 30);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-} if (rf & 2) {
-    const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r7.torrent.torrentLink);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r7.torrent.torrentTitle);
-} }
-const _c0 = function (a0, a1, a2) { return { download_disabled: a0, downloading: a1, done: a2 }; };
 class ShowTorrentComponent {
-    constructor(torrentsService, servicesStatusService) {
-        this.torrentsService = torrentsService;
-        this.servicesStatusService = servicesStatusService;
-        this.torrentChanged = false;
+    constructor() {
         this.moreDetailsMode = false;
-        this.canDownload = false;
-        this.isDone = false;
-        this.isDownloading = false;
     }
     set showTorrent(showTorrent) {
-        if (!this.torrentChanged) {
-            this.torrent = showTorrent;
-            this.updateTorrentStatus();
-        }
-    }
-    ngOnInit() {
-        this.servicesStatusService.getServicesStatus().subscribe(data => {
-            if (!data.services["transmission"].up) {
-                this.downloadMessage = "Transmission client seems to be down";
-                this.canDownload = false;
-            }
-            else if (this.torrent.downloadStatus !== _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].NEVER_STARTED) {
-                this.downloadMessage = "Torrents is already active";
-                this.canDownload = false;
-            }
-            else {
-                this.canDownload = true;
-                this.downloadMessage = undefined;
-            }
-        });
-    }
-    updateTorrentStatus() {
-        switch (this.torrent.downloadStatus) {
-            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].STOPPED:
-                this.statusIconName = 'stopped';
-                this.isDone = true;
-                break;
-            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].READY:
-                this.statusIconName = 'upload';
-                this.isDone = true;
-                break;
-            case _torrents_torrent__WEBPACK_IMPORTED_MODULE_1__["TorrentDownloadStatus"].DOWNLOADING:
-                this.statusIconName = 'download';
-                this.isDownloading = true;
-                break;
-            default:
-                this.statusIconName = 'download';
-        }
+        this.torrent = showTorrent;
     }
     toggleMoreDetails() {
         this.moreDetailsMode = !this.moreDetailsMode;
     }
-    downloadTorrent() {
-        if (!this.canDownload) {
-            return;
-        }
-        if (!this.torrent.isStandaloneTorrent) {
-            this.torrentsService.downloadShowTorrent(this.torrent.torrentId).subscribe(data => {
-                this.torrentChanged = true;
-                this.torrent.downloadStatus = data.torrent.download_status;
-                this.torrent.percentDone = data.torrent.percent_done;
-                this.updateTorrentStatus();
-                this.downloadMessage = data.message;
-                this.downloadSuccessful = data.successful;
-            }, error => {
-                this.downloadSuccessful = false;
-                this.downloadMessage = error;
-            });
-        }
-    }
 }
-ShowTorrentComponent.ɵfac = function ShowTorrentComponent_Factory(t) { return new (t || ShowTorrentComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__["TorrentsService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__["ServicesStatusService"])); };
-ShowTorrentComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowTorrentComponent, selectors: [["vestibule-show-torrent"]], inputs: { showTorrent: "showTorrent" }, decls: 22, vars: 17, consts: [[1, "torrent-cont"], [1, "torrent-title-cont"], [1, "torrent-title"], [4, "ngIf"], [1, "torrent-publication-time"], [1, "torrent-details-cont"], [1, "torrent-actions-cont"], [1, "torrent-action", "action-download", 3, "click"], [1, "icon-wrap"], [3, "src"], ["class", "download-status", 4, "ngIf"], ["class", "download-progress", 4, "ngIf"], [1, "torrent-info-cont"], [1, "torrent-tags"], ["class", "tag feed-tag", 4, "ngIf"], ["class", "tag source-type-tag", 4, "ngIf"], ["class", "torrent-base-details-cont", 3, "click", 4, "ngIf", "ngIfElse"], ["moreDetails", ""], [1, "download-status"], [1, "download-progress"], [1, "bar"], [1, "tag", "feed-tag"], [1, "tag", "source-type-tag"], [1, "torrent-base-details-cont", 3, "click"], [1, "torrent-action", "action-plus"], ["src", "/static/images/plus_icon.svg"], ["class", "tag quality-tag", 4, "ngIf"], [1, "tag", "quality-tag"], [1, "torrent-more-details-cont"], ["class", "tag torrent-link", 4, "ngIf"], ["class", "tag torrent-full-name", 4, "ngIf"], [1, "tag", "torrent-link"], ["target", "_blank", 3, "href"], [1, "tag", "torrent-full-name"]], template: function ShowTorrentComponent_Template(rf, ctx) { if (rf & 1) {
+ShowTorrentComponent.ɵfac = function ShowTorrentComponent_Factory(t) { return new (t || ShowTorrentComponent)(); };
+ShowTorrentComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ShowTorrentComponent, selectors: [["vestibule-show-torrent"]], inputs: { showTorrent: "showTorrent" }, decls: 18, vars: 9, consts: [[1, "torrent-cont"], [1, "torrent-title-cont"], [1, "torrent-title"], [4, "ngIf"], [1, "torrent-publication-time"], [1, "torrent-details-cont"], [1, "torrent-actions-cont"], [3, "showTorrent"], [1, "torrent-info-cont"], [1, "torrent-tags"], ["class", "tag feed-tag", 4, "ngIf"], ["class", "tag source-type-tag", 4, "ngIf"], ["class", "torrent-base-details-cont", 3, "click", 4, "ngIf", "ngIfElse"], ["moreDetails", ""], [1, "tag", "feed-tag"], [1, "tag", "source-type-tag"], [1, "torrent-base-details-cont", 3, "click"], [1, "torrent-action", "action-plus"], ["src", "/static/images/plus_icon.svg"], ["class", "tag quality-tag", 4, "ngIf"], [1, "tag", "quality-tag"], [1, "torrent-more-details-cont"], ["class", "tag torrent-link", 4, "ngIf"], ["class", "tag torrent-full-name", 4, "ngIf"], [1, "tag", "torrent-link"], ["target", "_blank", 3, "href"], [1, "tag", "torrent-full-name"]], template: function ShowTorrentComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "p");
@@ -3097,27 +3224,20 @@ ShowTorrentComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](8, "div", 5);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](9, "div", 6);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "div", 7);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ShowTorrentComponent_Template_div_click_10_listener() { return ctx.downloadTorrent(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](10, "vestibule-torrent-download-status", 7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](11, "div", 8);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](12, "img", 9);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "div", 9);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](13, ShowTorrentComponent_div_13_Template, 2, 1, "div", 10);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](14, ShowTorrentComponent_div_14_Template, 2, 1, "div", 11);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](13, ShowTorrentComponent_p_13_Template, 2, 1, "p", 10);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](14, ShowTorrentComponent_div_14_Template, 2, 3, "div", 11);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](15, "div", 12);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](16, "div", 13);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](17, ShowTorrentComponent_div_17_Template, 2, 1, "div", 14);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](18, ShowTorrentComponent_div_18_Template, 2, 1, "div", 15);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](19, ShowTorrentComponent_div_19_Template, 5, 3, "div", 16);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](20, ShowTorrentComponent_ng_template_20_Template, 4, 2, "ng-template", null, 17, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplateRefExtractor"]);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](15, ShowTorrentComponent_div_15_Template, 5, 3, "div", 12);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](16, ShowTorrentComponent_ng_template_16_Template, 4, 2, "ng-template", null, 13, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplateRefExtractor"]);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } if (rf & 2) {
-        const _r6 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵreference"](21);
+        const _r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵreference"](17);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate2"]("", ctx.torrent.showTitle, " S", ctx.torrent.seasonNumber, "");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
@@ -3125,20 +3245,14 @@ ShowTorrentComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](ctx.torrent.publicationTime);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassMap"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction3"](13, _c0, !ctx.canDownload, ctx.isDownloading, ctx.isDone));
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpropertyInterpolate1"]("src", "/static/images/", ctx.statusIconName, "_icon.svg", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"]);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.isDone);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.isDownloading);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("showTorrent", ctx.torrent);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.torrent.feed);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.torrent.sourceType);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.moreDetailsMode)("ngIfElse", _r6);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"]], styles: [".torrent-cont[_ngcontent-%COMP%] {\n  margin-bottom: 0.5rem;\n  padding: 0.5rem 0;\n  border-bottom: 3px solid #333;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%] {\n  display: flex;\n  margin-right: 0.5rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%] {\n  min-width: 2.6rem;\n  height: 1.2rem;\n  text-align: center;\n  transition: 0.3s;\n  border-radius: 0.6rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%] {\n  padding: 0 0.3rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%]   img[_ngcontent-%COMP%] {\n  height: 100%;\n  transition: 0.2s;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: center;\n  cursor: pointer;\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.download_disabled[_ngcontent-%COMP%] {\n  cursor: not-allowed;\n  background-color: #a4a5a0;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.download_disabled[_ngcontent-%COMP%]:hover {\n  background-color: #972945;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.downloading[_ngcontent-%COMP%] {\n  width: 6rem;\n  cursor: auto;\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.downloading[_ngcontent-%COMP%]:hover {\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.done[_ngcontent-%COMP%] {\n  cursor: auto;\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.done[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-status[_ngcontent-%COMP%] {\n  font-size: 0.8em;\n  padding: 0 0.6rem 0 0;\n  color: #e3e4db;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%] {\n  width: 4rem;\n  height: 0.3rem;\n  margin: 0.5rem 0.5rem 0 0;\n  background-color: #e3e4db;\n  border-radius: 0.15rem;\n  position: relative;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%]   .bar[_ngcontent-%COMP%] {\n  position: absolute;\n  height: 100%;\n  border-radius: inherit;\n  background-color: #2e7243;\n}\n\n.action-plus[_ngcontent-%COMP%] {\n  cursor: pointer;\n  background-color: #c8c9c0;\n  width: 2.6rem;\n  height: 1.2rem;\n  text-align: right;\n  transition: 0.3s;\n  border-radius: 0.6rem;\n  position: absolute;\n  right: -1.5rem;\n  z-index: -1;\n  padding-right: 0.25rem;\n}\n\n.action-plus[_ngcontent-%COMP%]   img[_ngcontent-%COMP%] {\n  height: 100%;\n  transition: 0.2s;\n}\n\n.x-mode[_ngcontent-%COMP%] {\n  transform: rotate(45deg);\n}\n\n.torrent-details-cont[_ngcontent-%COMP%] {\n  display: flex;\n  padding: 0.5rem 0;\n}\n\n.torrent-title-cont[_ngcontent-%COMP%]   .torrent-title[_ngcontent-%COMP%] {\n  font-weight: 400;\n}\n\n.torrent-title-cont[_ngcontent-%COMP%]   .torrent-publication-time[_ngcontent-%COMP%] {\n  display: inline-block;\n  margin-left: 1rem;\n  font-weight: 100;\n  font-size: 0.8em;\n  color: #747470;\n}\n\n.torrent-info-cont[_ngcontent-%COMP%] {\n  display: flex;\n  color: #d2d3c7;\n}\n\n.torrent-base-details-cont[_ngcontent-%COMP%] {\n  position: relative;\n}\n\n.torrent-tags[_ngcontent-%COMP%] {\n  display: flex;\n  height: 1.2rem;\n  margin-right: 0.5rem;\n}\n\n.torrent-tags[_ngcontent-%COMP%]:last-child {\n  margin-right: 0;\n}\n\n.tag[_ngcontent-%COMP%] {\n  background-color: #d2d3c7;\n  font-size: 0.8em;\n  padding: 0 0.5rem;\n}\n\n.tag[_ngcontent-%COMP%]:first-child {\n  border-radius: 0.6rem 0 0 0.6rem;\n}\n\n.tag[_ngcontent-%COMP%]:last-child {\n  border-radius: 0 0.6rem 0.6rem 0;\n}\n\n.tag[_ngcontent-%COMP%]:only-child {\n  border-radius: 0.6rem;\n}\n\n.tag.feed-tag[_ngcontent-%COMP%] {\n  background-color: #c8c9c0;\n}\n\n.tag.quality-tag[_ngcontent-%COMP%] {\n  background-color: #29abe2;\n}\n\n.tag.source-type-tag[_ngcontent-%COMP%] {\n  background-color: #a4a5a0;\n}\n\n.tag.torrent-link[_ngcontent-%COMP%] {\n  background-color: #a4a5a0;\n}\n\n.tag.torrent-full-name[_ngcontent-%COMP%] {\n  font-size: 0.7em;\n  font-weight: 100;\n  padding-top: 2px;\n  max-width: 24rem;\n  overflow: auto;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL3Nob3ctdG9ycmVudC9zaG93LXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCJzcmMvc3R5bGluZy92YXJpYWJsZXMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTtFQUNFLHFCQUFBO0VBQ0EsaUJBQUE7RUFDQSw2QkFBQTtBQURGOztBQUlBO0VBQ0UsYUFBQTtFQUNBLG9CQUFBO0FBREY7O0FBR0U7RUFDRSxpQkFBQTtFQUNBLGNBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EscUJBQUE7QUFESjs7QUFHSTtFQUNFLGlCQUFBO0FBRE47O0FBRU07RUFDRSxZQUFBO0VBQ0EsZ0JBQUE7QUFBUjs7QUFLRTtFQUNFLGFBQUE7RUFDQSx1QkFBQTtFQUNBLGVBQUE7RUFDQSx5QkM1Qlk7QUR5QmhCOztBQUtJO0VBQ0UseUJDOUJnQjtBRDJCdEI7O0FBTUk7RUFDRSxtQkFBQTtFQUNBLHlCQzFCTztBRHNCYjs7QUFNTTtFQUNFLHlCQ2xDWTtBRDhCcEI7O0FBUUk7RUFDRSxXQUFBO0VBQ0EsWUFBQTtFQUNBLHlCQzlDVTtBRHdDaEI7O0FBUU07RUFDRSx5QkNqRFE7QUQyQ2hCOztBQVVJO0VBQ0UsWUFBQTtFQUNBLHlCQ3REZ0I7QUQ4Q3RCOztBQVVNO0VBQ0UseUJDekRjO0FEaUR0Qjs7QUFZSTtFQUNFLGdCQUFBO0VBQ0EscUJBQUE7RUFDQSxjQzFETTtBRGdEWjs7QUFhSTtFQUNFLFdBQUE7RUFDQSxjQUFBO0VBQ0EseUJBQUE7RUFDQSx5QkFBQTtFQUNBLHNCQUFBO0VBQ0Esa0JBQUE7QUFYTjs7QUFhTTtFQUNFLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLHNCQUFBO0VBQ0EseUJDL0VjO0FEb0V0Qjs7QUFpQkE7RUFDRSxlQUFBO0VBQ0EseUJBQUE7RUFDQSxhQUFBO0VBQ0EsY0FBQTtFQUNBLGlCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxxQkFBQTtFQUNBLGtCQUFBO0VBQ0EsY0FBQTtFQUNBLFdBQUE7RUFDQSxzQkFBQTtBQWRGOztBQWdCRTtFQUNFLFlBQUE7RUFDQSxnQkFBQTtBQWRKOztBQWtCQTtFQUNFLHdCQUFBO0FBZkY7O0FBa0JBO0VBQ0UsYUFBQTtFQUNBLGlCQUFBO0FBZkY7O0FBbUJFO0VBQ0UsZ0JBQUE7QUFoQko7O0FBbUJFO0VBQ0UscUJBQUE7RUFDQSxpQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ2pIYztBRGdHbEI7O0FBcUJBO0VBQ0UsYUFBQTtFQUNBLGNDbkhXO0FEaUdiOztBQXFCQTtFQUNFLGtCQUFBO0FBbEJGOztBQXFCQTtFQUNFLGFBQUE7RUFDQSxjQUFBO0VBQ0Esb0JBQUE7QUFsQkY7O0FBb0JFO0VBQ0UsZUFBQTtBQWxCSjs7QUFzQkE7RUFDRSx5QkNySVc7RURzSVgsZ0JBQUE7RUFDQSxpQkFBQTtBQW5CRjs7QUFxQkU7RUFDRSxnQ0FBQTtBQW5CSjs7QUFzQkU7RUFDRSxnQ0FBQTtBQXBCSjs7QUF1QkU7RUFDRSxxQkFBQTtBQXJCSjs7QUF3QkU7RUFDRSx5QkFBQTtBQXRCSjs7QUF5QkU7RUFDRSx5QkFBQTtBQXZCSjs7QUEwQkU7RUFDRSx5QkFBQTtBQXhCSjs7QUEyQkU7RUFDRSx5QkN2S1M7QUQ4SWI7O0FBNEJFO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQUFBO0FBMUJKIiwiZmlsZSI6InNyYy9hcHAvc2hhcmVkL3Nob3ctdG9ycmVudC9zaG93LXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuLnRvcnJlbnQtY29udCB7XG4gIG1hcmdpbi1ib3R0b206IDAuNXJlbTtcbiAgcGFkZGluZzogMC41cmVtIDA7XG4gIGJvcmRlci1ib3R0b206IDNweCBzb2xpZCAkYmxhY2s7XG59XG5cbi50b3JyZW50LWFjdGlvbnMtY29udCB7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIG1hcmdpbi1yaWdodDogMC41cmVtO1xuXG4gIC50b3JyZW50LWFjdGlvbiB7XG4gICAgbWluLXdpZHRoOiAyLjZyZW07XG4gICAgaGVpZ2h0OiAxLjJyZW07XG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgIHRyYW5zaXRpb246IDAuM3M7XG4gICAgYm9yZGVyLXJhZGl1czogMC42cmVtO1xuXG4gICAgLmljb24td3JhcCB7XG4gICAgICBwYWRkaW5nOiAwIDAuM3JlbTtcbiAgICAgIGltZyB7XG4gICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgdHJhbnNpdGlvbjogMC4ycztcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICAuYWN0aW9uLWRvd25sb2FkIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdG9ycmVudC1ncmVlbjtcblxuICAgICY6aG92ZXIge1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gICAgfVxuXG4gICAgJi5kb3dubG9hZF9kaXNhYmxlZCB7XG4gICAgICBjdXJzb3I6IG5vdC1hbGxvd2VkO1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHVuc2VsZWN0ZWQ7XG5cbiAgICAgICY6aG92ZXIge1xuICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdmFsdWUtZmFsc2UtaG92ZXI7XG4gICAgICB9XG4gICAgfVxuXG4gICAgJi5kb3dubG9hZGluZyB7XG4gICAgICB3aWR0aDogNnJlbTtcbiAgICAgIGN1cnNvcjogYXV0bztcbiAgICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuO1xuXG4gICAgICAmOmhvdmVyIHtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW47XG4gICAgICB9XG4gICAgfVxuXG4gICAgJi5kb25lIHtcbiAgICAgIGN1cnNvcjogYXV0bztcbiAgICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuLWhvdmVyO1xuXG4gICAgICAmOmhvdmVyIHtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gICAgICB9XG4gICAgfVxuXG4gICAgLmRvd25sb2FkLXN0YXR1cyB7XG4gICAgICBmb250LXNpemU6IDAuOGVtO1xuICAgICAgcGFkZGluZzogMCAwLjZyZW0gMCAwO1xuICAgICAgY29sb3I6ICRtYWluLWJhY2s7XG4gICAgfVxuXG4gICAgLmRvd25sb2FkLXByb2dyZXNzIHtcbiAgICAgIHdpZHRoOiA0cmVtO1xuICAgICAgaGVpZ2h0OiAwLjNyZW07XG4gICAgICBtYXJnaW46IDAuNXJlbSAwLjVyZW0gMCAwO1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2UzZTRkYjtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDAuMTVyZW07XG4gICAgICBwb3NpdGlvbjogcmVsYXRpdmU7XG5cbiAgICAgIC5iYXIge1xuICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogaW5oZXJpdDtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXJcbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cblxuLmFjdGlvbi1wbHVzIHtcbiAgY3Vyc29yOiBwb2ludGVyO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjYzhjOWMwO1xuICB3aWR0aDogMi42cmVtO1xuICBoZWlnaHQ6IDEuMnJlbTtcbiAgdGV4dC1hbGlnbjogcmlnaHQ7XG4gIHRyYW5zaXRpb246IDAuM3M7XG4gIGJvcmRlci1yYWRpdXM6IDAuNnJlbTtcbiAgcG9zaXRpb246IGFic29sdXRlO1xuICByaWdodDogLTEuNXJlbTtcbiAgei1pbmRleDogLTE7XG4gIHBhZGRpbmctcmlnaHQ6IDAuMjVyZW07XG5cbiAgaW1nIHtcbiAgICBoZWlnaHQ6IDEwMCU7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4ueC1tb2RlIHtcbiAgdHJhbnNmb3JtOiByb3RhdGUoNDVkZWcpO1xufVxuXG4udG9ycmVudC1kZXRhaWxzLWNvbnQge1xuICBkaXNwbGF5OiBmbGV4O1xuICBwYWRkaW5nOiAwLjVyZW0gMDtcbn1cblxuLnRvcnJlbnQtdGl0bGUtY29udCB7XG4gIC50b3JyZW50LXRpdGxlIHtcbiAgICBmb250LXdlaWdodDogNDAwO1xuICB9XG5cbiAgLnRvcnJlbnQtcHVibGljYXRpb24tdGltZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgIG1hcmdpbi1sZWZ0OiAxcmVtO1xuICAgIGZvbnQtd2VpZ2h0OiAxMDA7XG4gICAgZm9udC1zaXplOiAwLjhlbTtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcbiAgfVxufVxuXG4udG9ycmVudC1pbmZvLWNvbnQge1xuICBkaXNwbGF5OiBmbGV4O1xuICBjb2xvcjogJGxpZ2h0LXRleHQ7XG59XG5cbi50b3JyZW50LWJhc2UtZGV0YWlscy1jb250IHtcbiAgcG9zaXRpb246IHJlbGF0aXZlO1xufVxuXG4udG9ycmVudC10YWdzIHtcbiAgZGlzcGxheTogZmxleDtcbiAgaGVpZ2h0OiAxLjJyZW07XG4gIG1hcmdpbi1yaWdodDogMC41cmVtO1xuXG4gICY6bGFzdC1jaGlsZCB7XG4gICAgbWFyZ2luLXJpZ2h0OiAwO1xuICB9XG59XG5cbi50YWcge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAkbGlnaHQtdGV4dDtcbiAgZm9udC1zaXplOiAwLjhlbTtcbiAgcGFkZGluZzogMCAwLjVyZW07XG5cbiAgJjpmaXJzdC1jaGlsZCB7XG4gICAgYm9yZGVyLXJhZGl1czogMC42cmVtIDAgMCAwLjZyZW07XG4gIH1cblxuICAmOmxhc3QtY2hpbGQge1xuICAgIGJvcmRlci1yYWRpdXM6IDAgMC42cmVtIDAuNnJlbSAwO1xuICB9XG5cbiAgJjpvbmx5LWNoaWxkIHtcbiAgICBib3JkZXItcmFkaXVzOiAwLjZyZW07XG4gIH1cblxuICAmLmZlZWQtdGFnIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYzhjOWMwO1xuICB9XG5cbiAgJi5xdWFsaXR5LXRhZyB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogIzI5YWJlMjtcbiAgfVxuXG4gICYuc291cmNlLXR5cGUtdGFnIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYTRhNWEwO1xuICB9XG5cbiAgJi50b3JyZW50LWxpbmsge1xuICAgIGJhY2tncm91bmQtY29sb3I6ICR1bnNlbGVjdGVkO1xuICB9XG5cbiAgJi50b3JyZW50LWZ1bGwtbmFtZSB7XG4gICAgZm9udC1zaXplOiAwLjdlbTtcbiAgICBmb250LXdlaWdodDogMTAwO1xuICAgIHBhZGRpbmctdG9wOiAycHg7XG4gICAgbWF4LXdpZHRoOiAyNHJlbTtcbiAgICBvdmVyZmxvdzogYXV0bztcbiAgfVxufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"] });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx.moreDetailsMode)("ngIfElse", _r4);
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["NgIf"], _torrent_download_status_torrent_download_status_component__WEBPACK_IMPORTED_MODULE_2__["TorrentDownloadStatusComponent"]], styles: [".torrent-cont[_ngcontent-%COMP%] {\n  margin-bottom: 0.5rem;\n  padding: 0.5rem 0;\n  border-bottom: 3px solid #333;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%] {\n  display: flex;\n  margin-right: 0.5rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%] {\n  min-width: 2.6rem;\n  height: 1.2rem;\n  text-align: center;\n  transition: 0.3s;\n  border-radius: 0.6rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%] {\n  padding: 0 0.3rem;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .torrent-action[_ngcontent-%COMP%]   .icon-wrap[_ngcontent-%COMP%]   img[_ngcontent-%COMP%] {\n  height: 100%;\n  transition: 0.2s;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: center;\n  cursor: pointer;\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.download_disabled[_ngcontent-%COMP%] {\n  cursor: not-allowed;\n  background-color: #a4a5a0;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.download_disabled[_ngcontent-%COMP%]:hover {\n  background-color: #972945;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.downloading[_ngcontent-%COMP%] {\n  width: 6rem;\n  cursor: auto;\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.downloading[_ngcontent-%COMP%]:hover {\n  background-color: #50ad6f;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.done[_ngcontent-%COMP%] {\n  cursor: auto;\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download.done[_ngcontent-%COMP%]:hover {\n  background-color: #2e7243;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-status[_ngcontent-%COMP%] {\n  font-size: 0.8em;\n  padding: 0 0.6rem 0 0;\n  color: #e3e4db;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%] {\n  width: 4rem;\n  height: 0.3rem;\n  margin: 0.5rem 0.5rem 0 0;\n  background-color: #e3e4db;\n  border-radius: 0.15rem;\n  position: relative;\n}\n\n.torrent-actions-cont[_ngcontent-%COMP%]   .action-download[_ngcontent-%COMP%]   .download-progress[_ngcontent-%COMP%]   .bar[_ngcontent-%COMP%] {\n  position: absolute;\n  height: 100%;\n  border-radius: inherit;\n  background-color: #2e7243;\n}\n\n.action-plus[_ngcontent-%COMP%] {\n  cursor: pointer;\n  background-color: #c8c9c0;\n  width: 2.6rem;\n  height: 1.2rem;\n  text-align: right;\n  transition: 0.3s;\n  border-radius: 0.6rem;\n  position: absolute;\n  right: -1.5rem;\n  z-index: -1;\n  padding-right: 0.25rem;\n}\n\n.action-plus[_ngcontent-%COMP%]   img[_ngcontent-%COMP%] {\n  height: 100%;\n  transition: 0.2s;\n}\n\n.x-mode[_ngcontent-%COMP%] {\n  transform: rotate(45deg);\n}\n\n.torrent-details-cont[_ngcontent-%COMP%] {\n  display: flex;\n  padding: 0.5rem 0;\n}\n\n.torrent-title-cont[_ngcontent-%COMP%]   .torrent-title[_ngcontent-%COMP%] {\n  font-weight: 400;\n}\n\n.torrent-title-cont[_ngcontent-%COMP%]   .torrent-publication-time[_ngcontent-%COMP%] {\n  display: inline-block;\n  margin-left: 1rem;\n  font-weight: 100;\n  font-size: 0.8em;\n  color: #747470;\n}\n\n.torrent-info-cont[_ngcontent-%COMP%] {\n  display: flex;\n  color: #d2d3c7;\n}\n\n.torrent-base-details-cont[_ngcontent-%COMP%] {\n  position: relative;\n}\n\n.torrent-tags[_ngcontent-%COMP%] {\n  display: flex;\n  height: 1.2rem;\n  margin-right: 0.5rem;\n}\n\n.torrent-tags[_ngcontent-%COMP%]:last-child {\n  margin-right: 0;\n}\n\n.tag[_ngcontent-%COMP%] {\n  background-color: #d2d3c7;\n  font-size: 0.8em;\n  padding: 0 0.5rem;\n}\n\n.tag[_ngcontent-%COMP%]:first-child {\n  border-radius: 0.6rem 0 0 0.6rem;\n}\n\n.tag[_ngcontent-%COMP%]:last-child {\n  border-radius: 0 0.6rem 0.6rem 0;\n}\n\n.tag[_ngcontent-%COMP%]:only-child {\n  border-radius: 0.6rem;\n}\n\n.tag.feed-tag[_ngcontent-%COMP%] {\n  background-color: #c8c9c0;\n}\n\n.tag.quality-tag[_ngcontent-%COMP%] {\n  background-color: #29abe2;\n}\n\n.tag.source-type-tag[_ngcontent-%COMP%] {\n  background-color: #a4a5a0;\n}\n\n.tag.torrent-link[_ngcontent-%COMP%] {\n  background-color: #a4a5a0;\n}\n\n.tag.torrent-full-name[_ngcontent-%COMP%] {\n  font-size: 0.7em;\n  font-weight: 100;\n  padding-top: 2px;\n  max-width: 24rem;\n  overflow: auto;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL3Nob3ctdG9ycmVudC9zaG93LXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCJzcmMvc3R5bGluZy92YXJpYWJsZXMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTtFQUNFLHFCQUFBO0VBQ0EsaUJBQUE7RUFDQSw2QkFBQTtBQURGOztBQUlBO0VBQ0UsYUFBQTtFQUNBLG9CQUFBO0FBREY7O0FBR0U7RUFDRSxpQkFBQTtFQUNBLGNBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EscUJBQUE7QUFESjs7QUFHSTtFQUNFLGlCQUFBO0FBRE47O0FBRU07RUFDRSxZQUFBO0VBQ0EsZ0JBQUE7QUFBUjs7QUFLRTtFQUNFLGFBQUE7RUFDQSx1QkFBQTtFQUNBLGVBQUE7RUFDQSx5QkM1Qlk7QUR5QmhCOztBQUtJO0VBQ0UseUJDOUJnQjtBRDJCdEI7O0FBTUk7RUFDRSxtQkFBQTtFQUNBLHlCQzFCTztBRHNCYjs7QUFNTTtFQUNFLHlCQ2xDWTtBRDhCcEI7O0FBUUk7RUFDRSxXQUFBO0VBQ0EsWUFBQTtFQUNBLHlCQzlDVTtBRHdDaEI7O0FBUU07RUFDRSx5QkNqRFE7QUQyQ2hCOztBQVVJO0VBQ0UsWUFBQTtFQUNBLHlCQ3REZ0I7QUQ4Q3RCOztBQVVNO0VBQ0UseUJDekRjO0FEaUR0Qjs7QUFZSTtFQUNFLGdCQUFBO0VBQ0EscUJBQUE7RUFDQSxjQzFETTtBRGdEWjs7QUFhSTtFQUNFLFdBQUE7RUFDQSxjQUFBO0VBQ0EseUJBQUE7RUFDQSx5QkFBQTtFQUNBLHNCQUFBO0VBQ0Esa0JBQUE7QUFYTjs7QUFhTTtFQUNFLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLHNCQUFBO0VBQ0EseUJDL0VjO0FEb0V0Qjs7QUFpQkE7RUFDRSxlQUFBO0VBQ0EseUJBQUE7RUFDQSxhQUFBO0VBQ0EsY0FBQTtFQUNBLGlCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxxQkFBQTtFQUNBLGtCQUFBO0VBQ0EsY0FBQTtFQUNBLFdBQUE7RUFDQSxzQkFBQTtBQWRGOztBQWdCRTtFQUNFLFlBQUE7RUFDQSxnQkFBQTtBQWRKOztBQWtCQTtFQUNFLHdCQUFBO0FBZkY7O0FBa0JBO0VBQ0UsYUFBQTtFQUNBLGlCQUFBO0FBZkY7O0FBbUJFO0VBQ0UsZ0JBQUE7QUFoQko7O0FBbUJFO0VBQ0UscUJBQUE7RUFDQSxpQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQ2pIYztBRGdHbEI7O0FBcUJBO0VBQ0UsYUFBQTtFQUNBLGNDbkhXO0FEaUdiOztBQXFCQTtFQUNFLGtCQUFBO0FBbEJGOztBQXFCQTtFQUNFLGFBQUE7RUFDQSxjQUFBO0VBQ0Esb0JBQUE7QUFsQkY7O0FBb0JFO0VBQ0UsZUFBQTtBQWxCSjs7QUFzQkE7RUFDRSx5QkNySVc7RURzSVgsZ0JBQUE7RUFDQSxpQkFBQTtBQW5CRjs7QUFxQkU7RUFDRSxnQ0FBQTtBQW5CSjs7QUFzQkU7RUFDRSxnQ0FBQTtBQXBCSjs7QUF1QkU7RUFDRSxxQkFBQTtBQXJCSjs7QUF3QkU7RUFDRSx5QkFBQTtBQXRCSjs7QUF5QkU7RUFDRSx5QkFBQTtBQXZCSjs7QUEwQkU7RUFDRSx5QkFBQTtBQXhCSjs7QUEyQkU7RUFDRSx5QkN2S1M7QUQ4SWI7O0FBNEJFO0VBQ0UsZ0JBQUE7RUFDQSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxjQUFBO0FBMUJKIiwiZmlsZSI6InNyYy9hcHAvc2hhcmVkL3Nob3ctdG9ycmVudC9zaG93LXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuLnRvcnJlbnQtY29udCB7XG4gIG1hcmdpbi1ib3R0b206IDAuNXJlbTtcbiAgcGFkZGluZzogMC41cmVtIDA7XG4gIGJvcmRlci1ib3R0b206IDNweCBzb2xpZCAkYmxhY2s7XG59XG5cbi50b3JyZW50LWFjdGlvbnMtY29udCB7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIG1hcmdpbi1yaWdodDogMC41cmVtO1xuXG4gIC50b3JyZW50LWFjdGlvbiB7XG4gICAgbWluLXdpZHRoOiAyLjZyZW07XG4gICAgaGVpZ2h0OiAxLjJyZW07XG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgIHRyYW5zaXRpb246IDAuM3M7XG4gICAgYm9yZGVyLXJhZGl1czogMC42cmVtO1xuXG4gICAgLmljb24td3JhcCB7XG4gICAgICBwYWRkaW5nOiAwIDAuM3JlbTtcbiAgICAgIGltZyB7XG4gICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgdHJhbnNpdGlvbjogMC4ycztcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICAuYWN0aW9uLWRvd25sb2FkIHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdG9ycmVudC1ncmVlbjtcblxuICAgICY6aG92ZXIge1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gICAgfVxuXG4gICAgJi5kb3dubG9hZF9kaXNhYmxlZCB7XG4gICAgICBjdXJzb3I6IG5vdC1hbGxvd2VkO1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHVuc2VsZWN0ZWQ7XG5cbiAgICAgICY6aG92ZXIge1xuICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdmFsdWUtZmFsc2UtaG92ZXI7XG4gICAgICB9XG4gICAgfVxuXG4gICAgJi5kb3dubG9hZGluZyB7XG4gICAgICB3aWR0aDogNnJlbTtcbiAgICAgIGN1cnNvcjogYXV0bztcbiAgICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuO1xuXG4gICAgICAmOmhvdmVyIHtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW47XG4gICAgICB9XG4gICAgfVxuXG4gICAgJi5kb25lIHtcbiAgICAgIGN1cnNvcjogYXV0bztcbiAgICAgIGJhY2tncm91bmQtY29sb3I6ICR0b3JyZW50LWdyZWVuLWhvdmVyO1xuXG4gICAgICAmOmhvdmVyIHtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXI7XG4gICAgICB9XG4gICAgfVxuXG4gICAgLmRvd25sb2FkLXN0YXR1cyB7XG4gICAgICBmb250LXNpemU6IDAuOGVtO1xuICAgICAgcGFkZGluZzogMCAwLjZyZW0gMCAwO1xuICAgICAgY29sb3I6ICRtYWluLWJhY2s7XG4gICAgfVxuXG4gICAgLmRvd25sb2FkLXByb2dyZXNzIHtcbiAgICAgIHdpZHRoOiA0cmVtO1xuICAgICAgaGVpZ2h0OiAwLjNyZW07XG4gICAgICBtYXJnaW46IDAuNXJlbSAwLjVyZW0gMCAwO1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2UzZTRkYjtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDAuMTVyZW07XG4gICAgICBwb3NpdGlvbjogcmVsYXRpdmU7XG5cbiAgICAgIC5iYXIge1xuICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogaW5oZXJpdDtcbiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogJHRvcnJlbnQtZ3JlZW4taG92ZXJcbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cblxuLmFjdGlvbi1wbHVzIHtcbiAgY3Vyc29yOiBwb2ludGVyO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjYzhjOWMwO1xuICB3aWR0aDogMi42cmVtO1xuICBoZWlnaHQ6IDEuMnJlbTtcbiAgdGV4dC1hbGlnbjogcmlnaHQ7XG4gIHRyYW5zaXRpb246IDAuM3M7XG4gIGJvcmRlci1yYWRpdXM6IDAuNnJlbTtcbiAgcG9zaXRpb246IGFic29sdXRlO1xuICByaWdodDogLTEuNXJlbTtcbiAgei1pbmRleDogLTE7XG4gIHBhZGRpbmctcmlnaHQ6IDAuMjVyZW07XG5cbiAgaW1nIHtcbiAgICBoZWlnaHQ6IDEwMCU7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4ueC1tb2RlIHtcbiAgdHJhbnNmb3JtOiByb3RhdGUoNDVkZWcpO1xufVxuXG4udG9ycmVudC1kZXRhaWxzLWNvbnQge1xuICBkaXNwbGF5OiBmbGV4O1xuICBwYWRkaW5nOiAwLjVyZW0gMDtcbn1cblxuLnRvcnJlbnQtdGl0bGUtY29udCB7XG4gIC50b3JyZW50LXRpdGxlIHtcbiAgICBmb250LXdlaWdodDogNDAwO1xuICB9XG5cbiAgLnRvcnJlbnQtcHVibGljYXRpb24tdGltZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgIG1hcmdpbi1sZWZ0OiAxcmVtO1xuICAgIGZvbnQtd2VpZ2h0OiAxMDA7XG4gICAgZm9udC1zaXplOiAwLjhlbTtcbiAgICBjb2xvcjogJHVuc2VsZWN0ZWQtZGFyaztcbiAgfVxufVxuXG4udG9ycmVudC1pbmZvLWNvbnQge1xuICBkaXNwbGF5OiBmbGV4O1xuICBjb2xvcjogJGxpZ2h0LXRleHQ7XG59XG5cbi50b3JyZW50LWJhc2UtZGV0YWlscy1jb250IHtcbiAgcG9zaXRpb246IHJlbGF0aXZlO1xufVxuXG4udG9ycmVudC10YWdzIHtcbiAgZGlzcGxheTogZmxleDtcbiAgaGVpZ2h0OiAxLjJyZW07XG4gIG1hcmdpbi1yaWdodDogMC41cmVtO1xuXG4gICY6bGFzdC1jaGlsZCB7XG4gICAgbWFyZ2luLXJpZ2h0OiAwO1xuICB9XG59XG5cbi50YWcge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAkbGlnaHQtdGV4dDtcbiAgZm9udC1zaXplOiAwLjhlbTtcbiAgcGFkZGluZzogMCAwLjVyZW07XG5cbiAgJjpmaXJzdC1jaGlsZCB7XG4gICAgYm9yZGVyLXJhZGl1czogMC42cmVtIDAgMCAwLjZyZW07XG4gIH1cblxuICAmOmxhc3QtY2hpbGQge1xuICAgIGJvcmRlci1yYWRpdXM6IDAgMC42cmVtIDAuNnJlbSAwO1xuICB9XG5cbiAgJjpvbmx5LWNoaWxkIHtcbiAgICBib3JkZXItcmFkaXVzOiAwLjZyZW07XG4gIH1cblxuICAmLmZlZWQtdGFnIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYzhjOWMwO1xuICB9XG5cbiAgJi5xdWFsaXR5LXRhZyB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogIzI5YWJlMjtcbiAgfVxuXG4gICYuc291cmNlLXR5cGUtdGFnIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjYTRhNWEwO1xuICB9XG5cbiAgJi50b3JyZW50LWxpbmsge1xuICAgIGJhY2tncm91bmQtY29sb3I6ICR1bnNlbGVjdGVkO1xuICB9XG5cbiAgJi50b3JyZW50LWZ1bGwtbmFtZSB7XG4gICAgZm9udC1zaXplOiAwLjdlbTtcbiAgICBmb250LXdlaWdodDogMTAwO1xuICAgIHBhZGRpbmctdG9wOiAycHg7XG4gICAgbWF4LXdpZHRoOiAyNHJlbTtcbiAgICBvdmVyZmxvdzogYXV0bztcbiAgfVxufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ShowTorrentComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{
@@ -3146,7 +3260,7 @@ ShowTorrentComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdef
                 templateUrl: './show-torrent.component.html',
                 styleUrls: ['./show-torrent.component.scss']
             }]
-    }], function () { return [{ type: _torrents_torrents_service__WEBPACK_IMPORTED_MODULE_2__["TorrentsService"] }, { type: _panel_services_status_services_status_service__WEBPACK_IMPORTED_MODULE_3__["ServicesStatusService"] }]; }, { showTorrent: [{
+    }], function () { return []; }, { showTorrent: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
         }] }); })();
 

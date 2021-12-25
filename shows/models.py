@@ -193,6 +193,7 @@ class Show(models.Model):
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
     lookup_names = models.TextField(default="", blank=True, null=True)
+    custom_lookup_names = models.TextField(default="", blank=True, null=True)
     imdb_rating = models.CharField(max_length=24, default="", blank=True)
 
     class Meta:
@@ -268,7 +269,7 @@ class Show(models.Model):
         """
         Returns the lookup names as a list of strings
         """
-        return self.lookup_names.split("\n")
+        return self.lookup_names.split("\n") + self.custom_lookup_names.lower().split("\n")
 
     @property
     def safe_folder_name(self) -> str:

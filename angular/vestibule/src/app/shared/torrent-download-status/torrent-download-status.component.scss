@@ -1,0 +1,78 @@
+@import "../../../styling/variables";
+
+.torrent-action {
+  min-width: 2.6rem;
+  height: 1.2rem;
+  text-align: center;
+  transition: 0.3s;
+  border-radius: 0.6rem;
+
+  .icon-wrap {
+    padding: 0 0.3rem;
+    img {
+      height: 100%;
+      transition: 0.2s;
+    }
+  }
+}
+
+.action-download {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  background-color: $torrent-green;
+
+  &:hover {
+    background-color: $torrent-green-hover;
+  }
+
+  &.download_disabled {
+    cursor: not-allowed;
+    background-color: $unselected;
+
+    &:hover {
+      background-color: $value-false-hover;
+    }
+  }
+
+  &.downloading {
+    width: 6rem;
+    cursor: auto;
+    background-color: $torrent-green;
+
+    &:hover {
+      background-color: $torrent-green;
+    }
+  }
+
+  &.done {
+    cursor: auto;
+    background-color: $torrent-green-hover;
+
+    &:hover {
+      background-color: $torrent-green-hover;
+    }
+  }
+
+  .download-status {
+    font-size: 0.8em;
+    padding: 0 0.6rem 0 0;
+    color: $main-back;
+  }
+
+  .download-progress {
+    width: 4rem;
+    height: 0.3rem;
+    margin: 0.5rem 0.5rem 0 0;
+    background-color: #e3e4db;
+    border-radius: 0.15rem;
+    position: relative;
+
+    .bar {
+      position: absolute;
+      height: 100%;
+      border-radius: inherit;
+      background-color: $torrent-green-hover
+    }
+  }
+}

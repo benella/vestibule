@@ -73,6 +73,14 @@
     </p>
   </div>
 
+  <div class="profile-form-field">
+    <p>Custom Lookup Names</p>
+    <p class="profile-option-description">
+      User-defined values used to find show torrents (will be added to auto-generated values)
+    </p>
+    <textarea formControlName="custom_lookup_names" rows="5" cols="20"></textarea>
+  </div>
+
   <button
     type="submit"
     [disabled]="!profileForm.valid || !profileForm.dirty || !isChanged"

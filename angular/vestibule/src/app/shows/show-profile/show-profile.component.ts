@@ -11,6 +11,8 @@ import { ShowsService } from "../shows.service";
 export class ShowProfileComponent implements OnInit {
   @Input() showProfile: ShowProfile
   @Input() showImdbID: string
+  @Input() showCustomLookupNames: string
+
   isChanged = false
   isLoading = false
   hasSaveError = false
@@ -21,6 +23,7 @@ export class ShowProfileComponent implements OnInit {
     high_quality_source: ['', Validators.required],
     download_automatically: ['', Validators.required],
     wait: ['', Validators.required],
+    custom_lookup_names: ['']
   })
 
   qualities = [
@@ -50,6 +53,7 @@ export class ShowProfileComponent implements OnInit {
       high_quality_source: this.showProfile.high_quality_source,
       download_automatically: this.showProfile.download_automatically,
       wait: this.showProfile.wait,
+      custom_lookup_names: this.showCustomLookupNames
     })
 
     this.profileForm.valueChanges.subscribe(val => {
@@ -59,23 +63,42 @@ export class ShowProfileComponent implements OnInit {
   }
 
   onSubmit() {
+    let settingsLoading = true
+    let profileLoading = true
+
     this.isLoading = true
     this.hasSaveError = false
+
+    const customLookupName = this.profileForm.get('custom_lookup_names').value as string
+
+    if (customLookupName) {
+      this.showsService.updateShowSettings(this.showImdbID, { imdb_id: this.showImdbID, custom_lookup_names: customLookupName }).subscribe(
+        showDetails => {
+          settingsLoading = false
+          this.showCustomLookupNames = showDetails.custom_lookup_names
+          this.updateIsChanged()
+          this.isLoading = profileLoading && settingsLoading
+      })
+    } else {
+      settingsLoading = false
+    }
 
     this.showsService.updateShowProfile(this.showImdbID, this.profileForm.value).subscribe(
       data => {
         this.showProfile = data
         this.updateIsChanged()
-        this.isLoading = false
+        profileLoading = false
+        this.isLoading = profileLoading && settingsLoading
       },
       () => {
-        this.isLoading = false
+        profileLoading = false
+        this.isLoading = profileLoading && settingsLoading
         this.hasSaveError = true
       }
     )
   }
 
   updateIsChanged() {
-    this.isChanged =  JSON.stringify(this.profileForm.value) !== JSON.stringify(this.showProfile)
+    this.isChanged =  JSON.stringify(this.profileForm.value) !== JSON.stringify({...this.showProfile, ...{ custom_lookup_names: this.showCustomLookupNames }})
   }
 }

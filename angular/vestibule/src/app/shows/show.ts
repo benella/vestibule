@@ -67,6 +67,11 @@ export interface ShowProfile {
   wait: string
 }
 
+export interface ShowSettings {
+  imdb_id: string
+  custom_lookup_names: string
+}
+
 export interface ShowDetails {
   imdb_id: string
   title: string
@@ -84,6 +89,7 @@ export interface ShowDetails {
   palette_list: Palette
   profile: ShowProfile
   formatted_imdb_id: string
+  custom_lookup_names: string
 }
 
 export interface ShowTorrents {

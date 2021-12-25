@@ -13,6 +13,7 @@ import {
   PreviewShowTorrents,
   UpdateTorrents,
   DownloadEpisodeBestMatch,
+  ShowSettings,
 } from "./show";
 
 @Injectable({
@@ -40,6 +41,10 @@ export class ShowsService {
 
   updateShowProfile(imdb_id: string, profile: ShowProfile): Observable<ShowProfile> {
     return this.http.put<ShowProfile>(`api/shows/update_profile/${imdb_id}`, profile)
+  }
+
+  updateShowSettings(imdb_id: string, settings: ShowSettings): Observable<ShowDetails> {
+    return this.http.put<ShowDetails>(`api/shows/${imdb_id}`, settings)
   }
 
   updateShowInfo(imdb_id: string): Observable<ShowDetails> {

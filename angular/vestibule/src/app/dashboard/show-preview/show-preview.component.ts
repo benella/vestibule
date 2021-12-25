@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ShowInUpcomingEpisodes} from "../../shows/show";
 import {PanelBackgroundService} from "../../panel/panel-background/panel-background.service";
+import {ShowTorrentDetails, TorrentInList} from "../../torrents/torrent";
 
 @Component({
   selector: 'vestibule-show-preview',
@@ -12,11 +13,14 @@ export class ShowPreviewComponent implements OnInit {
     this.show = newShow
     if (this.show) {
       this.panelBackgroundService.changeBackground(this.show.poster_link)
+      this.primaryColor = `rgb(${this.show.palette_list.primary.join(',')})`
     } else {
       this.panelBackgroundService.defaultBackground()
+      this.primaryColor = undefined;
     }
   }
 
+  primaryColor: string;
   show: ShowInUpcomingEpisodes;
 
   get color(): string {
@@ -27,4 +31,21 @@ export class ShowPreviewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  torrentToShowTorrent(torrent: TorrentInList): ShowTorrentDetails {
+    return {
+      torrentId: torrent.id,
+      showTitle: this.show.title,
+      seasonNumber: torrent.season,
+      episodeNumber: torrent.episode,
+      publicationTime: torrent.publication_time,
+      feed: torrent.feed,
+      quality: torrent.quality,
+      sourceType: torrent.source_type,
+      torrentTitle: torrent.title,
+      torrentLink: torrent.title,
+      isStandaloneTorrent: false,
+      downloadStatus: torrent.download_status,
+      percentDone: torrent.percent_done
+    }
+  }
 }
