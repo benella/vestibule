@@ -341,7 +341,7 @@ class Show(models.Model):
         self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
         poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
 
-        if not self.poster_link or self.poster_link != poster_link:
+        if (not self.poster_link) or (self.poster_link != poster_link) or (not self.palette):
             self.poster_link = poster_link
             self.extract_palette()
 
