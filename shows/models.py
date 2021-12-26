@@ -585,7 +585,10 @@ class Season(models.Model):
     number = models.IntegerField()
     title = models.CharField(default="", max_length=256)
     should_download = models.BooleanField(default=True)
-    downloaded = models.BooleanField(default=False)
+
+    @property
+    def is_downloaded(self) -> bool:
+        return bool(self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED]))
 
     @property
     def season_matching_torrents(self):
@@ -598,7 +601,7 @@ class Season(models.Model):
     @property
     def downloadable(self):
         any_episodes_downloaded = any(episode.is_downloaded for episode in self.episodes.all())
-        return self.should_download and not self.downloaded and self.torrents and not any_episodes_downloaded
+        return self.should_download and not self.is_downloaded and self.torrents and not any_episodes_downloaded
 
     @property
     def first_torrent_created_at(self):
@@ -621,10 +624,6 @@ class Season(models.Model):
 
         return None
 
-    def update_download_status(self, is_downloaded):
-        self.downloaded = is_downloaded
-        self.save()
-
 
 class Episode(models.Model):
     show = models.ForeignKey("shows.Show", related_name="show_episodes", on_delete=models.CASCADE)
@@ -632,10 +631,13 @@ class Episode(models.Model):
     number = models.IntegerField()
     title = models.CharField(default="", max_length=256)
     should_download = models.BooleanField(default=True)
-    is_downloaded = models.BooleanField(default=False)
     is_aired = models.BooleanField(default=False)
     air_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
     air_status = models.CharField(editable=False, max_length=256, default="")
+
+    @property
+    def is_downloaded(self) -> bool:
+        return bool(self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED]))
 
     @property
     def matching_torrents(self):
@@ -669,7 +671,3 @@ class Episode(models.Model):
             return self.unmatching_torrents[0]
 
         return None
-
-    def update_download_status(self, is_downloaded):
-        self.is_downloaded = is_downloaded
-        self.save()

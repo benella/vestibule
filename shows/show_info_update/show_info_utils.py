@@ -184,7 +184,6 @@ def update_entity_torrents(entity: Union['Season', 'Episode'], showProfile: 'Sho
         with TransmissionClient() as transmission:
             if transmission.is_up:
                 downloaded, message = transmission.download_torrent(prime_torrent)
-                entity.update_download_status(downloaded)
                 logger.info(message)
                 return downloaded
 

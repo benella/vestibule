@@ -41,7 +41,7 @@ class SeasonSerializer(serializers.ModelSerializer):
             'number',
             'title',
             'should_download',
-            'downloaded',
+            'is_downloaded',
             'episodes',
             'season_matching_torrents',
             'season_unmatching_torrents'

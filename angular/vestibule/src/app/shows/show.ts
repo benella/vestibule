@@ -102,7 +102,7 @@ export interface Season {
   number: number
   title: string
   should_download: boolean
-  downloaded: boolean
+  is_downloaded: boolean
   episodes: Episode[]
   season_matching_torrents: Torrent[]
   season_unmatching_torrents: Torrent[]
