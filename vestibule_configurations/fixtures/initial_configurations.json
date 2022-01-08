@@ -94,5 +94,13 @@
       "name": "Default Share Ratio",
       "value": "4"
     }
+  },
+    {
+    "model": "vestibule_configurations.VestibuleConfiguration",
+    "pk": 13,
+    "fields": {
+      "name": "TMDB API Key",
+      "value": "4"
+    }
   }
 ]

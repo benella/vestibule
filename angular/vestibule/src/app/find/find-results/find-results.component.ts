@@ -61,8 +61,6 @@ export class FindResultsComponent implements OnInit {
   }
 
   setPreviewShow(show: ShowSearchResult): void {
-    this.searchMode = false
-
     if (this.previewShow?.imdb_id === show.imdb_id) {
       return
     }

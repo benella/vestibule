@@ -1,4 +1,4 @@
-<form [formGroup]="findForm" class="find-form" (mouseover)="searchMode = true">
+<form [formGroup]="findForm" class="find-form">
   <img class="find-icon" alt="Find" src="/static/images/find_icon.svg">
   <input
     #searchInput
@@ -8,11 +8,10 @@
   >
 </form>
 
-<div class="search-results" *ngIf="searchMode && searchResults.length" (mouseleave)="searchMode = false">
-  <p class="title" *ngIf="searchResults.length">Shows</p>
+<div class="search-results" *ngIf="searchResults.length">
   <div class="results">
     <div *ngFor="let result of searchResults" class="search-result-wrapper" (click)="setPreviewShow(result)">
-      <div class="poster-wrapper" style="background-image: url('{{result.cover_url}}')"></div>
+      <div class="poster-wrapper" style="background-image: url('{{result.small_poster_path}}')"></div>
       <div class="data">
         <p class="year">
           <span>{{result.year}}</span>
@@ -21,15 +20,10 @@
       </div>
     </div>
   </div>
-  <ng-template *ngIf="!searchResults.length">
-    <p *ngIf="!searchInput.value.length && !loading">
-      Type to search
-    </p>
-  </ng-template>
 </div>
 
 <div id="preview-selected-show" *ngIf="previewShow">
-  <div class="poster-wrap" style="background-image: url('{{previewShow.full_cover_url}}')"></div>
+  <div class="poster-wrap" style="background-image: url('{{previewShow.large_poster_path}}')"></div>
   <div class="data">
     <div class="year-imdb">
       <span>{{previewShow.year}}</span>

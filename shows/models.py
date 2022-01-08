@@ -487,7 +487,7 @@ class Show(models.Model):
                 if saved_episode.number not in season_episodes.keys():
                     print(f"Saved Episode {saved_episode} ({saved_episode.number}) not found in {season_episodes.keys()}")
                     if not saved_episode.torrents.all():
-                        print(f"It have no torrents {saved_episode.torrents.all()}, deleting it")
+                        print(f"It has no torrents {saved_episode.torrents.all()}, deleting it")
                         saved_episode.delete()
 
 
@@ -587,8 +587,12 @@ class Season(models.Model):
     should_download = models.BooleanField(default=True)
 
     @property
+    def downloaded_torrents(self) -> List[Torrent]:
+        return self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
+
+    @property
     def is_downloaded(self) -> bool:
-        return bool(self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED]))
+        return bool(self.downloaded_torrents)
 
     @property
     def season_matching_torrents(self):
@@ -636,8 +640,12 @@ class Episode(models.Model):
     air_status = models.CharField(editable=False, max_length=256, default="")
 
     @property
+    def downloaded_torrents(self) -> List[Torrent]:
+        return self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
+
+    @property
     def is_downloaded(self) -> bool:
-        return bool(self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED]))
+        return self.season.is_downloaded or bool(self.downloaded_torrents)
 
     @property
     def matching_torrents(self):

@@ -6,5 +6,6 @@ APScheduler==3.6.3
 transmission-clutch==2.0.3
 PlexAPI==3.3.0
 tvdb-api-client==0.4.0
+tmdbsimple===2.8.1
 RarbgAPI==0.4.2
 colorthief==0.2.1

@@ -24,8 +24,8 @@ export interface Palette {
 export interface ShowSearchResult {
   title: string
   year: string
-  cover_url: string
-  full_cover_url: string
+  small_poster_path: string
+  large_poster_path: string
   imdb_id: string
   imdb_link: string
   subscribed: boolean

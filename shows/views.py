@@ -1,3 +1,4 @@
+from common.tmdb_client import TheMovieDBVestibuleClient
 from .models import Show, ShowProfile
 from django.http import JsonResponse
 from rest_framework import generics
@@ -19,37 +20,21 @@ ia = IMDb()
 
 def search_show(request, title):
     subscribed_shows_imdb_ids = [show.imdb_id for show in Show.objects.all()]
-    results = ia.search_movie(title)
+    results = []
 
-    with TVDBVestibuleClient() as tvdb_client:
-        tvdb_results = tvdb_client.search_show(title)
+    with TheMovieDBVestibuleClient() as tmdb_client:
+        for imdb_id, tvdb_info in tmdb_client.search_show(term=title):
+            results.append({
+                "title": tvdb_info.get("name"),
+                "year": tvdb_info.get("first_air_date", "Unknown Year-").split("-")[0],
+                "small_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w154"),
+                "large_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w342"),
+                "imdb_id": imdb_id,
+                "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=imdb_id),
+                "subscribed": imdb_id in subscribed_shows_imdb_ids
+            })
 
-        for tvdb_result in tvdb_results[:5]:
-            try:
-                imdb_id_number = int(tvdb_result.get("imdbId", "").replace("tt", ""))
-                results.insert(0, ia.get_movie(imdb_id_number))
-            except ValueError:
-                continue
-
-    filtered_results = list()
-
-    for result in results:
-        if result.get("kind") not in ["tv series", "tv miniseries", "tv mini series"]:
-            print("skipping [{}] {} (kind: {})".format(
-                result.getID(), result.get("title"), result.get("kind")))
-            continue
-
-        filtered_results.append({
-            "title": result.get("title"),
-            "year": result.get("year", "Unknown Year"),
-            "cover_url": result.get("cover url"),
-            "full_cover_url": result.get("full-size cover url"),
-            "imdb_id": result.getID(),
-            "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=result.getID()),
-            "subscribed": result.getID() in subscribed_shows_imdb_ids
-        })
-
-    return JsonResponse({"results": filtered_results})
+    return JsonResponse({"results": results})
 
 
 def show_enriched_info(request, imdb_id):
