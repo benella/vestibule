@@ -29,3 +29,20 @@ button:focus {
     display: inline-block;
     margin: 0 5px;
 }
+
+.show-imdb-link {
+  margin-top: 1.5rem;
+
+  a {
+    border: 2px solid;
+    padding: 0 5px 1px;
+    margin-right: 5px;
+    text-decoration: none;
+    transition: 0.2s;
+    display: inline-block;
+
+    &:hover {
+      background-color: rgba(252, 214, 56, 0.6);
+    }
+  }
+}

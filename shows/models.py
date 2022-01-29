@@ -587,12 +587,13 @@ class Season(models.Model):
     should_download = models.BooleanField(default=True)
 
     @property
-    def downloaded_torrents(self) -> List[Torrent]:
-        return self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
+    def downloaded_season_torrents(self) -> List[Torrent]:
+        return self.torrents.filter(
+            episode_data=None, download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
 
     @property
     def is_downloaded(self) -> bool:
-        return bool(self.downloaded_torrents)
+        return bool(self.downloaded_season_torrents)
 
     @property
     def season_matching_torrents(self):

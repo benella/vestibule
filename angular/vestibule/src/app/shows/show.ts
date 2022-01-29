@@ -7,7 +7,10 @@ export interface EnrichedShowInfo {
 }
 
 export interface ShowSearchResults {
-  results: ShowSearchResult[]
+  shows: {
+    subscribed: ShowSearchResult[],
+    unsubscribed: ShowSearchResult[]
+  }
 }
 
 export interface PreviewShowTorrents {
@@ -29,6 +32,9 @@ export interface ShowSearchResult {
   imdb_id: string
   imdb_link: string
   subscribed: boolean
+  network: string,
+  status: string,
+  number_of_seasons: number,
 }
 
 export interface ShowSuccessfulSubscription {

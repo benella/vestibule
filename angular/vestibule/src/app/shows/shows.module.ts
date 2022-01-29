@@ -6,7 +6,6 @@ import { ShowsRoutingModule } from './shows-routing.module';
 import { ShowsListComponent } from './shows-list/shows-list.component';
 import { PosterStripComponent } from './poster-strip/poster-strip.component';
 import { ShowDetailsComponent } from './show-details/show-details.component';
-import { PluralPipePipe } from "../pipes/plural-pipe.pipe";
 import { ShowDetailsTabComponent } from './show-details/show-details-tab/show-details-tab.component';
 import { ShowDetailsTabsComponent } from './show-details/show-details-tabs/show-details-tabs.component';
 import { ShowProfileComponent } from './show-profile/show-profile.component';
@@ -18,7 +17,6 @@ import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows
 
 @NgModule({
   declarations: [
-    PluralPipePipe,
     ShowsListComponent,
     PosterStripComponent,
     ShowDetailsComponent,

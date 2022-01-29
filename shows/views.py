@@ -26,15 +26,25 @@ def search_show(request, title):
         for imdb_id, tvdb_info in tmdb_client.search_show(term=title):
             results.append({
                 "title": tvdb_info.get("name"),
-                "year": tvdb_info.get("first_air_date", "Unknown Year-").split("-")[0],
-                "small_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w154"),
-                "large_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w342"),
+                "year": (tvdb_info.get("first_air_date", "Unknown Year-") or "Unknown Year-").split("-")[0],
+                "small_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w342"),
+                "large_poster_path": tmdb_client.get_poster_full_url(tvdb_info.get("poster_path"), "w500"),
                 "imdb_id": imdb_id,
                 "imdb_link": "https://www.imdb.com/title/tt{id}".format(id=imdb_id),
-                "subscribed": imdb_id in subscribed_shows_imdb_ids
+                "subscribed": imdb_id in subscribed_shows_imdb_ids,
+                "network": (
+                        tvdb_info.get("networks", [{"name": "Unknown Network"}]) or [{"name": "Unknown Network"}]
+                )[0].get("name", "Unknown Network"),
+                "status": tvdb_info.get("status", "Unknown Status"),
+                "number_of_seasons": tvdb_info.get("number_of_seasons", 0)
             })
 
-    return JsonResponse({"results": results})
+    return JsonResponse(
+        {"shows": {
+            "subscribed": list(filter(lambda s: s['subscribed'], results)),
+            "unsubscribed": list(filter(lambda s: not s['subscribed'], results))
+        }}
+    )
 
 
 def show_enriched_info(request, imdb_id):

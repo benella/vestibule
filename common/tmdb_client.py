@@ -42,6 +42,12 @@ class TheMovieDBVestibuleClient:
         except (requests.exceptions.HTTPError, AttributeError):
             return ''
 
+    def get_show_details(self, tmdb_id: int) -> dict:
+        try:
+            return self.client.TV(tmdb_id).info()
+        except (requests.exceptions.HTTPError, AttributeError):
+            return dict()
+
     def get_poster_full_url(self, image_url, poster_size: str = 'w185') -> str:
         """
         'poster_sizes': ['w92', 'w154', 'w185', 'w342', 'w500', 'w780', 'original']
@@ -53,7 +59,11 @@ class TheMovieDBVestibuleClient:
 
         try:
             shows = self.search.tv(query=term).get('results', [])
-            results = [(self.get_show_imdb_id(show.get('id')), show) for show in shows]
+            shows.sort(key=lambda s: s.get('popularity'), reverse=True)
+            results = [
+                (self.get_show_imdb_id(show.get('id')),
+                 self.get_show_details(show.get('id')))
+                for show in shows]
         except ConnectionRefusedError as e:
             print("Failed connecting to TMDB: ", e)
 

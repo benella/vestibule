@@ -1,5 +1,5 @@
 <form [formGroup]="findForm" class="find-form">
-  <img class="find-icon" alt="Find" src="/static/images/find_icon.svg">
+  <img class="find-icon" alt="Find" src="/static/images/find_icon.svg" [class.loading]="loading">
   <input
     #searchInput
     formControlName="term"
@@ -8,35 +8,42 @@
   >
 </form>
 
+<p class="result-message" *ngIf="resultsMessage | async as resultsMsg">{{ resultsMsg }}</p>
+
 <div class="search-results" *ngIf="searchResults.length">
   <div class="results">
-    <div *ngFor="let result of searchResults" class="search-result-wrapper" (click)="setPreviewShow(result)">
-      <div class="poster-wrapper" style="background-image: url('{{result.small_poster_path}}')"></div>
-      <div class="data">
-        <p class="year">
-          <span>{{result.year}}</span>
-        </p>
-        <p class="show-title">{{result.title}}</p>
+    <div *ngFor="let result of searchResults"
+         class="search-result-wrapper"
+         (click)="setPreviewShow(result)"
+         [ngClass]="{selected: result === previewShow, subscribed: result.subscribed}">
+      <div class="poster-preview">
+        <div class="poster-wrapper" [ngStyle]="getPosterStyle(result)"></div>
+        <div class="data">
+          <p class="year">
+            <span>{{result.year}}</span>
+          </p>
+          <p class="show-title">{{result.title}}</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <div id="preview-selected-show" *ngIf="previewShow">
-  <div class="poster-wrap" style="background-image: url('{{previewShow.large_poster_path}}')"></div>
   <div class="data">
-    <div class="year-imdb">
-      <span>{{previewShow.year}}</span>
-      <a class="imdb-link" target="_blank" href="{{previewShow.imdb_link}}">IMDB</a>
-      <span class="bullet">•</span>
-      <div class="loading-enriched" *ngIf="!previewShowEnriched">
-          <img src="/static/images/loading_circle.svg" alt="Loading">
-      </div>
-      <span *ngIf="previewShowEnriched?.network">
-        <span>{{ previewShowEnriched.network }}</span>
-      </span>
-    </div>
     <p class="title">{{previewShow.title}}</p>
+
+    <p class="show-title-tags">
+      <span *ngIf="previewShow.year"><span> {{ previewShow.year }} </span><span class="bullet">•</span></span>
+      <span *ngIf="previewShow.network"><span> {{ previewShow.network }} </span><span class="bullet">•</span></span>
+      <span *ngIf="previewShow.number_of_seasons"><span> {{ previewShow.number_of_seasons | pluralPipe:'Season' }}</span></span>
+    </p>
+
+    <p class="show-status-line">{{ previewShow.status }}</p>
+
+    <div class="show-imdb-link">
+      <p><a href="{{ previewShow.imdb_link }}" target="_blank">IMDB</a> 8.4</p>
+    </div>
 
     <div class="show-actions">
         <ng-container *ngIf="!previewShow.subscribed else subscribed">
@@ -45,22 +52,9 @@
         </ng-container>
         <ng-template #subscribed>
           <a [routerLink]="['/shows', previewShow.imdb_id]">
-            <p class="action subscription">Subscribed</p>
+            <p class="action subscription">See Subscription</p>
           </a>
         </ng-template>
-      <p *ngIf="!addLoading" class="action fins-torrents" (click)="findPreviewShowTorrents()">Find Torrents</p>
     </div>
-
-    <div class="enriched-data">
-      <p class="tag" *ngIf="previewShowEnriched?.status">{{previewShowEnriched.status}}</p>
-      <p class="tag" *ngIf="previewShowEnriched?.number_of_seasons">
-        {{previewShowEnriched.number_of_seasons}} Seasons</p>
-    </div>
-  </div>
-</div>
-
-<div class="torrents-wrapper">
-  <div *ngFor="let torrent of previewShowTorrents">
-    <vestibule-show-torrent [showTorrent]="torrent"></vestibule-show-torrent>
   </div>
 </div>
