@@ -5,7 +5,7 @@ import { EnrichedShowInfo, ShowSearchResult, ShowSearchResults } from "../../sho
 import { BehaviorSubject, interval, Observable, of, Subject } from "rxjs";
 import { debounce, switchMap } from "rxjs/operators";
 import { Router } from "@angular/router";
-import { ShowTorrentDetails, TorrentDownloadStatus } from "../../torrents/torrent";
+import { ShowTorrentDetails } from "../../torrents/torrent";
 import { PanelBackgroundService } from "../../panel/panel-background/panel-background.service";
 
 @Component({
@@ -103,27 +103,6 @@ export class FindResultsComponent implements OnInit {
     return {
       backgroundImage: `url('${url}')`
     }
-  }
-
-  findPreviewShowTorrents(): void {
-    this.showsService.findPreviewShowTorrents(this.previewShow.imdb_id).subscribe(
-      data => this.previewShowTorrents = data.results.map(torrent => {
-        return {
-          showTitle: this.previewShow.title,
-          seasonNumber: torrent.season,
-          episodeNumber: torrent.episode,
-          publicationTime: `${torrent.publication_time}`,
-          feed: torrent.feed,
-          quality: torrent.video_quality,
-          sourceType: torrent.source,
-          torrentTitle: torrent.raw_title,
-          torrentLink: torrent.link,
-          isStandaloneTorrent: true,
-          downloadStatus: TorrentDownloadStatus.NEVER_STARTED,
-          percentDone: 0
-        }
-      })
-    )
   }
 
   subscribeToShow(show: ShowSearchResult) {

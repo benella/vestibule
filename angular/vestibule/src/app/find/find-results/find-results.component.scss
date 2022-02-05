@@ -76,10 +76,6 @@
     color: $unselected-dark;
   }
 
-  &.blur {
-    filter: blur(12px);
-  }
-
   .results {
     display: flex;
     overflow-y: auto;
@@ -101,10 +97,6 @@
         flex-direction: column;
       }
 
-      &.subscribed {
-        //background-color: red;
-      }
-
       &.selected {
         .poster-wrapper {
           height: 15rem;
@@ -114,6 +106,10 @@
         .data {
           opacity: 0;
           top: 15.5rem;
+
+          .subscribed-mark {
+            opacity: 0;
+          }
         }
       }
 
@@ -126,7 +122,7 @@
         width: 6rem;
         background-position: top;
         background-repeat: no-repeat;
-        background-size: 100%;
+        background-size: cover;
         background-color: rgba(128, 128, 128, 0.3);
         margin: 0.15rem 0.5rem 0 0;
         border-radius: 0.2rem;
@@ -143,6 +139,18 @@
         span {
           color: inherit;
           font-weight: inherit;
+        }
+
+        .subscribed-mark {
+          transition: 0.1s;
+          width: 9px;
+          height: 9px;
+          background-color: $value-true;
+          border-radius: 50%;
+          position: absolute;
+          right: 0;
+          top: 0.35rem;
+          opacity: 1;
         }
 
         .year {
@@ -216,34 +224,7 @@
             color: $value-true;
           }
         }
-
-        &.fins-torrents {
-          border-color: $value-neutral;
-
-          &:hover {
-            color: $value-neutral;
-          }
-        }
-      }
-    }
-
-    .enriched-data {
-      display: flex;
-      margin-top: 2rem;
-
-      .tag {
-        height: 1.5rem;
-        background-color: $main-back-dark;
-        border-radius: 0.75rem;
-        padding: 0 0.5rem;
-        margin-right: 0.5rem;
       }
     }
   }
-}
-
-.torrents-wrapper {
-  margin: 3rem 3rem 0 0;
-  overflow-x: scroll;
-  height: calc(100vh - 30rem);
 }

@@ -19,6 +19,7 @@
       <div class="poster-preview">
         <div class="poster-wrapper" [ngStyle]="getPosterStyle(result)"></div>
         <div class="data">
+          <div *ngIf="result.subscribed" class="subscribed-mark"></div>
           <p class="year">
             <span>{{result.year}}</span>
           </p>
@@ -42,7 +43,7 @@
     <p class="show-status-line">{{ previewShow.status }}</p>
 
     <div class="show-imdb-link">
-      <p><a href="{{ previewShow.imdb_link }}" target="_blank">IMDB</a> 8.4</p>
+      <p><a href="{{ previewShow.imdb_link }}" target="_blank">IMDB</a></p>
     </div>
 
     <div class="show-actions">
