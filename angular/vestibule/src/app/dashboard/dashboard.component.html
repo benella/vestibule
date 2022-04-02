@@ -1,20 +1,29 @@
-<vestibule-show-preview [previewShow]="showInPreview">
+<ng-container *ngIf="upcomingEpisodesShows.length else noShows">
+  <vestibule-show-preview [previewShow]="showInPreview"></vestibule-show-preview>
 
-</vestibule-show-preview>
-
-<div class="dashboard-model-wrapper">
-  <p class="dashboard-model-title">Upcoming Episodes</p>
-  <div class="dashboard-model-entries">
-    <div *ngFor="let show of upcomingEpisodesShows" (click)="showInPreview=show">
-      <div class="dashboard-model-entry">
-        <div class="show-data">
-          <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
-          <p class="show-title">{{show.title}}</p>
-          <div class="show-next-episode-line">
-            <p>{{show.next_episode}}</p>
+  <div class="dashboard-model-wrapper">
+    <p class="dashboard-model-title">Upcoming Episodes</p>
+    <div class="dashboard-model-entries">
+      <div *ngFor="let show of upcomingEpisodesShows" (click)="showInPreview=show">
+        <div class="dashboard-model-entry">
+          <div class="show-data">
+            <vestibule-poster-strip [palette]="show.palette_list" [width]="'100%'"></vestibule-poster-strip>
+            <p class="show-title">{{show.title}}</p>
+            <div class="show-next-episode-line">
+              <p>{{show.next_episode}}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</ng-container>
+
+<ng-template #noShows>
+  <div class="no-shows">
+    <p>This is where you'll see all the upcoming episodes for your subscribed Shows,</p>
+    <p>but it seems you don't have any subscriptions yet.</p>
+    <br/>
+    <p>Try finding a new show on <a [routerLink]="'/find/results'">Find</a></p>
+  </div>
+</ng-template>

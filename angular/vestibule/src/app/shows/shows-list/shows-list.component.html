@@ -1,4 +1,10 @@
 <section id="shows-status-list">
+  <div *ngIf="noShows" class="no-shows">
+    <p>This is where you'll find all the Shows you've subscribed to,</p>
+    <p>but it seems you don't have any subscriptions yet.</p>
+    <br/>
+    <p>Try finding a new show on <a [routerLink]="'/find/results'">Find</a></p>
+  </div>
 
   <vestibule-shows-status-group
     [title]="'Continuing'"

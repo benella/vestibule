@@ -18,6 +18,7 @@ export class ShowsListComponent implements OnInit {
   upcomingShows: ShowInList[]
   endedShows: ShowInList[]
   showsByStatus: { [status: string] : ShowInList[] }
+  noShows = true;
 
   constructor(private showsService: ShowsService) { }
 
@@ -25,6 +26,7 @@ export class ShowsListComponent implements OnInit {
     this.showsService.listShows().subscribe(
       data => {
         this.showsByStatus = this.groupShowsBy(data)
+        this.noShows = !Object.keys(this.showsByStatus).length;
         this.continuingShows = this.showsByStatus[ShowStatus.CONTINUING]
         this.upcomingShows = this.showsByStatus[ShowStatus.UPCOMING]
         this.endedShows = this.showsByStatus[ShowStatus.ENDED]

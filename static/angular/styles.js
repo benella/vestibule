@@ -59,7 +59,7 @@ ___CSS_LOADER_EXPORT___.push([module.i, "* {\n  padding: 0;\n  margin: 0;\n  fon
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/Ben/PycharmProjects/VestibuleServer/angular/vestibule/src/styles.scss */"+EN/");
+module.exports = __webpack_require__(/*! /Users/ben/PycharmProjects/Vestibule/angular/vestibule/src/styles.scss */"+EN/");
 
 
 /***/ }),

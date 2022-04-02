@@ -1,6 +1,6 @@
 <div id="preview-wrap">
   <div class="poster-wrap" style="background-color: {{primaryColor}}">
-    <div class="poster" style="background-image: url('{{show.poster_link}}')"></div>
+    <div *ngIf="show?.poster_link" class="poster" style="background-image: url('{{show.poster_link}}')"></div>
   </div>
 
   <div class="details-wrap">

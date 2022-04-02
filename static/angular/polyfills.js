@@ -7,7 +7,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Users/Ben/PycharmProjects/VestibuleServer/angular/vestibule/src/polyfills.ts */"hN/g");
+module.exports = __webpack_require__(/*! /Users/ben/PycharmProjects/Vestibule/angular/vestibule/src/polyfills.ts */"hN/g");
 
 
 /***/ }),
