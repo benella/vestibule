@@ -1,7 +1,15 @@
-from typing import Tuple
-from imdb import IMDb, Movie
-from datetime import datetime, timedelta
+import logging
+import re
+from typing import TYPE_CHECKING, Tuple, Union
+from imdb import Movie
+from datetime import datetime
 from dataclasses import dataclass
+
+if TYPE_CHECKING:
+    from shows.models import Season, Episode, ShowProfile
+from torrents_manager.transmission_client import TransmissionClient
+
+logger = logging.getLogger(__name__)
 
 
 def get_today():
@@ -9,23 +17,17 @@ def get_today():
 
 
 @dataclass
-class FutureEpisode:
-    show: Movie
+class EpisodeTimeData:
     episode_data: Movie
     episode_air_time: datetime
     air_time_unknown: bool
     month_only: bool
     year_only: bool
 
-
-    def __str__(self):
-        return f"Season {self.episode_data['season']} Episode {self.episode_data['episode']} - " \
-               f"'{self.episode_data['title']}', {self.airs}."
-
     @property
     def absolute_episode_air_time_code(self):
         """
-        Used to compare Shoes air times. Converts episode airtime into code:
+        Used to compare Show air times. Converts episode airtime into code:
             '2020-07-24', '2020-99-99', '2020-10-99', '9999-99-99'
         """
         if self.air_time_unknown:
@@ -70,86 +72,120 @@ class FutureEpisode:
         if self.days_from_now == 1:
             return "airs tomorrow"
 
-        return f"airs in {self.days_from_now} days"
+        if self.days_from_now > 0:
+            return f"airs in {self.days_from_now} days"
+
+        if abs(self.days_from_now) < 15:
+            return f"aired {abs(self.days_from_now)} days ago"
+
+        return f"aired on {self.episode_air_time.strftime('%B %-d, %Y')}"
 
 
-def get_next_episode(show_id: str) -> Tuple[FutureEpisode, str]:
-    ia = IMDb()
-    show = ia.get_movie(show_id)
-    ia.update(show, "episodes")
-    future_episodes = list()
-
+def extract_episode_time(episode: Movie) -> Tuple[bool, EpisodeTimeData]:
+    """
+    Extract Episode timing data from IMDB episode data.
+    Returns <bool> if the episode was aired, and the episode
+    """
     now = get_today()
+    episode_air_time = datetime.max
 
-    for season_number, season_episodes in show["episodes"].items():
-        for episode_number, episode in season_episodes.items():
-            episode_air_time = datetime.max
+    # No Date
+    if 'original air date' not in episode.keys():
+        return False, EpisodeTimeData(
+            episode_data=episode,
+            episode_air_time=episode_air_time,
+            air_time_unknown=True,
+            month_only=False,
+            year_only=False,
+        )
 
-            # No Date
-            if 'original air date' not in episode.keys():
-                future_episodes.append(FutureEpisode(
+    # Full Date
+    for date_format in ["%d %b. %Y", "%d %b %Y"]:
+        try:
+            episode_air_time = datetime.strptime(episode['original air date'], date_format)
+            if episode_air_time >= now:
+                return False, EpisodeTimeData(
                     episode_data=episode,
                     episode_air_time=episode_air_time,
-                    air_time_unknown=True,
+                    air_time_unknown=False,
                     month_only=False,
-                    year_only=False,
-                    show=show
-                ))
-                continue
+                    year_only=False
+                )
 
-            # Full Date
-            for date_format in ["%d %b. %Y", "%d %b %Y"]:
-                try:
-                    episode_air_time = datetime.strptime(episode['original air date'], date_format)
-                    if episode_air_time >= now:
-                        future_episodes.append(FutureEpisode(
-                            episode_data=episode,
-                            episode_air_time=episode_air_time,
-                            air_time_unknown=False,
-                            month_only=False,
-                            year_only=False,
-                            show=show
-                        ))
-                    continue
-                except ValueError:
-                    pass
+        except ValueError:
+            pass
 
-            # Month Only
-            for date_format in ["%b. %Y", "%b %Y"]:
-                try:
-                    episode_air_time = datetime.strptime(episode['original air date'], date_format)
-                    if (episode_air_time.year >= now.year) and \
-                            (episode_air_time.month >= now.month):
-                        future_episodes.append(FutureEpisode(
-                            episode_data=episode,
-                            episode_air_time=episode_air_time,
-                            air_time_unknown=False,
-                            month_only=True,
-                            year_only=True,
-                            show=show
-                        ))
-                        continue
-                except ValueError:
-                    pass
+    # Month Only
+    for date_format in ["%b. %Y", "%b %Y"]:
+        try:
+            episode_air_time = datetime.strptime(episode['original air date'], date_format)
+            if (episode_air_time.year >= now.year) and (episode_air_time.month >= now.month):
+                return False, EpisodeTimeData(
+                    episode_data=episode,
+                    episode_air_time=episode_air_time,
+                    air_time_unknown=False,
+                    month_only=True,
+                    year_only=True
+                )
+        except ValueError:
+            pass
 
-            # Year Only
-            try:
-                episode_air_time = datetime.strptime(episode['original air date'], "%Y")
-                if episode_air_time.year >= now.year:
-                    future_episodes.append(FutureEpisode(
-                        episode_data=episode,
-                        episode_air_time=episode_air_time,
-                        air_time_unknown=False,
-                        month_only=False,
-                        year_only=True,
-                        show=show
-                    ))
-                    continue
-            except ValueError:
-                pass
+    # Year Only
+    try:
+        episode_air_time = datetime.strptime(episode['original air date'], "%Y")
+        if episode_air_time.year >= now.year:
+            return False, EpisodeTimeData(
+                episode_data=episode,
+                episode_air_time=episode_air_time,
+                air_time_unknown=False,
+                month_only=False,
+                year_only=True
+            )
+    except ValueError:
+        pass
 
-    if not future_episodes:
-        return None, f"Done or not renewed yet, has no upcoming episodes."
+    return True, EpisodeTimeData(
+        episode_data=episode,
+        episode_air_time=episode_air_time,
+        air_time_unknown=False,
+        month_only=False,
+        year_only=False,
+    )
 
-    future_episodes.sort(key=lambda x: x.episode_value)
-    return future_episodes[0], f"Continuing, has {len(future_episodes)} upcoming episodes."
+
+def generate_show_lookup_names(imdb_show_data: dict):
+    """
+    Creates list of possible torrent show titles
+    Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
+    """
+    aliases = [imdb_show_data.get("title", "")] + imdb_show_data.get("akas", [])
+    additional_aliases = [alias.replace("-", " ") for alias in aliases if "-" in alias]
+    aliases += additional_aliases
+    year = imdb_show_data.get("year", "")
+    formatted_aliases = list()
+
+    for name in aliases:
+        formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
+        formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+        formatted_name = re.sub("[:(),'?!]", "", formatted_name).lower()
+        formatted_name = re.sub("\.+", ".", formatted_name.strip())
+        formatted_aliases.append(formatted_name)
+        formatted_aliases.append(f"{formatted_name}.{year}")
+
+    return formatted_aliases
+
+
+def update_entity_torrents(entity: Union['Season', 'Episode'], showProfile: 'ShowProfile') -> bool:
+    should_wait = showProfile.should_wait(entity.first_torrent_created_at)
+    prime_torrent = entity.prime_torrent(must_match_profile=should_wait)
+
+    if prime_torrent:
+        logger.info(f'{entity} - Prime torrent found - {prime_torrent}')
+        with TransmissionClient() as transmission:
+            if transmission.is_up:
+                downloaded, message = transmission.download_torrent(prime_torrent)
+                logger.info(message)
+                return downloaded
+
+    logger.info(f'{entity} - Could not download prime torrent')
+    return False

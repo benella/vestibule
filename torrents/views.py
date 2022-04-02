@@ -1,8 +1,9 @@
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-from django.contrib import messages
 from django.views import generic
+from rest_framework import generics
+from rest_framework.response import Response
+
 from .models import Torrent
+from .serializers import TorrentSerializer
 from shows.models import Show
 from torrents_manager.transmission_client import TransmissionClient
 
@@ -29,30 +30,29 @@ class TorrentList(generic.TemplateView):
         return context
 
 
-def download_torrent(request, torrent_id):
-    torrent = Torrent.objects.get(id=torrent_id)
-    if torrent.download_status != torrent.NEVER_STARTED:
-        messages.add_message(
-            request=request,
-            level=messages.WARNING,
-            message=f"Torrent {torrent} download status is {torrent.get_download_status_display()}"
+class DownloadTorrent(generics.RetrieveAPIView):
+    queryset = Torrent.objects.all()
+    serializer_class = TorrentSerializer
+    lookup_field = "id"
+
+    def retrieve(self, request, *args, **kwargs):
+        torrent = self.get_object()
+
+        if torrent.download_status != torrent.DOWNLOADING:
+
+            with TransmissionClient() as transmission:
+                if transmission.is_up:
+                    successful, message = transmission.download_torrent(torrent)
+                else:
+                    successful = False
+                    message = "Transmission client seems to be down"
+        else:
+            successful = False
+            message = f"{torrent} is already downloading"
+
+        serializer = self.get_serializer(torrent)
+        return Response(dict(
+            torrent=serializer.data,
+            successful=successful,
+            message=message)
         )
-
-    else:
-        with TransmissionClient() as transmission:
-            if transmission.is_up:
-                successful, message = transmission.download_torrent(torrent)
-
-                messages.add_message(
-                    request=request,
-                    level=messages.SUCCESS if successful else message.ERROR,
-                    message=message
-                )
-            else:
-                messages.add_message(
-                    request=request,
-                    level=messages.WARNING,
-                    message=f"Transmission seems to be down. Set it up and try again."
-                )
-
-    return HttpResponseRedirect(reverse("shows:details", kwargs={'slug': torrent.show.slug}))

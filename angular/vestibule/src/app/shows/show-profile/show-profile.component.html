@@ -1,0 +1,96 @@
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+  <div class="profile-form-field">
+    <label>
+      Preferred Video Quality
+      <span class="bullet">•</span>
+      <select formControlName="quality" class="profile-form-option-select">
+        <option *ngFor="let quality of qualities" [ngValue]="quality">{{ quality }}</option>
+      </select>
+    </label>
+
+    <p class="profile-option-description">
+      Should favor torrents with matching video quality (or higher if not found)
+    </p>
+  </div>
+
+  <div class="profile-form-field">
+    <label>
+      Wait for Match
+      <span class="bullet">•</span>
+      <select formControlName="wait" class="profile-form-option-select">
+        <option *ngFor="let waitTime of waitTimes" [ngValue]="waitTime.value">{{ waitTime.name }}</option>
+      </select>
+    </label>
+
+    <p class="profile-option-description">
+      How long should the automatic download wait if no full profile match is found
+    </p>
+  </div>
+
+  <div class="profile-form-field">
+    <label>
+      Download Automatically
+      <span class="bullet">•</span>
+      <select formControlName="download_automatically" class="profile-form-option-select">
+        <option [ngValue]=true>Yes</option>
+        <option [ngValue]=false>No</option>
+      </select>
+    </label>
+
+    <p class="profile-option-description">
+      Should matching episodes be downloaded automatically upon match, or wait time exhaustion
+    </p>
+  </div>
+
+  <div class="profile-form-field">
+    <label>
+      Requires Subtitles
+      <span class="bullet">•</span>
+      <select formControlName="subtitles" class="profile-form-option-select">
+        <option [ngValue]=true>Yes</option>
+        <option [ngValue]=false>No</option>
+      </select>
+    </label>
+
+    <p class="profile-option-description">
+      Should favor torrents with subtitles
+    </p>
+  </div>
+
+  <div class="profile-form-field">
+    <label>
+      High-Quality Sources
+      <span class="bullet">•</span>
+      <select formControlName="high_quality_source" class="profile-form-option-select">
+        <option [ngValue]=true>Yes</option>
+        <option [ngValue]=false>No</option>
+      </select>
+    </label>
+
+    <p class="profile-option-description">
+      Should favor torrents from high quality sources, like Web or BlueRay
+    </p>
+  </div>
+
+  <div class="profile-form-field">
+    <p>Custom Lookup Names</p>
+    <p class="profile-option-description">
+      User-defined values used to find show torrents (will be added to auto-generated values)
+    </p>
+    <textarea formControlName="custom_lookup_names" rows="5" cols="20"></textarea>
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="!profileForm.valid || !profileForm.dirty || !isChanged"
+    class="profile-form-submit"
+    [ngClass]="{
+      'disabled': !profileForm.valid || !profileForm.dirty || !isChanged,
+      'loading': isLoading,
+      'error': hasSaveError
+    }"
+  >Save</button>
+  <p *ngIf="hasSaveError" class="save-error-text">Failed to save changes</p>
+
+</form>

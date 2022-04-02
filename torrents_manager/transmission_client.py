@@ -85,6 +85,7 @@ class TransmissionClient:
 
     def status(self) -> dict:
         return {
+            "name": "transmission",
             "up": self.is_up,
             "url": self._web_address
         }

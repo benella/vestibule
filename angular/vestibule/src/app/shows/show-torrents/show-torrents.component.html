@@ -1,0 +1,105 @@
+<ng-container *ngIf="seasons">
+  <div id="show-torrents-cont">
+    <section id="show-seasons-menu">
+      <div *ngFor="let season of seasons.seasons"
+           class="season-cont"
+           [class.selected-season]="season.id === selectedSeason.id">
+        <div class="season-episodes-list">
+          <div *ngFor="let episode of season.episodes"
+               class="episode-block-cont"
+               [class.selected-episode]="episode.id === selectedEpisode.id"
+               (click)="chooseEpisode(season, episode)">
+              <div class="episode-block-number">
+                <p >{{episode.number}}</p>
+              </div>
+              <div class="episode-block" [style.backgroundColor]="episodeStatusBulletColor(episode)"></div>
+          </div>
+        </div>
+
+        <div class="season-title-cont">
+          <p class="season-title">{{season.title}}</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="episode-details-cont" *ngIf="selectedEpisode">
+      <div class="episode-details-header">
+        <p class="episode-details-title">{{selectedEpisode.title}}</p>
+        <p class="episode-details-subtitle-info">
+          <span>{{selectedSeason.title}}</span>
+          <span>&nbsp; &mdash; &nbsp;</span>
+          <span>E{{selectedEpisode.number}}</span>
+          <span>&nbsp; &mdash; &nbsp;</span>
+          <span>{{selectedEpisode.air_status}}</span>
+        </p>
+      </div>
+
+      <div class="episode-download-status-cont">
+        <div class="episode-download-status" [style.color]="episodeStatusBulletColor(selectedEpisode)">
+          <span class="episode-status-bullet" [style.backgroundColor]="episodeStatusBulletColor(selectedEpisode)"></span>
+          <span>{{episodeStatusText(selectedEpisode)}}</span>
+        </div>
+
+        <div class="episode-download-status-actions">
+          <div class="episode-download-status-action skip-action" (click)="updateEpisodeDownloadStatus(selectedEpisode)">
+            <span>{{ selectedEpisode.should_download ? 'Skip' : 'Un-skip' }} this Episode</span>
+          </div>
+
+          <div class="episode-download-status-action skip-action" (click)="updateSeasonDownloadStatus(selectedSeason)">
+            <span>{{ selectedSeason.should_download ? 'Skip' : 'Un-skip' }} this Season</span>
+          </div>
+
+          <div class="episode-download-status-action download-action"
+               [ngClass]="{ disabled: !canDownload || this.showNoTorrentsMessage() }"
+               (click)="downloadEpisodeBestMatch(selectedEpisode)">
+            <span>Download Best Match</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="episode-torrents-list">
+        <p *ngIf="showNoTorrentsMessage() else hasTorrents" class="no-torrents-found-message">No torrents found for this Episode yet</p>
+
+        <ng-template #hasTorrents>
+          <vestibule-show-torrents-section
+            [title]="'Profile Matching Episode Torrents'"
+            [torrents]="selectedEpisode.matching_torrents"
+            [episode]="selectedEpisode"
+            [season]="selectedSeason"
+            [show]="show"
+            [defaultOpen]="true"
+            [matchingTorrents]="true"
+          ></vestibule-show-torrents-section>
+
+          <vestibule-show-torrents-section
+            [title]="'Profile Matching Season Torrents'"
+            [torrents]="selectedSeason.season_matching_torrents"
+            [season]="selectedSeason"
+            [show]="show"
+            [defaultOpen]="true"
+            [matchingTorrents]="true"
+          ></vestibule-show-torrents-section>
+
+          <vestibule-show-torrents-section
+            [title]="'Episode Torrents (Not Matching Profile)'"
+            [torrents]="selectedEpisode.unmatching_torrents"
+            [episode]="selectedEpisode"
+            [season]="selectedSeason"
+            [show]="show"
+            [matchingTorrents]="false"
+          ></vestibule-show-torrents-section>
+
+          <vestibule-show-torrents-section
+            [title]="'Season Torrents (Not Matching Profile)'"
+            [torrents]="selectedSeason.season_unmatching_torrents"
+            [season]="selectedSeason"
+            [show]="show"
+            [matchingTorrents]="false"
+          ></vestibule-show-torrents-section>
+        </ng-template>
+
+      </div>
+    </section>
+  </div>
+</ng-container>

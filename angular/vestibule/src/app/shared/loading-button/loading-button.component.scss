@@ -1,0 +1,60 @@
+@import "../../../styling/variables";
+
+@keyframes flash_border {
+  0% {
+    border-color: #58cd7c;
+  }
+  50% {
+    border-color: $value-true-hover;
+  }
+  100% {
+    border-color: #58cd7c;
+  }
+}
+
+:host ::ng-deep .action-message {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 0.9em;
+  color: $unselected;
+}
+
+:host ::ng-deep button {
+  margin-bottom: 5px;
+  font-size: 1.1em;
+  padding-bottom: 5px;
+  border: none;
+  background: none;
+  transition: 0.2s;
+  cursor: pointer;
+  border-bottom: solid rgba(0, 0, 0, 0) 3px;
+
+  &:hover {
+    color: $value-true-hover;
+  }
+
+  &.disabled {
+    color: $unselected;
+    cursor: auto;
+  }
+
+  &.loading {
+    border-bottom: solid $value-true 3px;
+    color: $value-true-hover;
+    margin-bottom: 15px;
+    animation-name: flash_border;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  &.error {
+    color: $value-false;
+  }
+
+  &.danger-zone-button {
+    &:hover {
+      color: $value-false-hover;
+    }
+  }
+}

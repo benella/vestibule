@@ -1,0 +1,68 @@
+<ng-container *ngIf="show">
+<p class="show-title">{{show.title}}</p>
+
+<vestibule-show-details-tabs>
+
+  <vestibule-show-details-tab tabTitle="Status" active="true">
+    <p class="show-title-tags">
+        <span *ngIf="show.year"><span> {{ show.year }} </span><span class="bullet">•</span></span>
+        <span *ngIf="show.network"><span> {{ show.network }} </span><span class="bullet">•</span></span>
+        <span *ngIf="show.number_of_seasons_as_int"><span> {{ show.number_of_seasons_as_int | pluralPipe:'Season' }}</span></span>
+    </p>
+
+    <p class="show-status-line">{{ show.status_line }}</p>
+    <p *ngIf="show.next_episode" class="show-next-episode-line">Next Episode: {{ show.next_episode }}</p>
+
+    <div class="show-imdb-link">
+      <p><a href="{{show.imdb_url}}" target="_blank">IMDB</a> {{show.imdb_rating}}</p>
+    </div>
+  </vestibule-show-details-tab>
+
+  <vestibule-show-details-tab tabTitle="Episodes + Torrents">
+    <vestibule-show-torrents [show]="show" [showUpdated$]="showUpdated.asObservable()"></vestibule-show-torrents>
+  </vestibule-show-details-tab>
+
+  <vestibule-show-details-tab tabTitle="Subscription Settings">
+    <vestibule-show-profile [showProfile]="show.profile" [showImdbID]="show.imdb_id" [showCustomLookupNames]="show.custom_lookup_names"></vestibule-show-profile>
+  </vestibule-show-details-tab>
+
+  <vestibule-show-details-tab tabTitle="Actions">
+
+    <vestibule-loading-button>
+      <button (click)="onUpdateShowInfo()"
+      [ngClass]="{
+        'loading': updateShowInfoStatus === 'loading',
+        'error': updateShowInfoStatus === 'error'
+      }">Update Show Info</button>
+    </vestibule-loading-button>
+
+    <vestibule-loading-button>
+      <button (click)="onFindShowTorrents()"
+      [ngClass]="{
+        'loading': findShowTorrentsStatus === 'loading',
+        'error': findShowTorrentsStatus === 'error'
+      }">Find Show Torrents</button>
+    </vestibule-loading-button>
+
+    <div class="danger-zone-actions">
+      <p>Danger Zone</p>
+      <vestibule-loading-button>
+        <button class="danger-zone-button" (click)="onUnsubscribe()">
+          Unsubscribe from Show</button>
+      </vestibule-loading-button>
+      <div *ngIf="unsubscribeShowStatus === 'confirm'" class="danger-zone-confirm">
+        <div class="danger-zone-text">
+          <p>
+            This will delete all '{{this.show.title}}' Torrents and show info<br>
+            <b>Are you sure you want to unsubscribe?</b>
+          </p>
+        </div>
+        <button (click)="onUnsubscribeConfirm()" class="danger-zone-confirm-yes">Yes, unsubscribe</button>
+        <button (click)="onUnsubscribeCancel()" class="danger-zone-confirm-cancel">Cancel</button>
+      </div>
+    </div>
+
+  </vestibule-show-details-tab>
+
+</vestibule-show-details-tabs>
+</ng-container>

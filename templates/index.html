@@ -1,0 +1,24 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Vestibule</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{% static "images/favicon.png" %}">
+</head>
+<body>
+  <app-root><img
+          alt="Loading"
+          src="{% static "images/favicon.png" %}"
+          style="height: 50px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%)"
+  ></app-root>
+  <script src="{% static 'angular/runtime.js' %}" defer></script>
+  <script src="{% static 'angular/polyfills.js' %}" defer></script>
+  <script src="{% static 'angular/styles.js' %}" defer></script>
+  <script src="{% static 'angular/vendor.js' %}" defer></script>
+  <script src="{% static 'angular/main.js' %}" defer></script>
+</body>
+</html>

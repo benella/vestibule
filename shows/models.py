@@ -2,21 +2,23 @@ import logging
 import re
 from typing import Tuple, List
 from datetime import timedelta
-from django.utils import timezone
 from collections import defaultdict
 
+from django.utils import timezone
 from django.db import models
 from django.utils.text import slugify
 from django.contrib import messages
 
+import json
 from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
 from torrents.models import Torrent
-from torrents_manager.transmission_client import TransmissionClient
 from common import Quality, Source, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
-from shows.show_info_update.show_info_utils import get_next_episode
+from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names, \
+    update_entity_torrents
+from shows.show_info_update.poster_main_colors_util import get_poster_main_colors
 from api_feeds import search_feeds_by_imdb_id
 
 logger = logging.getLogger(__name__)
@@ -81,6 +83,8 @@ class ShowProfile(models.Model):
                 torrent.save()
 
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
+        logger.info(f'should_wait, first_torrent_created_at: {first_torrent_created_at}')
+
         if self.wait == ShowProfile.W_NONE:
             return False
 
@@ -109,6 +113,9 @@ class ShowProfile(models.Model):
             days = 7
 
         else:
+            return True
+
+        if not first_torrent_created_at:
             return True
 
         return timezone.now() < first_torrent_created_at + timedelta(days=days)
@@ -176,13 +183,18 @@ class Show(models.Model):
     runtime = models.CharField(max_length=24, default="", blank=True)
     network = models.CharField(max_length=24, default="", blank=True)
     status = models.CharField(max_length=256, default="", blank=True)
+    status_line = models.CharField(max_length=256, default="", blank=True)
     next_episode = models.CharField(max_length=256, default="", blank=True)
+    next_episode_season_status = models.CharField(max_length=256, default="", blank=True)
     next_episode_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
     poster_link = models.URLField(default="", blank=True)
     thumbnail_link = models.URLField(default="", blank=True)
+    palette = models.CharField(max_length=256, default="", blank=True, null=True)
     slug = models.SlugField(max_length=20, default="", editable=False)
     profile = models.ForeignKey(ShowProfile, on_delete=models.CASCADE, null=True, blank=True)
     lookup_names = models.TextField(default="", blank=True, null=True)
+    custom_lookup_names = models.TextField(default="", blank=True, null=True)
+    imdb_rating = models.CharField(max_length=24, default="", blank=True)
 
     class Meta:
         ordering = ('title', )
@@ -203,42 +215,61 @@ class Show(models.Model):
             new_profile.save()
             self.profile = new_profile
 
-        self.update_show_meta_data()
+        self.update_show_meta_data(imdb_show_data)
 
         self.slug = slugify(self.title)
         super(Show, self).save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        self.profile.delete()
+
     @property
-    def formatted_imdb_id(self):
+    def downloading_torrents(self):
+        return self.torrents.filter(download_status=Torrent.DOWNLOADING)
+
+    @property
+    def formatted_imdb_id(self) -> str:
         return f"tt{self.imdb_id}"
+
+    @property
+    def imdb_url(self) -> str:
+        if self.imdb_id:
+            return f"https://www.imdb.com/title/{self.formatted_imdb_id}"
+
+    @property
+    def number_of_seasons_as_int(self) -> int:
+        try:
+            return int(self.number_of_seasons)
+        except ValueError:
+            return 0
+
+    @property
+    def palette_list(self) -> dict:
+        if self.palette:
+            palette = json.loads(self.palette)
+            base = {
+                "primary": palette[0],
+                "light": palette[1],
+                "dark": palette[2],
+            }
+            if len(palette) == 4:
+                base["secondary"] = palette[3]
+            return base
+        return {}
 
     def generate_lookup_names(self, imdb_show_data: dict):
         """
         Creates list of possible torrent show titles, and keeps it
         Example: ["primal", "primal.2019", "genndy.tartakovskys.primal", "genndy.tartakovskys.primal.2019"]
         """
-        aliases = [self.title] + imdb_show_data.get("akas", [])
-        additional_aliases = [alias.replace("-", " ") for alias in aliases if "-" in alias]
-        aliases += additional_aliases
-        formatted_aliases = list()
-
-        for name in aliases:
-            formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
-            formatted_name = re.sub("[_\s,]", ".", formatted_name.strip())
-            formatted_name = re.sub("[:(),'?]", "", formatted_name).lower()
-            formatted_name = re.sub("\.+", ".", formatted_name.strip())
-            formatted_name = formatted_name.rstrip(".")
-
-            formatted_aliases.append(formatted_name)
-            formatted_aliases.append(f"{formatted_name}.{self.year}")
-
+        formatted_aliases = generate_show_lookup_names(imdb_show_data)
         self.lookup_names = "\n".join(formatted_aliases)
 
     def get_lookup_names_list(self) -> List[str]:
         """
         Returns the lookup names as a list of strings
         """
-        return self.lookup_names.split("\n")
+        return self.lookup_names.split("\n") + self.custom_lookup_names.lower().split("\n")
 
     @property
     def safe_folder_name(self) -> str:
@@ -280,7 +311,7 @@ class Show(models.Model):
         return int(self.next_episode_time_code.replace("-", ""))
 
     @property
-    def seasons(self):
+    def episodes_by_seasons(self):
         """
         Get show's episode torrents grouped by season
         """
@@ -297,18 +328,26 @@ class Show(models.Model):
     def _show_torrents_titles(self):
         return [torrent.title for torrent in self.torrents.all()]
 
-    def update_show_meta_data(self):
-        ia = IMDb()
-        imdb_show_data = ia.get_movie(self.imdb_id)
+    def update_show_meta_data(self, imdb_show_data=None):
 
-        if not self.network:
-            with TVDBVestibuleClient() as tvdb_client:
-                self.network = tvdb_client.get_show_original_network(self.imdb_id)
+        if imdb_show_data is None:
+            ia = IMDb()
+            imdb_show_data = ia.get_movie(self.imdb_id)
 
-        self.poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
+        with TVDBVestibuleClient() as tvdb_client:
+            self.network = tvdb_client.get_show_original_network(self.imdb_id)
+            self.status = tvdb_client.get_show_status(self.imdb_id)
+
         self.thumbnail_link = imdb_show_data.get("cover url", DEFAULT_POSTER)
-        self.number_of_seasons = imdb_show_data.get("number of seasons")
-        self.year = imdb_show_data.get("year", "Unknown Year")
+        poster_link = imdb_show_data.get("full-size cover url", DEFAULT_POSTER)
+
+        if (not self.poster_link) or (self.poster_link != poster_link) or (not self.palette):
+            self.poster_link = poster_link
+            self.extract_palette()
+
+        self.number_of_seasons = imdb_show_data.get("number of seasons", "Unknown")
+        self.year = imdb_show_data.get("year", "Year Unknown")
+        self.imdb_rating = imdb_show_data.get("rating", "Rating Unknown")
         self.generate_lookup_names(imdb_show_data)
 
         try:
@@ -316,22 +355,141 @@ class Show(models.Model):
         except (KeyError, TypeError):
             pass
 
-    def update_show_info(self, request=None):
-        self.update_show_meta_data()
-        next_episode, show_status = get_next_episode(self.imdb_id)
-        self.status = show_status
+    def extract_palette(self):
+        if not self.poster_link:
+            return
+        main_colors = get_poster_main_colors(self.poster_link)
+        self.palette = str([color.raw for color in main_colors])
 
-        if next_episode:
-            self.next_episode_time_code = next_episode.absolute_episode_air_time_code
-            self.next_episode = str(next_episode)
+    def update_show_info(self):
+        ia = IMDb()
+        imdb_show_data = ia.get_movie(self.imdb_id)
+
+        self.update_show_meta_data(imdb_show_data)
+        self.map_seasons(imdb_show_data)
+
+        for torrent in self.torrents.all():
+            self.match_torrent_to_season_and_episode(torrent)
+
+        upcoming_episodes = self.show_episodes.all().filter(is_aired=False).order_by('air_time_code')
+
+        if upcoming_episodes:
+            self.status_line = f"{self.status}, has {len(upcoming_episodes)} upcoming episodes"
+            next_episode = upcoming_episodes[0]
+            count_upcoming_episodes_in_season = len(upcoming_episodes.filter(season=next_episode.season))
+
+            if next_episode.number == 1:
+                self.next_episode_season_status = "Show debut" if next_episode.season.number == 1 \
+                    else f"{next_episode.season.title} premier"
+            else:
+                if count_upcoming_episodes_in_season == 1:
+                    self.next_episode_season_status = f"{next_episode.season.title} finale"
+                else:
+                    self.next_episode_season_status = f"{count_upcoming_episodes_in_season} episodes left in season"
+
+            self.next_episode_time_code = next_episode.air_time_code
+            self.next_episode = f"S{next_episode.season.number} E{next_episode.number} " \
+                                f"- '{next_episode.title}', {next_episode.air_status}"
         else:
+            self.status_line = f"{self.status}, no upcoming episodes"
             self.next_episode_time_code = "9999-99-99"
             self.next_episode = ""
+            self.next_episode_season_status = ""
 
         self.save()
 
-        if request is not None:
-            messages.add_message(request, messages.SUCCESS, f"'{self}' info updated")
+    def match_torrent_to_season_and_episode(self, torrent: Torrent):
+        self.match_torrent_with_season(torrent)
+        self.match_torrent_with_episode(torrent)
+
+    def match_torrent_with_season(self, torrent: Torrent):
+        """
+        Returns True if updated
+        """
+        if torrent.season_data:
+            return
+
+        try:
+            season_number = int(torrent.season)
+        except ValueError:
+            season_number = 0
+
+        try:
+            season = self.seasons.get(number=season_number)
+        except Season.DoesNotExist:
+            print(f"{torrent} does not match any known season")
+            return
+
+        torrent.season_data = season
+        torrent.save()
+
+    def match_torrent_with_episode(self, torrent: Torrent):
+        """
+        Returns True if updated
+        """
+        if (not torrent.episode) or (not torrent.season) or (not torrent.season_data) or torrent.episode_data:
+            return
+
+        try:
+            episode_number = int(torrent.episode)
+        except ValueError:
+            episode_number = 0
+
+        try:
+            episode = torrent.season_data.episodes.get(number=episode_number)
+        except Episode.DoesNotExist:
+            print(f"{torrent} does not match any known episode")
+            return
+
+        torrent.episode_data = episode
+        torrent.save()
+
+    def map_seasons(self, show_imdb_data=None):
+        ia = IMDb()
+
+        if show_imdb_data is None:
+            show_imdb_data = ia.get_movie(self.imdb_id)
+
+        ia.update(show_imdb_data, "episodes")
+
+        if "episodes" not in show_imdb_data:
+            return
+
+        for season_number, season_episodes in show_imdb_data["episodes"].items():
+            try:
+                season = self.seasons.get(number=season_number)
+            except Season.DoesNotExist:
+                season = Season()
+                season.show = self
+                season.number = season_number
+                season.title = f"Season {season_number}" if season_number > 0 else "Unknown Season"
+                season.save()
+
+            for episode_number, episode_data in season_episodes.items():
+                try:
+                    episode = season.episodes.get(number=episode_number)
+                except Episode.DoesNotExist:
+                    episode = Episode()
+                    episode.show = self
+                    episode.season = season
+                    episode.number = episode_number
+
+                episode.title = episode_data.get("title", "")
+                is_aired, episode_time_data = extract_episode_time(episode_data)
+
+                episode.is_aired = is_aired
+                episode.air_time_code = episode_time_data.absolute_episode_air_time_code
+                episode.air_status = episode_time_data.airs
+                episode.save()
+
+            # Looking for dead episodes
+            for saved_episode in season.episodes.all():
+                if saved_episode.number not in season_episodes.keys():
+                    print(f"Saved Episode {saved_episode} ({saved_episode.number}) not found in {season_episodes.keys()}")
+                    if not saved_episode.torrents.all():
+                        print(f"It has no torrents {saved_episode.torrents.all()}, deleting it")
+                        saved_episode.delete()
+
 
     def find_show_torrents(self, request=None, torrents: List[FeedItem] = None):
         """
@@ -398,6 +556,7 @@ class Show(models.Model):
             else:
                 messages.add_message(request, messages.INFO, f"No new Torrents found for {self}")
 
+
     def update_show_downloads(self):
         """
         Update the show's torrents according to the installation profile.
@@ -408,48 +567,116 @@ class Show(models.Model):
             return
 
         logger.info(f"> Updating '{self}' Torrent Downloads")
-        for season, episodes in self.seasons.items():
-            for episode, torrents in episodes.items():
-                if not episode:
+
+        for season in self.seasons.all():
+            if season.downloadable:
+                downloaded = update_entity_torrents(season, self.profile)
+                if downloaded:
                     continue
-                self._update_episode_downloads(season=season, episode=episode, torrents=torrents)
 
-    def _update_episode_downloads(self, season: str, episode: str, torrents: List[Torrent]):
-        """
-        Check if an episode requires torrents downloads, according to profile.
-        """
-        logger.info(f"{season}-{episode} has {len(torrents)} torrents")
+            for episode in season.episodes.all():
+                if episode.downloadable:
+                    update_entity_torrents(episode, self.profile)
 
-        if len(torrents) == 0:
-            return
 
-        downloaded = [torrent for torrent in torrents if torrent.was_downloaded]
 
-        if len(downloaded) != 0:
-            logger.info(f"{len(downloaded)} torrents already downloaded - doing nothing")
-            return
+class Season(models.Model):
+    show = models.ForeignKey("shows.Show", related_name="seasons", on_delete=models.CASCADE)
+    number = models.IntegerField()
+    title = models.CharField(default="", max_length=256)
+    should_download = models.BooleanField(default=True)
 
-        matched = Torrent.objects.filter(
-            show=self, season=season, episode=episode, profile_match=True).order_by('-profile_match_score')
-        logger.info(f"{len(matched)} torrents match the profile")
+    @property
+    def downloaded_season_torrents(self) -> List[Torrent]:
+        return self.torrents.filter(
+            episode_data=None, download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
 
-        if len(matched) == 0:
+    @property
+    def is_downloaded(self) -> bool:
+        return bool(self.downloaded_season_torrents)
 
-            first_torrent_created_at = Torrent.objects.filter(
-                show=self, season=season, episode=episode).order_by('-created')[0].created
+    @property
+    def season_matching_torrents(self):
+        return self.torrents.filter(episode="", profile_match=True).order_by('-profile_match_score')
 
-            if self.profile.should_wait(first_torrent_created_at=first_torrent_created_at):
-                logger.info("Waiting for a profile match - doing nothing")
-                return
+    @property
+    def season_unmatching_torrents(self):
+        return self.torrents.filter(episode="", profile_match=False).order_by('-profile_match_score')
 
-            logger.info("Not waiting for match (profile setting) - downloading best available")
-            best_match = Torrent.objects.filter(
-                show=self, season=season, episode=episode).order_by('-profile_match_score')[0]
+    @property
+    def downloadable(self):
+        any_episodes_downloaded = any(episode.is_downloaded for episode in self.episodes.all())
+        return self.should_download and not self.is_downloaded and self.torrents and not any_episodes_downloaded
 
-        else:
-            best_match = matched[0]
+    @property
+    def first_torrent_created_at(self):
+        if self.torrents.filter(episode=""):
+            return self.torrents.filter(episode="").order_by('-created')[0].created
+        return None
 
-        with TransmissionClient() as transmission:
-            if transmission.is_up:
-                _, message = transmission.download_torrent(best_match)
-                logger.info(message)
+    def __str__(self):
+        return f"{self.show} - {self.title}"
+
+    class Meta:
+        ordering = ('show', '-number', )
+
+    def prime_torrent(self, must_match_profile=True):
+        if self.season_matching_torrents:
+            return self.season_matching_torrents[0]
+
+        if not must_match_profile and self.season_unmatching_torrents:
+            return self.season_unmatching_torrents[0]
+
+        return None
+
+
+class Episode(models.Model):
+    show = models.ForeignKey("shows.Show", related_name="show_episodes", on_delete=models.CASCADE)
+    season = models.ForeignKey("shows.Season", related_name="episodes", on_delete=models.CASCADE)
+    number = models.IntegerField()
+    title = models.CharField(default="", max_length=256)
+    should_download = models.BooleanField(default=True)
+    is_aired = models.BooleanField(default=False)
+    air_time_code = models.CharField(editable=False, max_length=24, default="9999-99-99")
+    air_status = models.CharField(editable=False, max_length=256, default="")
+
+    @property
+    def downloaded_torrents(self) -> List[Torrent]:
+        return self.torrents.filter(download_status__in=[Torrent.DOWNLOADING, Torrent.READY, Torrent.STOPPED])
+
+    @property
+    def is_downloaded(self) -> bool:
+        return self.season.is_downloaded or bool(self.downloaded_torrents)
+
+    @property
+    def matching_torrents(self):
+        return self.torrents.filter(profile_match=True).order_by('-profile_match_score')
+
+    @property
+    def unmatching_torrents(self):
+        return self.torrents.filter(profile_match=False).order_by('-profile_match_score')
+
+    @property
+    def downloadable(self):
+        return self.should_download and not self.is_downloaded and self.torrents
+
+    @property
+    def first_torrent_created_at(self):
+        if self.torrents.all():
+            return self.torrents.order_by('-created')[0].created
+        return None
+
+    def __str__(self):
+        return f"{self.season} - Episode {self.number} - {self.title}"
+
+    class Meta:
+        ordering = ('show', '-season', '-number', )
+
+    def prime_torrent(self, must_match_profile=True):
+        if self.matching_torrents:
+            return self.matching_torrents[0]
+
+        if not must_match_profile and self.unmatching_torrents:
+            return self.unmatching_torrents[0]
+
+        return None

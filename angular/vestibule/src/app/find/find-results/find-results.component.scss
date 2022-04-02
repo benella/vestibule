@@ -1,0 +1,230 @@
+@import "../../../styling/variables";
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+  0%   { opacity:1; }
+  50%  { opacity:0.5; }
+  100% { opacity:1; }
+}
+
+.find-form {
+  display: flex;
+  margin: 0.5rem 0 1rem 0;
+
+  .find-icon {
+    height: 2.5rem;
+    display: inline-block;
+    margin-right: 1rem;
+
+    &.loading {
+      animation: pulse 1s infinite;
+    }
+  }
+
+  input {
+    background: none;
+    border: none;
+    font-size: 2em;
+    margin-top: -6px;
+  }
+}
+
+.result-message {
+  padding-top: 1rem;
+  font-size: 1.1em;
+  opacity: 0.4;
+}
+
+.imdb-link {
+  display: inline-block;
+  margin-left: 8px;
+  font-weight: 100;
+  color: $unselected;
+  transition: 0.2s;
+
+  &:hover {
+    color: rgb(204, 171, 33);
+  }
+}
+
+.loading-enriched {
+  display: inline-block;
+
+  img {
+    height: 0.9rem;
+    animation-name: spin;
+    animation-duration: 5000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+}
+
+.search-results {
+    padding: 0.5rem 0;
+
+  .title {
+    margin-bottom: 0.8rem;
+    font-size: 0.9em;
+    color: $unselected-dark;
+  }
+
+  .results {
+    display: flex;
+    overflow-y: auto;
+    height: 16rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .search-result-wrapper {
+      display: flex;
+      flex-direction: row;
+      margin: 0 0.5rem 0.5rem 0;
+      position: relative;
+      height: fit-content;
+
+      .poster-preview {
+        display: flex;
+        flex-direction: column;
+      }
+
+      &.selected {
+        .poster-wrapper {
+          height: 15rem;
+          width: 10rem;
+        }
+
+        .data {
+          opacity: 0;
+          top: 15.5rem;
+
+          .subscribed-mark {
+            opacity: 0;
+          }
+        }
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      .poster-wrapper {
+        height: 9rem;
+        width: 6rem;
+        background-position: top;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: rgba(128, 128, 128, 0.3);
+        margin: 0.15rem 0.5rem 0 0;
+        border-radius: 0.2rem;
+        transition: 0.3s;
+      }
+
+      .data {
+        transition: 0.3s;
+        opacity: 1;
+        width: 6rem;
+        position: absolute;
+        top: 9.5rem;
+
+        span {
+          color: inherit;
+          font-weight: inherit;
+        }
+
+        .subscribed-mark {
+          transition: 0.1s;
+          width: 9px;
+          height: 9px;
+          background-color: $value-true;
+          border-radius: 50%;
+          position: absolute;
+          right: 0;
+          top: 0.35rem;
+          opacity: 1;
+        }
+
+        .year {
+          color: $unselected-dark;
+          font-size: 0.75em;
+          font-weight: 100;
+        }
+
+        .show-title {
+          font-size: 0.9em;
+        }
+      }
+    }
+  }
+}
+
+#preview-selected-show {
+  width: 100%;
+  display: flex;
+  margin-top: 1rem;
+
+  .poster-wrap {
+    width: 10rem;
+    height: 15rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.3rem;
+  }
+
+  .data {
+    .title {
+      font-size: 2.3rem;
+      margin: 0 0 1.5rem;
+      font-weight: 500;
+    }
+
+    .show-title-tags {
+      margin-bottom: 1.5rem;
+    }
+
+    .show-status-line {
+      font-weight: 100;
+    }
+
+    .show-actions {
+      display: flex;
+      min-width: 20rem;
+      padding-bottom: 0.2rem;
+      margin-top: 1.5rem;
+
+      .add-action {
+        font-weight: 100;
+        display: inline-block;
+        margin-right: 1rem;
+        padding-top: 0.1rem;
+      }
+
+      .action {
+        margin-right: 1rem;
+        border-bottom: 3px solid;
+        padding-bottom: 5px;
+        font-size: 1.1em;
+        transition: 0.2s;
+        cursor: pointer;
+
+        &.subscription {
+          border-color: $value-true;
+
+          &:hover {
+            color: $value-true;
+          }
+        }
+      }
+    }
+  }
+}

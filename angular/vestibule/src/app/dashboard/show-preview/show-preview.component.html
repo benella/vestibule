@@ -1,0 +1,26 @@
+<div id="preview-wrap">
+  <div class="poster-wrap" style="background-color: {{primaryColor}}">
+    <div class="poster" style="background-image: url('{{show.poster_link}}')"></div>
+  </div>
+
+  <div class="details-wrap">
+    <p class="show-title">{{show.title}}</p>
+
+    <div class="details">
+      <div class="status">
+        <p class="next-episode-line">{{show.next_episode}}</p>
+        <p class="season-status-line">{{show.next_episode_season_status}}</p>
+
+        <a class="subscription-link" [routerLink]="['/shows', show.imdb_id]" style="border-bottom: 3px solid {{primaryColor}}">See Subscription</a>
+      </div>
+
+      <div class="torrents">
+        <div *ngFor="let torrent of show.recent_torrents_active" class="torrent-wrap">
+          <p class="title">S{{torrent.season}} E{{torrent.episode}}</p>
+          <vestibule-torrent-download-status [showTorrent]="torrentToShowTorrent(torrent)"></vestibule-torrent-download-status>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

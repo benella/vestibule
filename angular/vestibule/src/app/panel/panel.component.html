@@ -1,0 +1,40 @@
+<section id="panel">
+
+  <div id="vestibule-home">
+    <a [routerLink]="'/dashboard'" class="acier-title">VESTIBULE</a>
+  </div>
+
+  <div id="main-links-box">
+
+      <section class="side-panel-links">
+          <a [routerLink]="'shows'" class="side-panel-link">Shows</a>
+          <a href="/" class="side-panel-link">Feeds</a>
+          <a href="/" class="side-panel-link">Torrents</a>
+      </section>
+
+      <div class="side-panel-divider"></div>
+
+      <section class="side-panel-links">
+        <form [formGroup]="findForm" (submit)="onFindSubmit()" class="side-panel-input-form">
+          <a [routerLink]="'find/results'">
+            <img class="side-panel-icon" alt="Find" src="/static/images/find_icon.svg">
+          </a>
+          <input formControlName="term" class="side-panel-input" type="text" placeholder="Find">
+        </form>
+      </section>
+
+  </div>
+
+  <vestibule-services-status></vestibule-services-status>
+
+</section>
+
+<div id="strip">
+  <img alt="Vestibule" class="strip-img" [src]=defaultBackgroundURL crossorigin="anonymous">
+  <img alt="Vestibule" class="strip-img" id="dynamic-background"
+       [class.visible]="isDynamicVisible"
+       [src]=backgroundURL
+       crossorigin="anonymous"
+  >
+  <div id="strip-cover"></div>
+</div>

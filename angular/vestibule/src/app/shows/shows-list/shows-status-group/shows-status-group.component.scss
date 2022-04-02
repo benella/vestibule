@@ -1,0 +1,35 @@
+@import "../../../../styling/variables";
+
+.show-list-group {
+  margin-bottom: 2rem;
+}
+
+.show-list-status {
+  color: $unselected;
+  margin-bottom: 1rem;
+}
+
+.show-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.show {
+    height: 2rem;
+    margin: 0 1rem 2rem 0;
+    width: 20rem;
+
+  &:hover .poster-strip {
+    width: 6rem;
+  }
+
+  &:hover .show-title{
+    transform: translate(8px, 0);
+  }
+}
+
+.show-title {
+    font-size: 1.4em;
+    margin-bottom: 3px;
+    transition: 0.3s;
+}

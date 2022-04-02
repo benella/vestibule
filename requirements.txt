@@ -1,8 +1,11 @@
-Django==3.0.4
-IMDbPY==6.8
+Django==3.2
+djangorestframework==3.12.4
+IMDbPY==2021.4.18
 requests==2.23.0
 APScheduler==3.6.3
 transmission-clutch==2.0.3
 PlexAPI==3.3.0
 tvdb-api-client==0.4.0
+tmdbsimple===2.8.1
 RarbgAPI==0.4.2
+colorthief==0.2.1

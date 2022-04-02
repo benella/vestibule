@@ -1,0 +1,82 @@
+@import "../../styling/variables";
+
+.bullet {
+  margin: 0 8px;
+}
+
+.dashboard-model-wrapper {
+  margin: 4rem 0 5rem;
+}
+
+.dashboard-model-title {
+  margin-bottom: 1rem;
+  color: $unselected;;
+}
+
+.dashboard-model-entries {
+  display: flex;
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.dashboard-model-entry {
+  cursor: pointer;
+  width: 16rem;
+  margin-right: 1.2rem;
+
+  &:hover .show-title {
+    transform: translate(4px, 0);
+  }
+
+  .show-data {
+
+    .show-title {
+      font-size: 1.1em;
+      margin: 0.7rem 0;
+      transition: 0.3s;
+    }
+
+    .show-next-episode-line {
+      font-size: 0.85em;
+      font-weight: 400;
+      color: $unselected-dark;
+      margin: 0 0 0.5rem;
+
+      p {
+        color: inherit;
+        font-weight: inherit;
+      }
+
+      .season-status {
+        font-weight: 200;
+        display: inline-block;
+        height: 1.2rem;
+      }
+    }
+  }
+
+  .show-recent-activity-wrapper {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    background-color: #babbb140;
+  }
+
+  .show-recent-activity-line {
+    font-size: 0.85em;
+    font-weight: 300;
+    color: $unselected-dark;
+    padding: 0.2rem 0.5rem;
+
+    span {
+      color: inherit;
+      font-weight: inherit;
+    }
+
+    .season-status {
+      font-weight: 200;
+    }
+  }
+}

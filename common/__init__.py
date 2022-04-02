@@ -51,6 +51,7 @@ class Source:
 
     WEB = "Web"
     NETFLIX = "Netflix"
+    DISNEY_PLUS = "Disney+"
     HDTV = "HDTV"
     AMAZON = "Amazon"
     HULU = "Hulu"
@@ -61,6 +62,7 @@ class Source:
         ("amazon", AMAZON),
         ("hulu", HULU),
         ("nf", NETFLIX),
+        ("dsnp", DISNEY_PLUS),
         ("bluray", BLUE_RAY),
         ("web", WEB),
         ("hdtv", HDTV),
@@ -69,6 +71,7 @@ class Source:
     SOURCES_VALUES = {
         AMAZON: 110,
         NETFLIX: 110,
+        DISNEY_PLUS: 110,
         HULU: 110,
         BLUE_RAY: 100,
         WEB: 100,

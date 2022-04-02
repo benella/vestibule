@@ -1,0 +1,48 @@
+@import "https://use.typekit.net/gki7zvg.css";
+@import "styling/variables";
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: halyard-display, sans-serif;
+    font-weight: 400;
+    color: #333333;
+}
+
+body {
+    background-color: $main-back;
+}
+
+a {
+    text-decoration: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+.bullet {
+    font-family: -webkit-pictograph monospace;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.show-imdb-link {
+  margin-top: 1.5rem;
+
+  a {
+    border: 2px solid;
+    padding: 0 5px 1px;
+    margin-right: 5px;
+    text-decoration: none;
+    transition: 0.2s;
+    display: inline-block;
+
+    &:hover {
+      background-color: rgba(252, 214, 56, 0.6);
+    }
+  }
+}

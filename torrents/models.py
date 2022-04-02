@@ -24,7 +24,9 @@ class Torrent(models.Model):
     show = models.ForeignKey("shows.Show", related_name="torrents", on_delete=models.CASCADE)
     feed = models.ForeignKey("feeds.Feed", related_name="torrents", on_delete=models.PROTECT, blank=True, null=True)
     season = models.CharField(max_length=20, default="", blank=True)
+    season_data = models.ForeignKey("shows.Season", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
     episode = models.CharField(max_length=20, default="", blank=True)
+    episode_data = models.ForeignKey("shows.Episode", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
     publication_time = models.CharField(max_length=64, blank=True)
     source_type = models.CharField(max_length=40, default="", blank=True)
     quality = models.CharField(max_length=20, default="", blank=True)
@@ -46,6 +48,14 @@ class Torrent(models.Model):
     @property
     def is_ready(self):
         return self.download_status == Torrent.READY
+
+    @property
+    def is_downloading(self):
+        return self.download_status == Torrent.DOWNLOADING
+
+    @property
+    def is_season_torrent(self):
+        return self.episode == ""
 
     def __str__(self):
         return "{show}{season}{episode} ({quality}) ({source}) ({feed})".format(

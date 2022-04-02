@@ -56,7 +56,11 @@ class RarbgTorrentsAPIFeed(TorrentsAPIFeed):
     def search_by_imdb_id(self, imdb_id: str) -> List[FeedItem]:
         print(f"Searching {self.name} with {imdb_id}")
         arguments = {"search_imdb": imdb_id, "extended_response": True}
-        torrents = self._api_request(method=self._client.search, arguments=arguments)
+        try:
+            torrents = self._api_request(method=self._client.search, arguments=arguments)
+        except Exception as e:
+            print(f"Failed to get torrents ({e})")
+            torrents = []
         return self._convert_api_torrents_to_feed_items(api_torrents=torrents)
 
     def search_by_string(self, string_term: str) -> List[FeedItem]:
