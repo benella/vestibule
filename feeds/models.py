@@ -38,7 +38,12 @@ class Feed(models.Model):
         if self.api_feed:
             return []
 
-        feed = requests.get(self.rss_url)
+        try:
+            feed = requests.get(self.rss_url, verify=False)
+        except BaseException as err:
+            logger.error(f"Failed to read feed {self} ({err})")
+            return []
+
         root = ET.fromstring(feed.text)
         feed_items = list()
 
