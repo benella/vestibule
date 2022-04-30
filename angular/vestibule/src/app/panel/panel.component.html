@@ -4,7 +4,46 @@
     <a [routerLink]="'/dashboard'" class="acier-title">VESTIBULE</a>
   </div>
 
-  <div id="main-links-box">
+  <div class="desktop-menu">
+      <ng-template [ngTemplateOutlet]="menu"></ng-template>
+  </div>
+
+  <div class="mobile-menu-button">
+    <div class="button" (click)="mobileMenuShown=!mobileMenuShown" cdkOverlayOrigin #trigger>
+      <div class="dots-icon">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="mobileMenuShown"
+    (backdropClick)="mobileMenuShown=false">
+      <div class="mobile-menu" *ngIf="mobileMenuShown">
+        <ng-template [ngTemplateOutlet]="menu"></ng-template>
+      </div>
+    </ng-template>
+  </div>
+
+  <vestibule-services-status></vestibule-services-status>
+
+</section>
+
+<div id="strip">
+  <img alt="Vestibule" class="strip-img" [src]=defaultBackgroundURL crossorigin="anonymous">
+  <img alt="Vestibule" class="strip-img" id="dynamic-background"
+       [class.visible]="isDynamicVisible"
+       [src]=backgroundURL
+       crossorigin="anonymous"
+  >
+  <div id="strip-cover"></div>
+</div>
+
+<ng-template #menu>
+    <div id="main-links-box">
 
       <section class="side-panel-links">
           <a [routerLink]="'shows'" class="side-panel-link">Shows</a>
@@ -24,17 +63,4 @@
       </section>
 
   </div>
-
-  <vestibule-services-status></vestibule-services-status>
-
-</section>
-
-<div id="strip">
-  <img alt="Vestibule" class="strip-img" [src]=defaultBackgroundURL crossorigin="anonymous">
-  <img alt="Vestibule" class="strip-img" id="dynamic-background"
-       [class.visible]="isDynamicVisible"
-       [src]=backgroundURL
-       crossorigin="anonymous"
-  >
-  <div id="strip-cover"></div>
-</div>
+</ng-template>

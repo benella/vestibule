@@ -4,6 +4,7 @@
   display: flex;
   padding-top: 0.9rem;
   margin-bottom: 3rem;
+  flex-direction: row;
 }
 
 .poster-wrap {
@@ -84,6 +85,41 @@
           padding: 0 0.4rem;
           text-align: center;
           color: $unselected-dark;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  #preview-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .poster-wrap {
+    .poster {
+      height: 15rem;
+      width: 10rem;
+    }
+  }
+
+  .details-wrap {
+    padding: 0;
+    width: 100%;
+    text-align: center;
+
+    .details {
+      justify-content: center;
+
+      .subscription-link {
+        position: static;
+      }
+      .status {
+        margin-right: 0;
+
+        .season-status-line {
+          margin-bottom: 1rem;
         }
       }
     }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PanelBackgroundService } from './panel-background/panel-background.service'
-import { Router } from "@angular/router";
+import {NavigationEnd, Router, Event} from "@angular/router";
 import { FormBuilder } from "@angular/forms";
 
 @Component({
@@ -12,6 +12,7 @@ export class PanelComponent implements OnInit {
   backgroundURL: string
   defaultBackgroundURL: string
   isDynamicVisible = false
+  mobileMenuShown = false
 
   findForm = this.fb.group({
     term: ['', []]
@@ -27,6 +28,12 @@ export class PanelComponent implements OnInit {
       } else {
         this.backgroundURL = url
         this.isDynamicVisible = true
+      }
+    })
+
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationEnd) {
+        this.mobileMenuShown = false
       }
     })
   }
