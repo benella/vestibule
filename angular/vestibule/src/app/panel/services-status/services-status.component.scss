@@ -1,14 +1,14 @@
 @import "../../../styling/variables";
 
 #services-status-box {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    height: 4rem;
-    width: 14rem;
-    display: flex;
-    justify-content: center;
-    background-color: $transparent-light;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 4rem;
+  width: 14rem;
+  display: flex;
+  justify-content: center;
+  background-color: $transparent-light;
 }
 
 .service-wrap {
@@ -52,4 +52,30 @@
 
 .service-down .service-status-bar {
     background-color: #AF4F68;
+}
+
+@media only screen and (max-width: 480px) {
+  #services-status-box {
+    top: 0;
+    right: 0;
+    bottom: auto;
+    left: auto;
+    height: 48px;
+    width: 120px;
+    background-color: transparent;
+  }
+
+  .service-wrap {
+    padding: 0.6rem;
+
+    .service-icon {
+      height: 28px;
+      margin: 0 auto 0;
+    }
+  }
+
+  .service-status-bar {
+    top: auto;
+    bottom: 0;
+  }
 }

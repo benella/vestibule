@@ -12,9 +12,10 @@ import { CookieService } from "ngx-cookie-service";
 import { TokenInterceptor } from "./authentication/token.interceptor";
 import { TorrentsModule } from "./torrents/torrents.module";
 import { FindModule } from "./find/find.module";
-import {ReactiveFormsModule} from "@angular/forms";
+import { ReactiveFormsModule } from "@angular/forms";
 import { ShowPreviewComponent } from './dashboard/show-preview/show-preview.component';
-import {SharedModule} from "./shared/shared.module";
+import { SharedModule } from "./shared/shared.module";
+import { OverlayModule } from "@angular/cdk/overlay";
 
 @NgModule({
   declarations: [
@@ -25,14 +26,15 @@ import {SharedModule} from "./shared/shared.module";
     ShowPreviewComponent
   ],
     imports: [
-        BrowserModule,
-        ShowsModule,
-        FindModule,
-        TorrentsModule,
-        AppRoutingModule,
-        HttpClientModule,
-        ReactiveFormsModule,
-        SharedModule,
+      BrowserModule,
+      ShowsModule,
+      FindModule,
+      TorrentsModule,
+      AppRoutingModule,
+      HttpClientModule,
+      ReactiveFormsModule,
+      SharedModule,
+      OverlayModule
     ],
   providers: [
     CookieService,
