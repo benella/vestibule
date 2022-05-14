@@ -1,4 +1,5 @@
 import { Torrent, TorrentInList, PreviewShowTorrent } from "../torrents/torrent";
+import { Palette } from "../shared/interfaces/palette";
 
 export interface EnrichedShowInfo {
   status: string
@@ -15,13 +16,6 @@ export interface ShowSearchResults {
 
 export interface PreviewShowTorrents {
   results: PreviewShowTorrent[]
-}
-
-export interface Palette {
-  primary: number[]
-  light: number[]
-  dark: number[]
-  secondary?: number[]
 }
 
 export interface ShowSearchResult {

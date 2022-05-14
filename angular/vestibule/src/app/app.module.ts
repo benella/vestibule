@@ -16,6 +16,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { ShowPreviewComponent } from './dashboard/show-preview/show-preview.component';
 import { SharedModule } from "./shared/shared.module";
 import { OverlayModule } from "@angular/cdk/overlay";
+import { MoviesModule } from "./movies/movies.module";
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { OverlayModule } from "@angular/cdk/overlay";
     imports: [
       BrowserModule,
       ShowsModule,
+      MoviesModule,
       FindModule,
       TorrentsModule,
       AppRoutingModule,

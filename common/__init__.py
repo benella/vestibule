@@ -25,6 +25,12 @@ class Quality:
         QUALITY_720P: 720
     }
 
+    QUALITY_CHOICES = [
+        (QUALITY_720P, QUALITY_720P),
+        (QUALITY_1080P, QUALITY_1080P),
+        (QUALITY_4K, QUALITY_4K),
+    ]
+
     @staticmethod
     def parse_quality_form_phrase(phrase: str) -> str:
         phrase = phrase.lower()

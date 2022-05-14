@@ -2,8 +2,7 @@ from django.utils import timezone
 from django.db import models
 
 
-class Torrent(models.Model):
-
+class TorrentBase(models.Model):
     NEVER_STARTED = "N"
     DOWNLOADING = "D"
     READY = "R"
@@ -21,12 +20,7 @@ class Torrent(models.Model):
 
     link = models.CharField(default="", blank=True, max_length=500)
     title = models.CharField(max_length=2160, default="")
-    show = models.ForeignKey("shows.Show", related_name="torrents", on_delete=models.CASCADE)
-    feed = models.ForeignKey("feeds.Feed", related_name="torrents", on_delete=models.PROTECT, blank=True, null=True)
-    season = models.CharField(max_length=20, default="", blank=True)
-    season_data = models.ForeignKey("shows.Season", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
-    episode = models.CharField(max_length=20, default="", blank=True)
-    episode_data = models.ForeignKey("shows.Episode", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
+    feed = models.ForeignKey("feeds.Feed", related_name="torrents", on_delete=models.SET_NULL, blank=True, null=True)
     publication_time = models.CharField(max_length=64, blank=True)
     source_type = models.CharField(max_length=40, default="", blank=True)
     quality = models.CharField(max_length=20, default="", blank=True)
@@ -37,9 +31,8 @@ class Torrent(models.Model):
     profile_match_score = models.IntegerField(default=0)
     profile_match = models.BooleanField(default=False)
 
-
     class Meta:
-        ordering = ('show', '-season', '-episode', '-profile_match_score', 'feed')
+        abstract = True
 
     @property
     def was_downloaded(self):
@@ -53,25 +46,11 @@ class Torrent(models.Model):
     def is_downloading(self):
         return self.download_status == Torrent.DOWNLOADING
 
-    @property
-    def is_season_torrent(self):
-        return self.episode == ""
-
-    def __str__(self):
-        return "{show}{season}{episode} ({quality}) ({source}) ({feed})".format(
-            show=self.show.title,
-            season=" S{}".format(self.season),
-            episode=" E{}".format(self.episode) if self.episode else "",
-            quality=self.quality,
-            source=self.source_type,
-            feed=self.feed.name
-        )
-
     def save(self, *args, **kwargs):
         if not self.id:
             self.created = timezone.now()
 
-        return super(Torrent, self).save(*args, **kwargs)
+        return super(TorrentBase, self).save(*args, **kwargs)
 
     def update_download_status(self, new_status):
         self.download_status = new_status
@@ -91,6 +70,32 @@ class Torrent(models.Model):
         if self.download_status == Torrent.NEVER_STARTED:
             return "Download"
         return self.get_download_status_display()
+
+
+class Torrent(TorrentBase):
+
+    show = models.ForeignKey("shows.Show", related_name="torrents", on_delete=models.CASCADE)
+    season = models.CharField(max_length=20, default="", blank=True)
+    season_data = models.ForeignKey("shows.Season", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
+    episode = models.CharField(max_length=20, default="", blank=True)
+    episode_data = models.ForeignKey("shows.Episode", related_name="torrents", on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        ordering = ('show', '-season', '-episode', '-profile_match_score', 'feed')
+
+    @property
+    def is_season_torrent(self):
+        return self.episode == ""
+
+    def __str__(self):
+        return "{show}{season}{episode} ({quality}) ({source}) ({feed})".format(
+            show=self.show.title,
+            season=" S{}".format(self.season),
+            episode=" E{}".format(self.episode) if self.episode else "",
+            quality=self.quality,
+            source=self.source_type,
+            feed=self.feed.name
+        )
 
     @property
     def short_title(self):
@@ -115,3 +120,12 @@ class Torrent(models.Model):
             episode=" E{}".format(self.episode) if self.episode else "",
             quality=self.quality
         )
+
+
+class MovieTorrent(TorrentBase):
+
+    movie = models.ForeignKey("movies.Movie", related_name="torrents", on_delete=models.CASCADE)
+    feed = models.ForeignKey("feeds.Feed", related_name="movie_torrents", on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        ordering = ('-profile_match_score', 'feed')

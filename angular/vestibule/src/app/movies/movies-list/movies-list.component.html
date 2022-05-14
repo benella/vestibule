@@ -1,0 +1,11 @@
+<div class="movie-list">
+  <div *ngFor="let movie of movies" class="movie">
+    <div class="poster-wrap">
+      <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+    </div>
+    <vestibule-poster-strip [width]="'10rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
+    <p class="year">{{ movie.year }}</p>
+    <p class="title">{{ movie.title }}</p>
+  </div>
+</div>
+

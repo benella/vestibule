@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { ShowsRoutingModule } from './shows-routing.module';
 import { ShowsListComponent } from './shows-list/shows-list.component';
-import { PosterStripComponent } from './poster-strip/poster-strip.component';
 import { ShowDetailsComponent } from './show-details/show-details.component';
 import { ShowDetailsTabComponent } from './show-details/show-details-tab/show-details-tab.component';
 import { ShowDetailsTabsComponent } from './show-details/show-details-tabs/show-details-tabs.component';
@@ -18,7 +17,6 @@ import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows
 @NgModule({
   declarations: [
     ShowsListComponent,
-    PosterStripComponent,
     ShowDetailsComponent,
     ShowDetailsTabComponent,
     ShowDetailsTabsComponent,
@@ -26,9 +24,6 @@ import { ShowsStatusGroupComponent } from './shows-list/shows-status-group/shows
     ShowTorrentsComponent,
     ShowTorrentsSectionComponent,
     ShowsStatusGroupComponent,
-  ],
-  exports: [
-    PosterStripComponent
   ],
   imports: [
     CommonModule,

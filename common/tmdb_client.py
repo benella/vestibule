@@ -6,6 +6,7 @@ from vestibule_configurations.models import VestibuleConfiguration
 
 DEFAULT_IMAGES_BASE_URL = "http://image.tmdb.org/t/p/"
 
+
 class TheMovieDBVestibuleClient:
 
     def __init__(self):
@@ -42,7 +43,7 @@ class TheMovieDBVestibuleClient:
         except (requests.exceptions.HTTPError, AttributeError):
             return ''
 
-    def get_show_details(self, tmdb_id: int) -> dict:
+    def get_show_data(self, tmdb_id: int) -> dict:
         try:
             return self.client.TV(tmdb_id).info()
         except (requests.exceptions.HTTPError, AttributeError):
@@ -62,9 +63,49 @@ class TheMovieDBVestibuleClient:
             shows.sort(key=lambda s: s.get('popularity'), reverse=True)
             results = [
                 (self.get_show_imdb_id(show.get('id')),
-                 self.get_show_details(show.get('id')))
+                 self.get_show_data(show.get('id')))
                 for show in shows]
         except ConnectionRefusedError as e:
             print("Failed connecting to TMDB: ", e)
 
         return results
+
+    # Movies
+
+    def get_movie_imdb_id(self, tmdb_id: int) -> str:
+        try:
+            return self.client.Movies(tmdb_id).external_ids().get('imdb_id', '').replace('tt', '')
+        except (requests.exceptions.HTTPError, AttributeError):
+            return ''
+
+    def search_movie(self, term) -> List[Tuple[str, dict]]:
+        results = []
+
+        try:
+            movies = self.search.movie(query=term).get('results', [])
+            movies.sort(key=lambda s: s.get('popularity'), reverse=True)
+            results = [
+                (self.get_movie_imdb_id(movie.get('id')),
+                 self.get_movie_data(movie.get('id')))
+                for movie in movies]
+        except ConnectionRefusedError as e:
+            print("Failed connecting to TMDB: ", e)
+
+        return results
+
+    def get_movie_data(self, tmdb_id: int) -> dict:
+        try:
+            return self.client.Movies(tmdb_id).info()
+        except (requests.exceptions.HTTPError, AttributeError):
+            return {}
+
+    def get_movie_alternative_titles(self, tmdb_id: int) -> List[str]:
+        result = []
+        try:
+            alternative_titles = self.client.Movies(tmdb_id).alternative_titles()
+            for title in alternative_titles.get("titles", []):
+                if title.get("iso_3166_1", "") == "US":
+                    result.append(title.get("title"))
+        except (requests.exceptions.HTTPError, AttributeError):
+            pass
+        return result

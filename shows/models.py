@@ -1,7 +1,6 @@
 import logging
 import re
 from typing import Tuple, List
-from datetime import timedelta
 from collections import defaultdict
 
 from django.utils import timezone
@@ -14,57 +13,26 @@ from imdb import IMDb
 from feeds.models import Feed
 from feeds.feet_item import FeedItem
 from torrents.models import Torrent
-from common import Quality, Source, DEFAULT_POSTER
+from common import Quality, DEFAULT_POSTER
 from common.tvdb_client import TVDBVestibuleClient
+from common.profile_utils import WaitValues, should_download_wait, torrent_match_score
 from shows.show_info_update.show_info_utils import extract_episode_time, generate_show_lookup_names, \
     update_entity_torrents
-from shows.show_info_update.poster_main_colors_util import get_poster_main_colors
+from common.poster_main_colors_util import get_poster_main_colors
 from api_feeds import search_feeds_by_imdb_id
 
 logger = logging.getLogger(__name__)
 
 
 class ShowProfile(models.Model):
-
-    SCORE_LEVEL_UP = 100
-
-    QUALITY_CHOICES = [
-        (Quality.QUALITY_720P, Quality.QUALITY_720P),
-        (Quality.QUALITY_1080P, Quality.QUALITY_1080P),
-        (Quality.QUALITY_4K, Quality.QUALITY_4K),
-    ]
-
-    quality = models.CharField(choices=QUALITY_CHOICES, default=Quality.QUALITY_1080P, max_length=10,
-                               help_text="Show video quality")
     subtitles = models.BooleanField(default=True, help_text="Are subtitles required")
     high_quality_source = models.BooleanField(default=True, help_text="Wait for high quality torrents sources")
-
-    W_NONE = "N"
-    W_1_DAY = "1D"
-    W_2_DAY = "2D"
-    W_3_DAY = "3D"
-    W_4_DAY = "4D"
-    W_5_DAY = "5D"
-    W_6_DAY = "6D"
-    W_1_WEEK = "1W"
-    W_FOREVER = "F"
-
-    WAIT_CHOICES = [
-        (W_NONE, "Don't Wait"),
-        (W_1_DAY, "Up to a Day"),
-        (W_2_DAY, "Up to 2 Days"),
-        (W_3_DAY, "Up to 3 Days"),
-        (W_4_DAY, "Up to 4 Days"),
-        (W_5_DAY, "Up to 5 Days"),
-        (W_6_DAY, "Up to 6 Days"),
-        (W_1_WEEK, "Up to a Week"),
-        (W_FOREVER, "Forever"),
-    ]
-
     download_automatically = models.BooleanField(default=False)
-    wait = models.CharField(choices=WAIT_CHOICES, default=W_1_WEEK, max_length=4,
+    wait = models.CharField(choices=WaitValues.WAIT_CHOICES, default=WaitValues.W_1_WEEK, max_length=4,
                             help_text="How long to wait before downloading best available match, "
                                       "if full match not found")
+    quality = models.CharField(choices=Quality.QUALITY_CHOICES, default=Quality.QUALITY_1080P, max_length=10,
+                               help_text="Show video quality")
 
     @property
     def show(self):
@@ -83,95 +51,18 @@ class ShowProfile(models.Model):
                 torrent.save()
 
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
-        logger.info(f'should_wait, first_torrent_created_at: {first_torrent_created_at}')
-
-        if self.wait == ShowProfile.W_NONE:
-            return False
-
-        if self.wait == ShowProfile.W_FOREVER:
-            return True
-
-        if self.wait == ShowProfile.W_1_DAY:
-            days = 1
-
-        elif self.wait == ShowProfile.W_2_DAY:
-            days = 2
-
-        elif self.wait == ShowProfile.W_3_DAY:
-            days = 3
-
-        elif self.wait == ShowProfile.W_4_DAY:
-            days = 4
-
-        elif self.wait == ShowProfile.W_5_DAY:
-            days = 5
-
-        elif self.wait == ShowProfile.W_6_DAY:
-            days = 6
-
-        elif self.wait == ShowProfile.W_1_WEEK:
-            days = 7
-
-        else:
-            return True
-
-        if not first_torrent_created_at:
-            return True
-
-        return timezone.now() < first_torrent_created_at + timedelta(days=days)
-
+        return should_download_wait(wait_value=self.wait, first_torrent_created_at=first_torrent_created_at)
 
     def __str__(self):
         return f"{self.show} - Show Profile"
 
     def get_torrent_match_score(self, torrent: Torrent) -> Tuple[bool, int]:
-        feed_match, feed_score = self._feed_score(torrent)
-        quality_match, quality_score = self._quality_score(torrent)
-        source_match, source_score = self._source_score(torrent)
-
-        logger.info(f"{torrent} Scores - feed: {feed_score}, quality: {quality_score}, source: {source_score}")
-        total_score = feed_score + quality_score + source_score
-        total_match = feed_match and quality_match and source_match
-        logger.info(f"> Total score: {total_score}, Total match: {total_match}")
-        return total_match, total_score
-
-    def _feed_score(self, torrent: Torrent) -> Tuple[bool, int]:
-        score = 0
-        match = False
-
-        # If subtitles are not required, match
-        if not self.subtitles:
-            match = True
-
-        # If subtitles are required, match only for feeds with subtitles
-        if torrent.feed.has_subtitles and self.subtitles:
-            match = True
-            score += ShowProfile.SCORE_LEVEL_UP
-
-        return match, score + int(((torrent.feed.priority + 1) * 0.1 * ShowProfile.SCORE_LEVEL_UP))
-
-    def _quality_score(self, torrent: Torrent) -> Tuple[bool, int]:
-        diff = Quality.difference(quality=torrent.quality, expected_quality=self.quality)
-
-        # Quality Match
-        if diff == 0:
-            return True, ShowProfile.SCORE_LEVEL_UP
-
-        # Quality lower
-        if diff < 0:
-            return False, diff * ShowProfile.SCORE_LEVEL_UP
-
-        # Quality Higher
-        if diff > 0:
-            return False, int(-0.3 * diff * ShowProfile.SCORE_LEVEL_UP)
-
-    def _source_score(self, torrent: Torrent) -> Tuple[bool, int]:
-        if not self.high_quality_source:
-            return True, 0
-
-        source_score = Source.source_value(torrent.source_type)
-        return source_score >= ShowProfile.SCORE_LEVEL_UP, Source.source_value(torrent.source_type)
-
+        return torrent_match_score(
+            torrent=torrent,
+            subtitles_required=self.subtitles,
+            expected_quality=self.quality,
+            high_quality_source_expected=self.high_quality_source
+        )
 
 
 class Show(models.Model):

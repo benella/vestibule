@@ -4,6 +4,7 @@ import { LoadingButtonComponent } from './loading-button/loading-button.componen
 import { ShowTorrentComponent } from "./show-torrent/show-torrent.component";
 import { TorrentDownloadStatusComponent } from './torrent-download-status/torrent-download-status.component';
 import { PluralPipePipe } from "./pipes/plural-pipe.pipe";
+import { PosterStripComponent } from "./poster-strip/poster-strip.component";
 
 
 @NgModule({
@@ -11,13 +12,15 @@ import { PluralPipePipe } from "./pipes/plural-pipe.pipe";
     PluralPipePipe,
     LoadingButtonComponent,
     ShowTorrentComponent,
-    TorrentDownloadStatusComponent
+    TorrentDownloadStatusComponent,
+    PosterStripComponent
   ],
     exports: [
       PluralPipePipe,
       LoadingButtonComponent,
       ShowTorrentComponent,
-      TorrentDownloadStatusComponent
+      TorrentDownloadStatusComponent,
+      PosterStripComponent
     ],
   imports: [
     CommonModule

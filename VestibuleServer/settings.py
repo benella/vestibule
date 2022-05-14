@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'vestibule.apps.VestibuleConfig',
     'shows.apps.ShowsConfig',
+    'movies.apps.MoviesConfig',
     'torrents.apps.TorrentsConfig',
     'feeds.apps.FeedsConfig',
     'vestibule_configurations.apps.VestibuleConfigurationsConfig'

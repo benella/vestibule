@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Palette } from "../show";
+import { Palette } from "../interfaces/palette";
 
 @Component({
   selector: 'vestibule-poster-strip',
