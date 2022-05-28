@@ -27,8 +27,9 @@ class Movie(models.Model):
     palette = models.CharField(max_length=256, default="", blank=True, null=True)
     lookup_names = models.TextField(default="", blank=True, null=True)
     custom_lookup_names = models.TextField(default="", blank=True, null=True)
-    imdb_rating = models.CharField(max_length=24, default="", blank=True)
     profile = models.ForeignKey(MovieProfile, on_delete=models.CASCADE, null=True, blank=True)
+    crew = models.JSONField(default=dict, blank=True, null=True)
+    runtime = models.IntegerField(default=0, blank=True, null=True)
 
     class Meta:
         ordering = ("title", )
@@ -69,6 +70,12 @@ class Movie(models.Model):
 
             self.generate_lookup_names()
 
+            self.runtime = data.get("runtime", 0)
+            self.crew = {
+                "directors": tmdb.get_movie_directors(self.tmdb_id),
+                "production": [company.get("name") for company in data.get("production_companies", [])],
+            }
+
     def delete(self, using=None, keep_parents=False):
         self.profile.delete()
 
@@ -108,6 +115,23 @@ class Movie(models.Model):
             return ""
 
         return datetime.strptime(self.release_date, "%Y-%m-%d").strftime("%b %-d, %Y")
+
+    @property
+    def runtime_text(self) -> str:
+        if not self.runtime:
+            return ""
+
+        result = ""
+        hours = self.runtime // 60
+        minutes = self.runtime % 60
+
+        if hours:
+            result += f"{hours} hr "
+
+        if minutes:
+            result += f"{minutes} min"
+
+        return result.strip()
 
     @property
     def downloading_torrents(self):

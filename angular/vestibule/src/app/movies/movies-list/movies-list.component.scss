@@ -3,7 +3,7 @@
 .movie-list {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 2rem;
   overflow: auto;
   height: 95vh;
   padding-bottom: 4rem;
@@ -11,7 +11,7 @@
 
 .movie {
   margin: 0 5rem 4rem 0;
-  width: 20rem;
+  width: 21rem;
   display: flex;
   flex-direction: row;
   cursor: pointer;
@@ -42,7 +42,7 @@
   padding: 1rem;
   position: relative;
   flex: 1;
-  background-color: #d2d3c775;
+  background-color: $transparent-light-2;
   border-radius: 0 0.2rem 0.2rem 0;
   transition: 0.3s ease-in-out;
 }

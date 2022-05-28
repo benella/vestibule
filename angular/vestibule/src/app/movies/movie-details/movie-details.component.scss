@@ -1,0 +1,60 @@
+@import "../../../styling/variables";
+
+.header {
+  .status {
+    color: $unselected-dark;
+    border: 1px solid;
+    border-radius: 0.2rem;
+    width: fit-content;
+    padding: 0.2rem 0.5rem 0.25rem;
+    line-height: 1rem;
+    font-weight: 300;
+    margin-right: 1rem;
+  }
+
+  .release-date {
+    color: $unselected-dark;
+    font-weight: 200;
+  }
+}
+
+.main {
+  margin-top: 2rem;
+}
+
+.poster-wrap {
+  transition: background-color 0.1s linear;
+  position: relative;
+  border-radius: 0.2rem;
+
+  .poster {
+    width: 12rem;
+    height: 18rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.2rem;
+  }
+}
+
+.data {
+  display: flex;
+  flex-direction: row;
+  height: 18rem;
+}
+
+.details {
+  padding: 1rem 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  .crew-position {
+    margin: 0 3rem 2rem 0;
+
+    .job {
+      font-weight: 200;
+    }
+  }
+}
+

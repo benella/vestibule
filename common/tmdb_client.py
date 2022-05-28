@@ -99,6 +99,22 @@ class TheMovieDBVestibuleClient:
         except (requests.exceptions.HTTPError, AttributeError):
             return {}
 
+    def get_movie_credits(self, tmdb_id: int) -> dict:
+        try:
+            return self.client.Movies(tmdb_id).credits()
+        except (requests.exceptions.HTTPError, AttributeError):
+            return {}
+
+    def get_movie_directors(self, tmdb_id: int) -> List[str]:
+        movie_credits = self.get_movie_credits(tmdb_id=tmdb_id)
+        directors = list()
+
+        for movie_credit in movie_credits.get("crew", []):
+            if movie_credit.get("job") == "Director":
+                directors.append(movie_credit.get("name"))
+
+        return directors
+
     def get_movie_alternative_titles(self, tmdb_id: int) -> List[str]:
         result = []
         try:

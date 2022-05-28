@@ -1,17 +1,19 @@
 <section id="movies-status-list">
+  <div class="header">
+<!--    <input type="text">-->
+  </div>
+
   <div class="movie-list">
-    <a *ngFor="let movie of movies">
-      <div class="movie" (mouseenter)="movieHover(movie)">
-        <div class="poster-wrap">
-          <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
-        </div>
-        <div class="data">
-          <p class="title">{{ movie.title }}</p>
-          <vestibule-poster-strip [width]="'6rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
-          <p class="release-date">{{ movie.release_date_text }}</p>
-          <div class="release-data">
-            <p class="status">{{ movie.status }}</p>
-          </div>
+    <a *ngFor="let movie of movies" class="movie" (mouseenter)="movieHover(movie)" [routerLink]="['/movie', movie.tmdb_id]">
+      <div class="poster-wrap">
+        <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+      </div>
+      <div class="data">
+        <p class="title">{{ movie.title }}</p>
+        <vestibule-poster-strip [width]="'6rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
+        <p class="release-date">{{ movie.release_date_text }}</p>
+        <div class="release-data">
+          <p class="status">{{ movie.status }}</p>
         </div>
       </div>
     </a>
