@@ -1,5 +1,5 @@
 <div class="show-list-group">
-  <p class="show-list-status" *ngIf="showList">{{title}}</p>
+  <p class="show-list-status" *ngIf="showList">{{ title }}</p>
 
   <div class="show-list">
     <a *ngFor="let show of showList" [routerLink]="['/shows', show.imdb_id]">

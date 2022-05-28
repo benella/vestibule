@@ -1,11 +1,32 @@
-<div class="movie-list">
-  <div *ngFor="let movie of movies" class="movie">
-    <div class="poster-wrap">
-      <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
-    </div>
-    <vestibule-poster-strip [width]="'10rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
-    <p class="year">{{ movie.year }}</p>
-    <p class="title">{{ movie.title }}</p>
-  </div>
-</div>
+<section id="movies-status-list">
+  <vestibule-movies-status-group
+    [title]="'Rumored'"
+    [movieList]="rumoredMovies">
+  </vestibule-movies-status-group>
+
+  <vestibule-movies-status-group
+    [title]="'Planned'"
+    [movieList]="plannedMovies">
+  </vestibule-movies-status-group>
+
+  <vestibule-movies-status-group
+    [title]="'In Production'"
+    [movieList]="inProductionMovies">
+  </vestibule-movies-status-group>
+
+  <vestibule-movies-status-group
+    [title]="'Post Production'"
+    [movieList]="postProductionMovies">
+  </vestibule-movies-status-group>
+
+  <vestibule-movies-status-group
+    [title]="'Released'"
+    [movieList]="releasedMovies">
+  </vestibule-movies-status-group>
+
+  <vestibule-movies-status-group
+    [title]="'Canceled'"
+    [movieList]="canceledMovies">
+  </vestibule-movies-status-group>
+</section>
 

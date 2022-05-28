@@ -2,6 +2,7 @@ import { Palette } from "../../shared/interfaces/palette";
 
 export interface MovieInList {
   imdb_id: string
+  tmdb_id: string
   title: string
   year: string
   release_date: string

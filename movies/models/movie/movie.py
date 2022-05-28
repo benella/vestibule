@@ -20,7 +20,7 @@ class Movie(models.Model):
     tmdb_id = models.IntegerField(default=0)
     imdb_id = models.CharField(max_length=24, blank=True)
     title = models.CharField(max_length=256, default="", blank=True)
-    release_date = models.CharField(max_length=24, default="", blank=True)
+    release_date = models.CharField(max_length=24, default="9999-99-99", blank=True)
     poster_link = models.URLField(default="", blank=True)
     status = models.CharField(max_length=256, default="", blank=True)
     palette = models.CharField(max_length=256, default="", blank=True, null=True)
@@ -51,7 +51,9 @@ class Movie(models.Model):
 
             self.imdb_id = data.get("imdb_id", self.imdb_id).replace("tt", "")
             self.title = data.get("title", self.title)
-            self.release_date = data.get("release_date", self.release_date)
+
+            release_date = data.get("release_date", "")
+            self.release_date = release_date if release_date else "9999-99-99"
             self.status = data.get("status", self.status)
 
             poster_path = data.get("poster_path")
@@ -68,6 +70,10 @@ class Movie(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.profile.delete()
+
+    @property
+    def release_date_order_value(self):
+        return int(self.release_date.replace("-", ""))
 
     @property
     def lookup_names_list(self) -> List[str]:
@@ -92,7 +98,8 @@ class Movie(models.Model):
 
     @property
     def year(self) -> str:
-        return self.release_date.split("-")[0]
+        year = self.release_date.split("-")[0]
+        return year if year != "9999" else "Unknown Year"
 
     @property
     def downloading_torrents(self):
