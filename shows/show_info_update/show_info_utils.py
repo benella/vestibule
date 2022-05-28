@@ -166,7 +166,7 @@ def generate_show_lookup_names(imdb_show_data: dict):
 
     for name in aliases:
         formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
-        formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+        formatted_name = re.sub("[_\s,]", ".", formatted_name.strip())
         formatted_name = re.sub("[:(),'?!]", "", formatted_name).lower()
         formatted_name = re.sub("\.+", ".", formatted_name.strip())
         formatted_aliases.append(formatted_name)
