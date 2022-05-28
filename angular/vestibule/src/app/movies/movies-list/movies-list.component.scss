@@ -1,0 +1,73 @@
+@import "../../../styling/variables";
+
+.movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  overflow: auto;
+  height: 95vh;
+  padding-bottom: 4rem;
+}
+
+.movie {
+  margin: 0 5rem 4rem 0;
+  width: 20rem;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+
+  &:hover {
+    .data {
+      background-color: $light-text;
+    }
+  }
+}
+
+.poster-wrap {
+  transition: background-color 0.1s linear;
+  position: relative;
+  border-radius: 0.2rem;
+
+  .poster {
+    width: 9rem;
+    height: 13.5rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.2rem 0 0 0.2rem;
+  }
+}
+
+.data {
+  padding: 1rem;
+  position: relative;
+  flex: 1;
+  background-color: #d2d3c775;
+  border-radius: 0 0.2rem 0.2rem 0;
+  transition: 0.3s ease-in-out;
+}
+
+.title {
+  margin-bottom: 1rem;
+}
+
+.release-date {
+  font-weight: 200;
+  margin-top: 1rem;
+}
+
+.release-data {
+  bottom: 1rem;
+  position: absolute;
+
+  .status {
+    color: $unselected-dark;
+    border: 1px solid;
+    border-radius: 0.2rem;
+    width: fit-content;
+    padding: 0.2rem 0.5rem 0.25rem;
+    line-height: 1rem;
+    font-weight: 300;
+  }
+}
+

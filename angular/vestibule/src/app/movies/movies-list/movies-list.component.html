@@ -1,32 +1,19 @@
 <section id="movies-status-list">
-  <vestibule-movies-status-group
-    [title]="'Rumored'"
-    [movieList]="rumoredMovies">
-  </vestibule-movies-status-group>
-
-  <vestibule-movies-status-group
-    [title]="'Planned'"
-    [movieList]="plannedMovies">
-  </vestibule-movies-status-group>
-
-  <vestibule-movies-status-group
-    [title]="'In Production'"
-    [movieList]="inProductionMovies">
-  </vestibule-movies-status-group>
-
-  <vestibule-movies-status-group
-    [title]="'Post Production'"
-    [movieList]="postProductionMovies">
-  </vestibule-movies-status-group>
-
-  <vestibule-movies-status-group
-    [title]="'Released'"
-    [movieList]="releasedMovies">
-  </vestibule-movies-status-group>
-
-  <vestibule-movies-status-group
-    [title]="'Canceled'"
-    [movieList]="canceledMovies">
-  </vestibule-movies-status-group>
+  <div class="movie-list">
+    <a *ngFor="let movie of movies">
+      <div class="movie" (mouseenter)="movieHover(movie)">
+        <div class="poster-wrap">
+          <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+        </div>
+        <div class="data">
+          <p class="title">{{ movie.title }}</p>
+          <vestibule-poster-strip [width]="'6rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
+          <p class="release-date">{{ movie.release_date_text }}</p>
+          <div class="release-data">
+            <p class="status">{{ movie.status }}</p>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
 </section>
-

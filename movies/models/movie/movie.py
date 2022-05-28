@@ -2,6 +2,7 @@ import re
 import logging
 import json
 
+from datetime import datetime
 from typing import List
 
 from django.db import models
@@ -99,7 +100,14 @@ class Movie(models.Model):
     @property
     def year(self) -> str:
         year = self.release_date.split("-")[0]
-        return year if year != "9999" else "Unknown Year"
+        return year if year != "9999" else ""
+
+    @property
+    def release_date_text(self) -> str:
+        if self.release_date == "9999-99-99":
+            return ""
+
+        return datetime.strptime(self.release_date, "%Y-%m-%d").strftime("%b %-d, %Y")
 
     @property
     def downloading_torrents(self):

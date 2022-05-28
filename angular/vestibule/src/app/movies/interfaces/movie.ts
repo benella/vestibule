@@ -5,7 +5,7 @@ export interface MovieInList {
   tmdb_id: string
   title: string
   year: string
-  release_date: string
+  release_date_text: string
   status: string
   poster_link: string
   palette_list: Palette
