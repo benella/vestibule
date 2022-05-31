@@ -216,6 +216,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DataSource": () => (/* binding */ DataSource),
 /* harmony export */   "SelectionModel": () => (/* binding */ SelectionModel),
 /* harmony export */   "UniqueSelectionDispatcher": () => (/* binding */ UniqueSelectionDispatcher),
+/* harmony export */   "_DisposeViewRepeaterStrategy": () => (/* binding */ _DisposeViewRepeaterStrategy),
+/* harmony export */   "_RecycleViewRepeaterStrategy": () => (/* binding */ _RecycleViewRepeaterStrategy),
+/* harmony export */   "_VIEW_REPEATER_STRATEGY": () => (/* binding */ _VIEW_REPEATER_STRATEGY),
 /* harmony export */   "getMultipleValuesInSingleSelectionError": () => (/* binding */ getMultipleValuesInSingleSelectionError),
 /* harmony export */   "isDataSource": () => (/* binding */ isDataSource)
 /* harmony export */ });
@@ -270,6 +273,182 @@ class ArrayDataSource extends DataSource {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A repeater that destroys views when they are removed from a
+ * {@link ViewContainerRef}. When new items are inserted into the container,
+ * the repeater will always construct a new embedded view for each item.
+ *
+ * @template T The type for the embedded view's $implicit property.
+ * @template R The type for the item in each IterableDiffer change record.
+ * @template C The type for the context passed to each embedded view.
+ */
+class _DisposeViewRepeaterStrategy {
+    applyChanges(changes, viewContainerRef, itemContextFactory, itemValueResolver, itemViewChanged) {
+        changes.forEachOperation((record, adjustedPreviousIndex, currentIndex) => {
+            let view;
+            let operation;
+            if (record.previousIndex == null) {
+                const insertContext = itemContextFactory(record, adjustedPreviousIndex, currentIndex);
+                view = viewContainerRef.createEmbeddedView(insertContext.templateRef, insertContext.context, insertContext.index);
+                operation = 1 /* INSERTED */;
+            }
+            else if (currentIndex == null) {
+                viewContainerRef.remove(adjustedPreviousIndex);
+                operation = 3 /* REMOVED */;
+            }
+            else {
+                view = viewContainerRef.get(adjustedPreviousIndex);
+                viewContainerRef.move(view, currentIndex);
+                operation = 2 /* MOVED */;
+            }
+            if (itemViewChanged) {
+                itemViewChanged({
+                    context: view === null || view === void 0 ? void 0 : view.context,
+                    operation,
+                    record,
+                });
+            }
+        });
+    }
+    detach() {
+    }
+}
+
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * A repeater that caches views when they are removed from a
+ * {@link ViewContainerRef}. When new items are inserted into the container,
+ * the repeater will reuse one of the cached views instead of creating a new
+ * embedded view. Recycling cached views reduces the quantity of expensive DOM
+ * inserts.
+ *
+ * @template T The type for the embedded view's $implicit property.
+ * @template R The type for the item in each IterableDiffer change record.
+ * @template C The type for the context passed to each embedded view.
+ */
+class _RecycleViewRepeaterStrategy {
+    constructor() {
+        /**
+         * The size of the cache used to store unused views.
+         * Setting the cache size to `0` will disable caching. Defaults to 20 views.
+         */
+        this.viewCacheSize = 20;
+        /**
+         * View cache that stores embedded view instances that have been previously stamped out,
+         * but don't are not currently rendered. The view repeater will reuse these views rather than
+         * creating brand new ones.
+         *
+         * TODO(michaeljamesparsons) Investigate whether using a linked list would improve performance.
+         */
+        this._viewCache = [];
+    }
+    /** Apply changes to the DOM. */
+    applyChanges(changes, viewContainerRef, itemContextFactory, itemValueResolver, itemViewChanged) {
+        // Rearrange the views to put them in the right location.
+        changes.forEachOperation((record, adjustedPreviousIndex, currentIndex) => {
+            let view;
+            let operation;
+            if (record.previousIndex == null) { // Item added.
+                const viewArgsFactory = () => itemContextFactory(record, adjustedPreviousIndex, currentIndex);
+                view = this._insertView(viewArgsFactory, currentIndex, viewContainerRef, itemValueResolver(record));
+                operation = view ? 1 /* INSERTED */ : 0 /* REPLACED */;
+            }
+            else if (currentIndex == null) { // Item removed.
+                this._detachAndCacheView(adjustedPreviousIndex, viewContainerRef);
+                operation = 3 /* REMOVED */;
+            }
+            else { // Item moved.
+                view = this._moveView(adjustedPreviousIndex, currentIndex, viewContainerRef, itemValueResolver(record));
+                operation = 2 /* MOVED */;
+            }
+            if (itemViewChanged) {
+                itemViewChanged({
+                    context: view === null || view === void 0 ? void 0 : view.context,
+                    operation,
+                    record,
+                });
+            }
+        });
+    }
+    detach() {
+        for (const view of this._viewCache) {
+            view.destroy();
+        }
+    }
+    /**
+     * Inserts a view for a new item, either from the cache or by creating a new
+     * one. Returns `undefined` if the item was inserted into a cached view.
+     */
+    _insertView(viewArgsFactory, currentIndex, viewContainerRef, value) {
+        let cachedView = this._insertViewFromCache(currentIndex, viewContainerRef);
+        if (cachedView) {
+            cachedView.context.$implicit = value;
+            return undefined;
+        }
+        const viewArgs = viewArgsFactory();
+        return viewContainerRef.createEmbeddedView(viewArgs.templateRef, viewArgs.context, viewArgs.index);
+    }
+    /** Detaches the view at the given index and inserts into the view cache. */
+    _detachAndCacheView(index, viewContainerRef) {
+        const detachedView = this._detachView(index, viewContainerRef);
+        this._maybeCacheView(detachedView, viewContainerRef);
+    }
+    /** Moves view at the previous index to the current index. */
+    _moveView(adjustedPreviousIndex, currentIndex, viewContainerRef, value) {
+        const view = viewContainerRef.get(adjustedPreviousIndex);
+        viewContainerRef.move(view, currentIndex);
+        view.context.$implicit = value;
+        return view;
+    }
+    /**
+     * Cache the given detached view. If the cache is full, the view will be
+     * destroyed.
+     */
+    _maybeCacheView(view, viewContainerRef) {
+        if (this._viewCache.length < this.viewCacheSize) {
+            this._viewCache.push(view);
+        }
+        else {
+            const index = viewContainerRef.indexOf(view);
+            // The host component could remove views from the container outside of
+            // the view repeater. It's unlikely this will occur, but just in case,
+            // destroy the view on its own, otherwise destroy it through the
+            // container to ensure that all the references are removed.
+            if (index === -1) {
+                view.destroy();
+            }
+            else {
+                viewContainerRef.remove(index);
+            }
+        }
+    }
+    /** Inserts a recycled view from the cache at the given index. */
+    _insertViewFromCache(index, viewContainerRef) {
+        const cachedView = this._viewCache.pop();
+        if (cachedView) {
+            viewContainerRef.insert(cachedView, index);
+        }
+        return cachedView || null;
+    }
+    /** Detaches the embedded view at the given index. */
+    _detachView(index, viewContainerRef) {
+        return viewContainerRef.detach(index);
+    }
+}
 
 /**
  * @license
@@ -418,7 +597,7 @@ class SelectionModel {
      * including multiple values while the selection model is not supporting multiple values.
      */
     _verifyValueAssignment(values) {
-        if (values.length > 1 && !this._multiple) {
+        if (values.length > 1 && !this._multiple && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw getMultipleValuesInSingleSelectionError();
         }
     }
@@ -492,6 +671,19 @@ UniqueSelectionDispatcher.ɵprov = (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * Injection token for {@link _ViewRepeater}. This token is for use by Angular Material only.
+ * @docs-private
+ */
+const _VIEW_REPEATER_STRATEGY = new _angular_core__WEBPACK_IMPORTED_MODULE_3__.InjectionToken('_ViewRepeater');
 
 /**
  * @license
@@ -981,7 +1173,7 @@ class CloseScrollStrategy {
     }
     /** Attaches this scroll strategy to an overlay. */
     attach(overlayRef) {
-        if (this._overlayRef) {
+        if (this._overlayRef && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw getMatScrollStrategyAlreadyAttachedError();
         }
         this._overlayRef = overlayRef;
@@ -1100,7 +1292,7 @@ class RepositionScrollStrategy {
     }
     /** Attaches this scroll strategy to an overlay. */
     attach(overlayRef) {
-        if (this._overlayRef) {
+        if (this._overlayRef && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw getMatScrollStrategyAlreadyAttachedError();
         }
         this._overlayRef = overlayRef;
@@ -1223,10 +1415,6 @@ class OverlayConfig {
          * the `HashLocationStrategy`).
          */
         this.disposeOnNavigation = false;
-        /**
-         * Array of HTML elements clicking on which should not be considered as outside click
-         */
-        this.excludeFromOutsideClick = [];
         if (config) {
             // Use `Iterable` instead of `Array` because TypeScript, as of 3.6.3,
             // loses the array generic type in the `for of`. But we *also* have to use `Array` because
@@ -1491,22 +1679,22 @@ class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {
         this._clickListener = (event) => {
             // Get the target through the `composedPath` if possible to account for shadow DOM.
             const target = event.composedPath ? event.composedPath()[0] : event.target;
-            const overlays = this._attachedOverlays;
+            // We copy the array because the original may be modified asynchronously if the
+            // outsidePointerEvents listener decides to detach overlays resulting in index errors inside
+            // the for loop.
+            const overlays = this._attachedOverlays.slice();
             // Dispatch the mouse event to the top overlay which has subscribers to its mouse events.
             // We want to target all overlays for which the click could be considered as outside click.
             // As soon as we reach an overlay for which the click is not outside click we break off
             // the loop.
             for (let i = overlays.length - 1; i > -1; i--) {
                 const overlayRef = overlays[i];
-                if (overlayRef._outsidePointerEvents.observers.length < 1) {
+                if (overlayRef._outsidePointerEvents.observers.length < 1 || !overlayRef.hasAttached()) {
                     continue;
                 }
-                const config = overlayRef.getConfig();
-                const excludeElements = [...config.excludeFromOutsideClick, overlayRef.overlayElement];
-                const isInsideClick = excludeElements.some(e => e.contains(target));
-                // If it is inside click just break - we should do nothing
-                // If it is outside click dispatch the mouse event, and proceed with the next overlay
-                if (isInsideClick) {
+                // If it's a click inside the overlay, just break - we should do nothing
+                // If it's an outside click dispatch the mouse event, and proceed with the next overlay
+                if (overlayRef.overlayElement.contains(target)) {
                     break;
                 }
                 overlayRef._outsidePointerEvents.next(event);
@@ -1526,6 +1714,7 @@ class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {
         // tslint:enable: max-line-length
         if (!this._isAttached) {
             this._document.body.addEventListener('click', this._clickListener, true);
+            this._document.body.addEventListener('contextmenu', this._clickListener, true);
             // click event is not fired on iOS. To make element "clickable" we are
             // setting the cursor to pointer
             if (this._platform.IOS && !this._cursorStyleIsSet) {
@@ -1540,6 +1729,7 @@ class OverlayOutsideClickDispatcher extends BaseOverlayDispatcher {
     detach() {
         if (this._isAttached) {
             this._document.body.removeEventListener('click', this._clickListener, true);
+            this._document.body.removeEventListener('contextmenu', this._clickListener, true);
             if (this._platform.IOS && this._cursorStyleIsSet) {
                 this._document.body.style.cursor = this._cursorOriginalValue;
                 this._cursorStyleIsSet = false;
@@ -1754,7 +1944,6 @@ class OverlayRef {
         // before attempting to position it, as the position may depend on the size of the rendered
         // content.
         this._ngZone.onStable
-            .asObservable()
             .pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.take)(1))
             .subscribe(() => {
             // The overlay could've been detached before the zone has stabilized.
@@ -1855,23 +2044,23 @@ class OverlayRef {
     }
     /** Gets an observable that emits when the backdrop has been clicked. */
     backdropClick() {
-        return this._backdropClick.asObservable();
+        return this._backdropClick;
     }
     /** Gets an observable that emits when the overlay has been attached. */
     attachments() {
-        return this._attachments.asObservable();
+        return this._attachments;
     }
     /** Gets an observable that emits when the overlay has been detached. */
     detachments() {
-        return this._detachments.asObservable();
+        return this._detachments;
     }
     /** Gets an observable of keydown events targeted to this overlay. */
     keydownEvents() {
-        return this._keydownEvents.asObservable();
+        return this._keydownEvents;
     }
     /** Gets an observable of pointer events targeted outside this overlay. */
     outsidePointerEvents() {
-        return this._outsidePointerEvents.asObservable();
+        return this._outsidePointerEvents;
     }
     /** Gets the current overlay configuration, which is immutable. */
     getConfig() {
@@ -2062,7 +2251,6 @@ class OverlayRef {
             // might still be animating. This stream helps us avoid interrupting the animation
             // by waiting for the pane to become empty.
             const subscription = this._ngZone.onStable
-                .asObservable()
                 .pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_8__.takeUntil)((0,rxjs__WEBPACK_IMPORTED_MODULE_9__.merge)(this._attachments, this._detachments)))
                 .subscribe(() => {
                 // Needs a couple of checks for the pane and host, because
@@ -2147,7 +2335,7 @@ class FlexibleConnectedPositionStrategy {
         /** Keeps track of the CSS classes that the position strategy has applied on the overlay panel. */
         this._appliedPanelClasses = [];
         /** Observable sequence of position changes. */
-        this.positionChanges = this._positionChanges.asObservable();
+        this.positionChanges = this._positionChanges;
         this.setOrigin(connectedTo);
     }
     /** Ordered list of preferred positions, from most to least desirable. */
@@ -2156,7 +2344,8 @@ class FlexibleConnectedPositionStrategy {
     }
     /** Attaches this position strategy to an overlay. */
     attach(overlayRef) {
-        if (this._overlayRef && overlayRef !== this._overlayRef) {
+        if (this._overlayRef && overlayRef !== this._overlayRef &&
+            (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw Error('This position strategy is already attached to an overlay');
         }
         this._validatePositions();
@@ -2946,17 +3135,19 @@ class FlexibleConnectedPositionStrategy {
     }
     /** Validates that the current position match the expected values. */
     _validatePositions() {
-        if (!this._preferredPositions.length) {
-            throw Error('FlexibleConnectedPositionStrategy: At least one position is required.');
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+            if (!this._preferredPositions.length) {
+                throw Error('FlexibleConnectedPositionStrategy: At least one position is required.');
+            }
+            // TODO(crisbeto): remove these once Angular's template type
+            // checking is advanced enough to catch these cases.
+            this._preferredPositions.forEach(pair => {
+                validateHorizontalPosition('originX', pair.originX);
+                validateVerticalPosition('originY', pair.originY);
+                validateHorizontalPosition('overlayX', pair.overlayX);
+                validateVerticalPosition('overlayY', pair.overlayY);
+            });
         }
-        // TODO(crisbeto): remove these once Angular's template type
-        // checking is advanced enough to catch these cases.
-        this._preferredPositions.forEach(pair => {
-            validateHorizontalPosition('originX', pair.originX);
-            validateVerticalPosition('originY', pair.originY);
-            validateHorizontalPosition('overlayX', pair.overlayX);
-            validateVerticalPosition('overlayY', pair.overlayY);
-        });
     }
     /** Adds a single CSS class or an array of classes on the overlay panel. */
     _addPanelClasses(cssClasses) {
@@ -3051,10 +3242,7 @@ class ConnectedPositionStrategy {
             .withPush(false)
             .withViewportMargin(0);
         this.withFallbackPosition(originPos, overlayPos);
-    }
-    /** Emits an event when the connection point changes. */
-    get onPositionChange() {
-        return this._positionStrategy.positionChanges;
+        this.onPositionChange = this._positionStrategy.positionChanges;
     }
     /** Ordered list of preferred positions, from most to least desirable. */
     get positions() {
@@ -3521,7 +3709,7 @@ class Overlay {
         return new _angular_cdk_portal__WEBPACK_IMPORTED_MODULE_10__.DomPortalOutlet(pane, this._componentFactoryResolver, this._appRef, this._injector, this._document);
     }
 }
-Overlay.ɵfac = function Overlay_Factory(t) { return new (t || Overlay)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](ScrollStrategyOptions), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayContainer), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.ComponentFactoryResolver), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayPositionBuilder), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayKeyboardDispatcher), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.Injector), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.NgZone), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_3__.DOCUMENT), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_11__.Directionality), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_3__.Location, 8), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayOutsideClickDispatcher, 8)); };
+Overlay.ɵfac = function Overlay_Factory(t) { return new (t || Overlay)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](ScrollStrategyOptions), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayContainer), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.ComponentFactoryResolver), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayPositionBuilder), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayKeyboardDispatcher), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.Injector), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_2__.NgZone), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_3__.DOCUMENT), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_11__.Directionality), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common__WEBPACK_IMPORTED_MODULE_3__.Location), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](OverlayOutsideClickDispatcher)); };
 Overlay.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: Overlay, factory: Overlay.ɵfac });
 Overlay.ctorParameters = () => [
     { type: ScrollStrategyOptions },
@@ -3533,19 +3721,15 @@ Overlay.ctorParameters = () => [
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.NgZone },
     { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Inject, args: [_angular_common__WEBPACK_IMPORTED_MODULE_3__.DOCUMENT,] }] },
     { type: _angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_11__.Directionality },
-    { type: _angular_common__WEBPACK_IMPORTED_MODULE_3__.Location, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Optional }] },
-    { type: OverlayOutsideClickDispatcher, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Optional }] }
+    { type: _angular_common__WEBPACK_IMPORTED_MODULE_3__.Location },
+    { type: OverlayOutsideClickDispatcher }
 ];
 (function () { (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵsetClassMetadata"](Overlay, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Injectable
     }], function () { return [{ type: ScrollStrategyOptions }, { type: OverlayContainer }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.ComponentFactoryResolver }, { type: OverlayPositionBuilder }, { type: OverlayKeyboardDispatcher }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Injector }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.NgZone }, { type: undefined, decorators: [{
                 type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Inject,
                 args: [_angular_common__WEBPACK_IMPORTED_MODULE_3__.DOCUMENT]
-            }] }, { type: _angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_11__.Directionality }, { type: _angular_common__WEBPACK_IMPORTED_MODULE_3__.Location, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Optional
-            }] }, { type: OverlayOutsideClickDispatcher, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_2__.Optional
-            }] }]; }, null); })();
+            }] }, { type: _angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_11__.Directionality }, { type: _angular_common__WEBPACK_IMPORTED_MODULE_3__.Location }, { type: OverlayOutsideClickDispatcher }]; }, null); })();
 
 /**
  * @license
@@ -4354,9 +4538,36 @@ function normalizePassiveListenerOptions(options) {
  */
 /** Cached result of the way the browser handles the horizontal scroll axis in RTL mode. */
 let rtlScrollAxisType;
+/** Cached result of the check that indicates whether the browser supports scroll behaviors. */
+let scrollBehaviorSupported;
 /** Check whether the browser supports scroll behaviors. */
 function supportsScrollBehavior() {
-    return !!(typeof document == 'object' && 'scrollBehavior' in document.documentElement.style);
+    if (scrollBehaviorSupported == null) {
+        // If we're not in the browser, it can't be supported.
+        if (typeof document !== 'object' || !document) {
+            scrollBehaviorSupported = false;
+        }
+        // If the element can have a `scrollBehavior` style, we can be sure that it's supported.
+        if ('scrollBehavior' in document.documentElement.style) {
+            scrollBehaviorSupported = true;
+        }
+        else {
+            // At this point we have 3 possibilities: `scrollTo` isn't supported at all, it's
+            // supported but it doesn't handle scroll behavior, or it has been polyfilled.
+            const scrollToFunction = Element.prototype.scrollTo;
+            if (scrollToFunction) {
+                // We can detect if the function has been polyfilled by calling `toString` on it. Native
+                // functions are obfuscated using `[native code]`, whereas if it was overwritten we'd get
+                // the actual function source. Via https://davidwalsh.name/detect-native-function. Consider
+                // polyfilled functions as supporting scroll behavior.
+                scrollBehaviorSupported = !/\{\s*\[native code\]\s*\}/.test(scrollToFunction.toString());
+            }
+            else {
+                scrollBehaviorSupported = false;
+            }
+        }
+    }
+    return scrollBehaviorSupported;
 }
 /**
  * Checks the type of RTL scroll axis used by this browser. As of time of writing, Chrome is NORMAL,
@@ -4542,11 +4753,13 @@ function throwNoPortalAttachedError() {
 class Portal {
     /** Attach this portal to a host. */
     attach(host) {
-        if (host == null) {
-            throwNullPortalOutletError();
-        }
-        if (host.hasAttached()) {
-            throwPortalAlreadyAttachedError();
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+            if (host == null) {
+                throwNullPortalOutletError();
+            }
+            if (host.hasAttached()) {
+                throwPortalAlreadyAttachedError();
+            }
         }
         this._attachedHost = host;
         return host.attach(this);
@@ -4554,12 +4767,12 @@ class Portal {
     /** Detach this portal from its host */
     detach() {
         let host = this._attachedHost;
-        if (host == null) {
-            throwNoPortalAttachedError();
-        }
-        else {
+        if (host != null) {
             this._attachedHost = null;
             host.detach();
+        }
+        else if (typeof ngDevMode === 'undefined' || ngDevMode) {
+            throwNoPortalAttachedError();
         }
     }
     /** Whether this portal is attached to a host. */
@@ -4641,14 +4854,16 @@ class BasePortalOutlet {
     }
     /** Attaches a portal. */
     attach(portal) {
-        if (!portal) {
-            throwNullPortalError();
-        }
-        if (this.hasAttached()) {
-            throwPortalAlreadyAttachedError();
-        }
-        if (this._isDisposed) {
-            throwPortalOutletAlreadyDisposedError();
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+            if (!portal) {
+                throwNullPortalError();
+            }
+            if (this.hasAttached()) {
+                throwPortalAlreadyAttachedError();
+            }
+            if (this._isDisposed) {
+                throwPortalOutletAlreadyDisposedError();
+            }
         }
         if (portal instanceof ComponentPortal) {
             this._attachedPortal = portal;
@@ -4663,7 +4878,9 @@ class BasePortalOutlet {
             this._attachedPortal = portal;
             return this.attachDomPortal(portal);
         }
-        throwUnknownPortalTypeError();
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+            throwUnknownPortalTypeError();
+        }
     }
     /** Detaches a previously attached portal. */
     detach() {
@@ -4733,11 +4950,11 @@ class DomPortalOutlet extends BasePortalOutlet {
         this.attachDomPortal = (portal) => {
             // @breaking-change 10.0.0 Remove check and error once the
             // `_document` constructor parameter is required.
-            if (!this._document) {
+            if (!this._document && (typeof ngDevMode === 'undefined' || ngDevMode)) {
                 throw Error('Cannot attach DOM portal without _document constructor parameter');
             }
             const element = portal.element;
-            if (!element.parentNode) {
+            if (!element.parentNode && (typeof ngDevMode === 'undefined' || ngDevMode)) {
                 throw Error('DOM portal content must be attached to a parent node.');
             }
             // Anchor used to save the element's previous position so
@@ -4912,11 +5129,11 @@ class CdkPortalOutlet extends BasePortalOutlet {
         this.attachDomPortal = (portal) => {
             // @breaking-change 9.0.0 Remove check and error once the
             // `_document` constructor parameter is required.
-            if (!this._document) {
+            if (!this._document && (typeof ngDevMode === 'undefined' || ngDevMode)) {
                 throw Error('Cannot attach DOM portal without _document constructor parameter');
             }
             const element = portal.element;
-            if (!element.parentNode) {
+            if (!element.parentNode && (typeof ngDevMode === 'undefined' || ngDevMode)) {
                 throw Error('DOM portal content must be attached to a parent node.');
             }
             // Anchor used to save the element's previous position so
@@ -5087,6 +5304,8 @@ PortalModule.ɵinj = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0__["�
  * Custom injector to be used when providing custom
  * injection tokens to components inside a portal.
  * @docs-private
+ * @deprecated Use `Injector.create` instead.
+ * @breaking-change 11.0.0
  */
 class PortalInjector {
     constructor(_parentInjector, _customTokens) {
@@ -5185,6 +5404,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 const _c0 = ["contentWrapper"];
 const _c1 = ["*"];
 const VIRTUAL_SCROLL_STRATEGY = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.InjectionToken('VIRTUAL_SCROLL_STRATEGY');
@@ -5234,7 +5454,7 @@ class FixedSizeVirtualScrollStrategy {
      * @param maxBufferPx The amount of buffer (in pixels) to render when rendering more.
      */
     updateItemAndBufferSize(itemSize, minBufferPx, maxBufferPx) {
-        if (maxBufferPx < minBufferPx) {
+        if (maxBufferPx < minBufferPx && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw Error('CDK virtual scroll: maxBufferPx must be greater than or equal to minBufferPx');
         }
         this._itemSize = itemSize;
@@ -5909,7 +6129,7 @@ class CdkVirtualScrollViewport extends CdkScrollable {
         /** Emits when the index of the first element visible in the viewport changes. */
         this.scrolledIndexChange = new rxjs__WEBPACK_IMPORTED_MODULE_5__.Observable((observer) => this._scrollStrategy.scrolledIndexChange.subscribe(index => Promise.resolve().then(() => this.ngZone.run(() => observer.next(index)))));
         /** A stream that emits whenever the rendered range changes. */
-        this.renderedRangeStream = this._renderedRangeSubject.asObservable();
+        this.renderedRangeStream = this._renderedRangeSubject;
         /**
          * The total size of all content (in pixels), including content that is not currently rendered.
          */
@@ -5937,7 +6157,7 @@ class CdkVirtualScrollViewport extends CdkScrollable {
         this._runAfterChangeDetection = [];
         /** Subscription to changes in the viewport size. */
         this._viewportChanges = rxjs__WEBPACK_IMPORTED_MODULE_15__.Subscription.EMPTY;
-        if (!_scrollStrategy) {
+        if (!_scrollStrategy && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw Error('Error: cdk-virtual-scroll-viewport requires the "itemSize" property to be set.');
         }
         // @breaking-change 11.0.0 Remove null check for `viewportRuler`.
@@ -5989,7 +6209,7 @@ class CdkVirtualScrollViewport extends CdkScrollable {
     }
     /** Attaches a `CdkVirtualScrollRepeater` to this viewport. */
     attach(forOf) {
-        if (this._forOf) {
+        if (this._forOf && (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw Error('CdkVirtualScrollViewport is already attached.');
         }
         // Subscribe to the data stream of the CdkVirtualForOf to keep track of when the data length
@@ -6190,7 +6410,7 @@ class CdkVirtualScrollViewport extends CdkScrollable {
             this.orientation === 'horizontal' ? `${this._totalContentSize}px` : '';
     }
 }
-CdkVirtualScrollViewport.ɵfac = function CdkVirtualScrollViewport_Factory(t) { return new (t || CdkVirtualScrollViewport)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](VIRTUAL_SCROLL_STRATEGY, 8), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_12__.Directionality, 8), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ScrollDispatcher), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ViewportRuler, 8)); };
+CdkVirtualScrollViewport.ɵfac = function CdkVirtualScrollViewport_Factory(t) { return new (t || CdkVirtualScrollViewport)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](VIRTUAL_SCROLL_STRATEGY, 8), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_12__.Directionality, 8), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ScrollDispatcher), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ViewportRuler)); };
 CdkVirtualScrollViewport.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: CdkVirtualScrollViewport, selectors: [["cdk-virtual-scroll-viewport"]], viewQuery: function CdkVirtualScrollViewport_Query(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵviewQuery"](_c0, 7);
     } if (rf & 2) {
@@ -6218,7 +6438,7 @@ CdkVirtualScrollViewport.ctorParameters = () => [
     { type: undefined, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject, args: [VIRTUAL_SCROLL_STRATEGY,] }] },
     { type: _angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_12__.Directionality, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional }] },
     { type: ScrollDispatcher },
-    { type: ViewportRuler, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional }] }
+    { type: ViewportRuler }
 ];
 CdkVirtualScrollViewport.propDecorators = {
     orientation: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input }],
@@ -6250,9 +6470,7 @@ CdkVirtualScrollViewport.propDecorators = {
                 args: [VIRTUAL_SCROLL_STRATEGY]
             }] }, { type: _angular_cdk_bidi__WEBPACK_IMPORTED_MODULE_12__.Directionality, decorators: [{
                 type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional
-            }] }, { type: ScrollDispatcher }, { type: ViewportRuler, decorators: [{
-                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Optional
-            }] }]; }, { scrolledIndexChange: [{
+            }] }, { type: ScrollDispatcher }, { type: ViewportRuler }]; }, { scrolledIndexChange: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Output
         }], orientation: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
@@ -6292,21 +6510,19 @@ class CdkVirtualForOf {
     _template, 
     /** The set of available differs. */
     _differs, 
+    /** The strategy used to render items in the virtual scroll viewport. */
+    _viewRepeater, 
     /** The virtual scrolling viewport that these items are being rendered in. */
     _viewport, ngZone) {
         this._viewContainerRef = _viewContainerRef;
         this._template = _template;
         this._differs = _differs;
+        this._viewRepeater = _viewRepeater;
         this._viewport = _viewport;
         /** Emits when the rendered view of the data changes. */
         this.viewChange = new rxjs__WEBPACK_IMPORTED_MODULE_1__.Subject();
         /** Subject that emits when a new DataSource instance is given. */
         this._dataSourceChanges = new rxjs__WEBPACK_IMPORTED_MODULE_1__.Subject();
-        /**
-         * The size of the cache used to store templates that are not being used for re-use later.
-         * Setting the cache size to `0` will disable caching. Defaults to 20 templates.
-         */
-        this.cdkVirtualForTemplateCacheSize = 20;
         /** Emits whenever the data in the current DataSource changes. */
         this.dataStream = this._dataSourceChanges
             .pipe(
@@ -6322,12 +6538,6 @@ class CdkVirtualForOf {
         (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_19__.shareReplay)(1));
         /** The differ used to calculate changes to the data. */
         this._differ = null;
-        /**
-         * The template cache used to hold on ot template instancess that have been stamped out, but don't
-         * currently need to be rendered. These instances will be reused in the future rather than
-         * stamping out brand new ones.
-         */
-        this._templateCache = [];
         /** Whether the rendered data should be updated during the next ngDoCheck cycle. */
         this._needsUpdate = false;
         this._destroyed = new rxjs__WEBPACK_IMPORTED_MODULE_1__.Subject();
@@ -6352,8 +6562,8 @@ class CdkVirtualForOf {
             this._dataSourceChanges.next(value);
         }
         else {
-            // Slice the value if its an NgIterable to ensure we're working with an array.
-            this._dataSourceChanges.next(new _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__.ArrayDataSource((0,rxjs__WEBPACK_IMPORTED_MODULE_21__.isObservable)(value) ? value : Array.prototype.slice.call(value || [])));
+            // If value is an an NgIterable, convert it to an array.
+            this._dataSourceChanges.next(new _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__.ArrayDataSource((0,rxjs__WEBPACK_IMPORTED_MODULE_21__.isObservable)(value) ? value : Array.from(value || [])));
         }
     }
     /**
@@ -6377,6 +6587,16 @@ class CdkVirtualForOf {
         }
     }
     /**
+     * The size of the cache used to store templates that are not being used for re-use later.
+     * Setting the cache size to `0` will disable caching. Defaults to 20 templates.
+     */
+    get cdkVirtualForTemplateCacheSize() {
+        return this._viewRepeater.viewCacheSize;
+    }
+    set cdkVirtualForTemplateCacheSize(size) {
+        this._viewRepeater.viewCacheSize = (0,_angular_cdk_coercion__WEBPACK_IMPORTED_MODULE_3__.coerceNumberProperty)(size);
+    }
+    /**
      * Measures the combined size (width for horizontal orientation, height for vertical) of all items
      * in the specified range. Throws an error if the range includes items that are not currently
      * rendered.
@@ -6385,7 +6605,8 @@ class CdkVirtualForOf {
         if (range.start >= range.end) {
             return 0;
         }
-        if (range.start < this._renderedRange.start || range.end > this._renderedRange.end) {
+        if ((range.start < this._renderedRange.start || range.end > this._renderedRange.end) &&
+            (typeof ngDevMode === 'undefined' || ngDevMode)) {
             throw Error(`Error: attempted to measure an item that isn't rendered.`);
         }
         // The index into the list of rendered views for the first item in the range.
@@ -6437,9 +6658,7 @@ class CdkVirtualForOf {
         this.viewChange.complete();
         this._destroyed.next();
         this._destroyed.complete();
-        for (let view of this._templateCache) {
-            view.destroy();
-        }
+        this._viewRepeater.detach();
     }
     /** React to scroll state changes in the viewport. */
     _onRenderedDataChange() {
@@ -6474,21 +6693,7 @@ class CdkVirtualForOf {
     }
     /** Apply changes to the DOM. */
     _applyChanges(changes) {
-        // Rearrange the views to put them in the right location.
-        changes.forEachOperation((record, adjustedPreviousIndex, currentIndex) => {
-            if (record.previousIndex == null) { // Item added.
-                const view = this._insertViewForNewItem(currentIndex);
-                view.context.$implicit = record.item;
-            }
-            else if (currentIndex == null) { // Item removed.
-                this._cacheView(this._detachView(adjustedPreviousIndex));
-            }
-            else { // Item moved.
-                const view = this._viewContainerRef.get(adjustedPreviousIndex);
-                this._viewContainerRef.move(view, currentIndex);
-                view.context.$implicit = record.item;
-            }
-        });
+        this._viewRepeater.applyChanges(changes, this._viewContainerRef, (record, adjustedPreviousIndex, currentIndex) => this._getEmbeddedViewArgs(record, currentIndex), (record) => record.item);
         // Update $implicit for any items that had an identity change.
         changes.forEachIdentityChange((record) => {
             const view = this._viewContainerRef.get(record.currentIndex);
@@ -6504,28 +6709,6 @@ class CdkVirtualForOf {
             this._updateComputedContextProperties(view.context);
         }
     }
-    /** Cache the given detached view. */
-    _cacheView(view) {
-        if (this._templateCache.length < this.cdkVirtualForTemplateCacheSize) {
-            this._templateCache.push(view);
-        }
-        else {
-            const index = this._viewContainerRef.indexOf(view);
-            // It's very unlikely that the index will ever be -1, but just in case,
-            // destroy the view on its own, otherwise destroy it through the
-            // container to ensure that all the references are removed.
-            if (index === -1) {
-                view.destroy();
-            }
-            else {
-                this._viewContainerRef.remove(index);
-            }
-        }
-    }
-    /** Inserts a view for a new item, either from the cache or by creating a new one. */
-    _insertViewForNewItem(index) {
-        return this._insertViewFromCache(index) || this._createEmbeddedViewAt(index);
-    }
     /** Update the computed properties on the `CdkVirtualForOfContext`. */
     _updateComputedContextProperties(context) {
         context.first = context.index === 0;
@@ -6533,44 +6716,38 @@ class CdkVirtualForOf {
         context.even = context.index % 2 === 0;
         context.odd = !context.even;
     }
-    /** Creates a new embedded view and moves it to the given index */
-    _createEmbeddedViewAt(index) {
+    _getEmbeddedViewArgs(record, index) {
         // Note that it's important that we insert the item directly at the proper index,
         // rather than inserting it and the moving it in place, because if there's a directive
         // on the same node that injects the `ViewContainerRef`, Angular will insert another
         // comment node which can throw off the move when it's being repeated for all items.
-        return this._viewContainerRef.createEmbeddedView(this._template, {
-            $implicit: null,
-            // It's guaranteed that the iterable is not "undefined" or "null" because we only
-            // generate views for elements if the "cdkVirtualForOf" iterable has elements.
-            cdkVirtualForOf: this._cdkVirtualForOf,
-            index: -1,
-            count: -1,
-            first: false,
-            last: false,
-            odd: false,
-            even: false
-        }, index);
-    }
-    /** Inserts a recycled view from the cache at the given index. */
-    _insertViewFromCache(index) {
-        const cachedView = this._templateCache.pop();
-        if (cachedView) {
-            this._viewContainerRef.insert(cachedView, index);
-        }
-        return cachedView || null;
-    }
-    /** Detaches the embedded view at the given index. */
-    _detachView(index) {
-        return this._viewContainerRef.detach(index);
+        return {
+            templateRef: this._template,
+            context: {
+                $implicit: record.item,
+                // It's guaranteed that the iterable is not "undefined" or "null" because we only
+                // generate views for elements if the "cdkVirtualForOf" iterable has elements.
+                cdkVirtualForOf: this._cdkVirtualForOf,
+                index: -1,
+                count: -1,
+                first: false,
+                last: false,
+                odd: false,
+                even: false
+            },
+            index,
+        };
     }
 }
-CdkVirtualForOf.ɵfac = function CdkVirtualForOf_Factory(t) { return new (t || CdkVirtualForOf)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ViewContainerRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.TemplateRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.IterableDiffers), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](CdkVirtualScrollViewport, 4), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone)); };
-CdkVirtualForOf.ɵdir = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineDirective"]({ type: CdkVirtualForOf, selectors: [["", "cdkVirtualFor", "", "cdkVirtualForOf", ""]], inputs: { cdkVirtualForTemplateCacheSize: "cdkVirtualForTemplateCacheSize", cdkVirtualForOf: "cdkVirtualForOf", cdkVirtualForTrackBy: "cdkVirtualForTrackBy", cdkVirtualForTemplate: "cdkVirtualForTemplate" } });
+CdkVirtualForOf.ɵfac = function CdkVirtualForOf_Factory(t) { return new (t || CdkVirtualForOf)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ViewContainerRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.TemplateRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.IterableDiffers), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._VIEW_REPEATER_STRATEGY), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](CdkVirtualScrollViewport, 4), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone)); };
+CdkVirtualForOf.ɵdir = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineDirective"]({ type: CdkVirtualForOf, selectors: [["", "cdkVirtualFor", "", "cdkVirtualForOf", ""]], inputs: { cdkVirtualForOf: "cdkVirtualForOf", cdkVirtualForTrackBy: "cdkVirtualForTrackBy", cdkVirtualForTemplate: "cdkVirtualForTemplate", cdkVirtualForTemplateCacheSize: "cdkVirtualForTemplateCacheSize" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵProvidersFeature"]([
+            { provide: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._VIEW_REPEATER_STRATEGY, useClass: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._RecycleViewRepeaterStrategy },
+        ])] });
 CdkVirtualForOf.ctorParameters = () => [
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ViewContainerRef },
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.TemplateRef },
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.IterableDiffers },
+    { type: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._RecycleViewRepeaterStrategy, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject, args: [_angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._VIEW_REPEATER_STRATEGY,] }] },
     { type: CdkVirtualScrollViewport, decorators: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.SkipSelf }] },
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone }
 ];
@@ -6583,17 +6760,23 @@ CdkVirtualForOf.propDecorators = {
 (function () { (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](CdkVirtualForOf, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Directive,
         args: [{
-                selector: '[cdkVirtualFor][cdkVirtualForOf]'
+                selector: '[cdkVirtualFor][cdkVirtualForOf]',
+                providers: [
+                    { provide: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._VIEW_REPEATER_STRATEGY, useClass: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._RecycleViewRepeaterStrategy },
+                ]
             }]
-    }], function () { return [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ViewContainerRef }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.TemplateRef }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.IterableDiffers }, { type: CdkVirtualScrollViewport, decorators: [{
+    }], function () { return [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ViewContainerRef }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.TemplateRef }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.IterableDiffers }, { type: _angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._RecycleViewRepeaterStrategy, decorators: [{
+                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Inject,
+                args: [_angular_cdk_collections__WEBPACK_IMPORTED_MODULE_20__._VIEW_REPEATER_STRATEGY]
+            }] }, { type: CdkVirtualScrollViewport, decorators: [{
                 type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.SkipSelf
-            }] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone }]; }, { cdkVirtualForTemplateCacheSize: [{
-            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
-        }], cdkVirtualForOf: [{
+            }] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone }]; }, { cdkVirtualForOf: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
         }], cdkVirtualForTrackBy: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
         }], cdkVirtualForTemplate: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+        }], cdkVirtualForTemplateCacheSize: [{
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
         }] }); })();
 
@@ -66068,7 +66251,14 @@ function innerSubscribe(result, innerSubscriber) {
     if (result instanceof _Observable__WEBPACK_IMPORTED_MODULE_1__.Observable) {
         return result.subscribe(innerSubscriber);
     }
-    return (0,_util_subscribeTo__WEBPACK_IMPORTED_MODULE_2__.subscribeTo)(result)(innerSubscriber);
+    let subscription;
+    try {
+        subscription = (0,_util_subscribeTo__WEBPACK_IMPORTED_MODULE_2__.subscribeTo)(result)(innerSubscriber);
+    }
+    catch (error) {
+        innerSubscriber.error(error);
+    }
+    return subscription;
 }
 
 
@@ -67873,12 +68063,12 @@ function shareReplay(configOrBufferSize, windowTime, scheduler) {
             bufferSize: configOrBufferSize,
             windowTime,
             refCount: false,
-            scheduler
+            scheduler,
         };
     }
     return (source) => source.lift(shareReplayOperator(config));
 }
-function shareReplayOperator({ bufferSize = Number.POSITIVE_INFINITY, windowTime = Number.POSITIVE_INFINITY, refCount: useRefCount, scheduler }) {
+function shareReplayOperator({ bufferSize = Number.POSITIVE_INFINITY, windowTime = Number.POSITIVE_INFINITY, refCount: useRefCount, scheduler, }) {
     let subject;
     let refCount = 0;
     let subscription;
@@ -67892,7 +68082,9 @@ function shareReplayOperator({ bufferSize = Number.POSITIVE_INFINITY, windowTime
             subject = new _ReplaySubject__WEBPACK_IMPORTED_MODULE_0__.ReplaySubject(bufferSize, windowTime, scheduler);
             innerSub = subject.subscribe(this);
             subscription = source.subscribe({
-                next(value) { subject.next(value); },
+                next(value) {
+                    subject.next(value);
+                },
                 error(err) {
                     hasError = true;
                     subject.error(err);
@@ -67903,6 +68095,9 @@ function shareReplayOperator({ bufferSize = Number.POSITIVE_INFINITY, windowTime
                     subject.complete();
                 },
             });
+            if (isComplete) {
+                subscription = undefined;
+            }
         }
         else {
             innerSub = subject.subscribe(this);
@@ -67910,6 +68105,7 @@ function shareReplayOperator({ bufferSize = Number.POSITIVE_INFINITY, windowTime
         this.add(() => {
             refCount--;
             innerSub.unsubscribe();
+            innerSub = undefined;
             if (subscription && !isComplete && useRefCount && refCount === 0) {
                 subscription.unsubscribe();
                 subscription = undefined;
