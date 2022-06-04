@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Movie } from "../interfaces/movie";
-import {ActivatedRoute} from "@angular/router";
-import {MoviesService} from "../movies.service";
-import {switchMap, take} from "rxjs/operators";
-import {PanelBackgroundService} from "../../panel/panel-background/panel-background.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MoviesService } from "../movies.service";
+import { switchMap, take } from "rxjs/operators";
+import { PanelBackgroundService } from "../../panel/panel-background/panel-background.service";
 
 @Component({
   selector: 'vestibule-movie-details',
@@ -13,8 +13,13 @@ import {PanelBackgroundService} from "../../panel/panel-background/panel-backgro
 export class MovieDetailsComponent implements OnInit {
   movie: Movie
   primaryColor: string;
+  loading = false
 
-  constructor(private route: ActivatedRoute, private moviesService: MoviesService, private panelBackgroundService: PanelBackgroundService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private moviesService: MoviesService,
+    private panelBackgroundService: PanelBackgroundService) { }
 
   ngOnInit(): void {
     this.route.params.pipe(take(1), switchMap(params => {
@@ -27,4 +32,27 @@ export class MovieDetailsComponent implements OnInit {
     })
   }
 
+  updateInfo(): void {
+    if (this.loading) {
+      return
+    }
+
+    this.loading = true
+    this.moviesService.updateMovieInfo(this.movie.tmdb_id).subscribe(movie => {
+      this.loading = false
+      this.movie = movie
+    })
+  }
+
+  unsubscribe(): void {
+    if (this.loading) {
+      return
+    }
+
+    this.loading = true
+    this.moviesService.unsubscribeFromMovie(this.movie.tmdb_id).subscribe(() => {
+      this.loading = false
+      this.router.navigate(['/movies'])
+    })
+  }
 }

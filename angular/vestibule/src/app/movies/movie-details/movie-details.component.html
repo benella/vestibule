@@ -2,37 +2,48 @@
   <div class="wrapper">
     <div class="header">
       <div class="content">
-        <p class="header-title">{{ movie.title }}</p>
-        <div class="header-divider" style="background-color: {{primaryColor}}"></div>
-        <p class="status">{{ movie.status }}</p>
-        <p class="release-date">{{ movie.release_date_text }}</p>
+        <div class="header-content">
+          <p class="header-title">{{ movie.title }}</p>
+          <div class="header-divider" style="background-color: {{primaryColor}}"></div>
+          <p class="status">{{ movie.status }}</p>
+          <p class="release-date">{{ movie.release_date_text }}</p>
+        </div>
+        <vestibule-loading-line *ngIf="loading"></vestibule-loading-line>
       </div>
     </div>
 
     <div class="main">
-      <div class="data">
-        <div class="poster-wrap">
-          <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
-        </div>
-        <div class="details">
-          <ng-container *ngIf="movie.crew?.directors">
-            <div class="crew-position">
-              <p class="job">Directed By</p>
-              <p *ngFor="let director of movie.crew.directors" class="name">{{ director }}</p>
+      <div class="top">
+        <div class="data">
+          <div class="poster-wrap">
+            <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+          </div>
+          <div class="meta">
+            <div class="details">
+              <ng-container *ngIf="movie.crew?.directors">
+                <div class="crew-position">
+                  <p class="job">Directed By</p>
+                  <p *ngFor="let director of movie.crew.directors" class="name">{{ director }}</p>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="movie.runtime_text">
+                <div class="crew-position">
+                  <p class="job">Runtime</p>
+                  <p class="name">{{ movie.runtime_text }}</p>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="movie.crew?.production">
+                <div class="crew-position">
+                  <p class="job">Studio</p>
+                  <p *ngFor="let production of movie.crew.production" class="name">{{ production }}</p>
+                </div>
+              </ng-container>
             </div>
-          </ng-container>
-          <ng-container *ngIf="movie.runtime_text">
-            <div class="crew-position">
-              <p class="job">Runtime</p>
-              <p class="name">{{ movie.runtime_text }}</p>
+            <div class="actions">
+              <button (click)="updateInfo()">Update Info</button>
+              <button class="danger" (click)="unsubscribe()">Unsubscribe</button>
             </div>
-          </ng-container>
-          <ng-container *ngIf="movie.crew?.production">
-            <div class="crew-position">
-              <p class="job">Studio</p>
-              <p *ngFor="let production of movie.crew.production" class="name">{{ production }}</p>
-            </div>
-          </ng-container>
+          </div>
         </div>
       </div>
     </div>

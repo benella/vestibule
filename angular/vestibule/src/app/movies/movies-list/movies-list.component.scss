@@ -7,19 +7,8 @@
 .header {
   justify-content: space-between;
 
-  .actions {
-    border-radius: 0.2rem 0 0 0.2rem;
-  }
-
-  .add-movie-button {
-    display: flex;
-    align-items: center;
-    background: none;
-    border: none;
-
-    img {
-      height: 1.5rem;
-    }
+  .content {
+    padding-right: 2rem;
   }
 }
 

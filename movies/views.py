@@ -3,6 +3,7 @@ from rest_framework import generics
 from common.tmdb_client import TheMovieDBVestibuleClient
 from django.http import JsonResponse
 from common import DEFAULT_EMPTY_POSTER
+from rest_framework.response import Response
 
 from .models import Movie
 from .serializers import MovieListItemSerializer, MovieDetailsSerializer, MovieCreateSerializer
@@ -20,6 +21,18 @@ class MovieRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieDetailsSerializer
     lookup_field = "tmdb_id"
+
+
+class MovieUpdateInfo(generics.RetrieveAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieDetailsSerializer
+    lookup_field = "tmdb_id"
+
+    def retrieve(self, request, *args, **kwargs):
+        movie = self.get_object()
+        movie.save()
+        serializer = self.get_serializer(movie)
+        return Response(serializer.data)
 
 
 class MovieSubscribe(generics.CreateAPIView):

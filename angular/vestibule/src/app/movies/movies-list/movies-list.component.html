@@ -2,6 +2,7 @@
   <div class="header">
     <div class="content">
       <input class="filter" placeholder="Search Movies" [formControl]="filter" type="text">
+      <vestibule-loading-line *ngIf="searching"></vestibule-loading-line>
     </div>
   </div>
 
@@ -21,8 +22,6 @@
         </div>
       </a>
     </div>
-
-    <vestibule-loading-line *ngIf="searching"></vestibule-loading-line>
 
     <div class="movie-list">
       <div [@fadeInOutAnimation]

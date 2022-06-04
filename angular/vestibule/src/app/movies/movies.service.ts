@@ -5,6 +5,7 @@ import { MovieInList, Movie } from "./interfaces/movie";
 import { MoviesRepository } from "./movies.repository";
 import { map, tap } from "rxjs/operators";
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -32,5 +33,9 @@ export class MoviesService {
 
   unsubscribeFromMovie(tmdb_id: string): Observable<any> {
     return this.http.delete<any>(`api/movies/${tmdb_id}`)
+  }
+
+  updateMovieInfo(tmdb_id: string): Observable<Movie> {
+    return this.http.get<Movie>(`api/movies/update_info/${tmdb_id}`)
   }
 }
