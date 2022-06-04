@@ -1,21 +1,43 @@
-<section id="movies-status-list">
+<section class="movies-status-list">
   <div class="header">
-<!--    <input type="text">-->
+    <div class="content">
+      <input class="filter" placeholder="Search Movies" [formControl]="filter" type="text">
+    </div>
   </div>
 
-  <div class="movie-list">
-    <a *ngFor="let movie of movies" class="movie" (mouseenter)="movieHover(movie)" [routerLink]="['/movie', movie.tmdb_id]">
-      <div class="poster-wrap">
-        <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
-      </div>
-      <div class="data">
-        <p class="title">{{ movie.title }}</p>
-        <vestibule-poster-strip [width]="'6rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
-        <p class="release-date">{{ movie.release_date_text }}</p>
-        <div class="release-data">
-          <p class="status">{{ movie.status }}</p>
+  <div class="lists">
+    <div class="movie-list">
+      <a *ngFor="let movie of movies$ | async" class="movie" (mouseenter)="movieHover(movie)" [routerLink]="['/movie', movie.tmdb_id]">
+        <div class="poster-wrap">
+          <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+        </div>
+        <div class="data">
+          <p class="title">{{ movie.title }}</p>
+          <vestibule-poster-strip [width]="'6rem'" [palette]="movie.palette_list"></vestibule-poster-strip>
+          <p class="release-date">{{ movie.release_date_text }}</p>
+          <div class="release-data">
+            <p class="status">{{ movie.status }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div *ngIf="searching" class="searching"><span>Searching New Movies</span></div>
+
+    <div class="movie-list">
+      <div *ngFor="let movie of unsubscribedMovies$ | async" class="movie unsubscribed" (mouseenter)="movieHover(movie)">
+        <div class="poster-wrap">
+          <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
+        </div>
+        <div class="data">
+          <p class="title">{{ movie.title }}</p>
+          <div class="unsubscribed-poster-strip"></div>
+          <p class="release-date">{{ movie.release_date_text }}</p>
+          <div class="subscribe" (click)="addMovie(movie)">
+            <p class="action">{{ subscribing ? 'Subscribing' : 'Subscribe'}}</p>
+          </div>
         </div>
       </div>
-    </a>
+    </div>
   </div>
 </section>

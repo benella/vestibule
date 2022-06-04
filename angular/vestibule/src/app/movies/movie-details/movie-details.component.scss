@@ -1,5 +1,9 @@
 @import "../../../styling/variables";
 
+.wrapper {
+  margin-right: 4rem;
+}
+
 .header {
   .status {
     color: $unselected-dark;

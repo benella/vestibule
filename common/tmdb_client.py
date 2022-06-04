@@ -72,26 +72,14 @@ class TheMovieDBVestibuleClient:
 
     # Movies
 
-    def get_movie_imdb_id(self, tmdb_id: int) -> str:
-        try:
-            return self.client.Movies(tmdb_id).external_ids().get('imdb_id', '').replace('tt', '')
-        except (requests.exceptions.HTTPError, AttributeError):
-            return ''
-
-    def search_movie(self, term) -> List[Tuple[str, dict]]:
-        results = []
-
+    def search_movie(self, term) -> List[dict]:
         try:
             movies = self.search.movie(query=term).get('results', [])
             movies.sort(key=lambda s: s.get('popularity'), reverse=True)
-            results = [
-                (self.get_movie_imdb_id(movie.get('id')),
-                 self.get_movie_data(movie.get('id')))
-                for movie in movies]
+            return movies
         except ConnectionRefusedError as e:
             print("Failed connecting to TMDB: ", e)
-
-        return results
+            return []
 
     def get_movie_data(self, tmdb_id: int) -> dict:
         try:

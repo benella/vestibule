@@ -1,17 +1,55 @@
 @import "../../../styling/variables";
 
+.movies-status-list {
+  margin-right: 4rem;
+}
+
+.header {
+  justify-content: space-between;
+
+  .actions {
+    border-radius: 0.2rem 0 0 0.2rem;
+  }
+
+  .add-movie-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+
+    img {
+      height: 1.5rem;
+    }
+  }
+}
+
+.filter {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.3em;
+  font-weight: 400;
+  line-height: 1.8rem;
+  width: 100%;
+}
+
+.lists {
+  margin-top: 2rem;
+  height: 75vh;
+  padding-bottom: 4rem;
+  overflow: auto;
+}
+
 .movie-list {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 2rem;
-  overflow: auto;
-  height: 95vh;
-  padding-bottom: 4rem;
+  column-gap: 4rem;
 }
 
 .movie {
-  margin: 0 5rem 4rem 0;
+  margin-bottom: 4rem;
   width: 21rem;
+  height: 13.5rem;
   display: flex;
   flex-direction: row;
   cursor: pointer;
@@ -21,53 +59,113 @@
       background-color: $light-text;
     }
   }
-}
 
-.poster-wrap {
-  transition: background-color 0.1s linear;
-  position: relative;
-  border-radius: 0.2rem;
-
-  .poster {
-    width: 9rem;
-    height: 13.5rem;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    border-radius: 0.2rem 0 0 0.2rem;
-  }
-}
-
-.data {
-  padding: 1rem;
-  position: relative;
-  flex: 1;
-  background-color: $transparent-light-2;
-  border-radius: 0 0.2rem 0.2rem 0;
-  transition: 0.3s ease-in-out;
-}
-
-.title {
-  margin-bottom: 1rem;
-}
-
-.release-date {
-  font-weight: 200;
-  margin-top: 1rem;
-}
-
-.release-data {
-  bottom: 1rem;
-  position: absolute;
-
-  .status {
-    color: $unselected-dark;
-    border: 1px solid;
+  .poster-wrap {
+    transition: background-color 0.1s linear;
+    position: relative;
     border-radius: 0.2rem;
-    width: fit-content;
-    padding: 0.2rem 0.5rem 0.25rem;
-    line-height: 1rem;
-    font-weight: 300;
+
+    .poster {
+      width: 9rem;
+      height: 13.5rem;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      border-radius: 0.2rem 0 0 0.2rem;
+    }
   }
+
+  .data {
+    padding: 1rem;
+    position: relative;
+    flex: 1;
+    background-color: $transparent-light-2;
+    border-radius: 0 0.2rem 0.2rem 0;
+    transition: 0.3s ease-in-out;
+  }
+
+  .title {
+    margin-bottom: 1rem;
+  }
+
+  .release-date {
+    font-weight: 200;
+    margin-top: 1rem;
+  }
+
+  .release-data {
+    bottom: 1rem;
+    position: absolute;
+
+    .status {
+      color: $unselected-dark;
+      border: 1px solid;
+      border-radius: 0.2rem;
+      width: fit-content;
+      padding: 0.2rem 0.5rem 0.25rem;
+      line-height: 1rem;
+      font-weight: 300;
+    }
+  }
+
+  &.unsubscribed {
+    cursor: default;
+
+    &:hover {
+      .data {
+        background-color: $transparent-light-2;
+
+        .subscribe {
+          background-color: $torrent-green-hover;
+        }
+      }
+    }
+
+    .data {
+      background-color: #c9cac6;
+      //background-color: #c1c1c1;
+
+      .title, .release-date {
+        //color: white;
+      }
+
+      .subscribe {
+        transition: 0.3s;
+        width: fit-content;
+        background-color: #758e7c;
+        position: absolute;
+        bottom: 1rem;
+        height: 1.5rem;
+        border-radius: 0.2rem;
+        cursor: pointer;
+
+        .action {
+          width: fit-content;
+          padding: 0.2rem 0.5rem 0.25rem;
+          line-height: 1rem;
+          font-weight: 400;
+          color: $main-color;
+        }
+      }
+    }
+
+    .unsubscribed-poster-strip {
+      width: 6rem;
+      height: 3px;
+      background-color: $main-color;
+    }
+  }
+}
+
+
+
+.searching {
+  height: 8rem;
+  width: 8rem;
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 

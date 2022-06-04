@@ -64827,6 +64827,1661 @@ const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.Version('12.2.16'
 
 /***/ }),
 
+/***/ 9001:
+/*!********************************************************!*\
+  !*** ./node_modules/@ngneat/elf-entities/index.esm.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "EntitiesRef": () => (/* binding */ EntitiesRef),
+/* harmony export */   "UIEntitiesRef": () => (/* binding */ UIEntitiesRef),
+/* harmony export */   "addActiveIds": () => (/* binding */ addActiveIds),
+/* harmony export */   "addEntities": () => (/* binding */ addEntities),
+/* harmony export */   "addEntitiesFifo": () => (/* binding */ addEntitiesFifo),
+/* harmony export */   "deleteAllEntities": () => (/* binding */ deleteAllEntities),
+/* harmony export */   "deleteEntities": () => (/* binding */ deleteEntities),
+/* harmony export */   "deleteEntitiesByPredicate": () => (/* binding */ deleteEntitiesByPredicate),
+/* harmony export */   "entitiesPropsFactory": () => (/* binding */ entitiesPropsFactory),
+/* harmony export */   "getActiveEntities": () => (/* binding */ getActiveEntities),
+/* harmony export */   "getActiveEntity": () => (/* binding */ getActiveEntity),
+/* harmony export */   "getActiveId": () => (/* binding */ getActiveId),
+/* harmony export */   "getActiveIds": () => (/* binding */ getActiveIds),
+/* harmony export */   "getAllEntities": () => (/* binding */ getAllEntities),
+/* harmony export */   "getAllEntitiesApply": () => (/* binding */ getAllEntitiesApply),
+/* harmony export */   "getEntitiesCount": () => (/* binding */ getEntitiesCount),
+/* harmony export */   "getEntitiesCountByPredicate": () => (/* binding */ getEntitiesCountByPredicate),
+/* harmony export */   "getEntitiesIds": () => (/* binding */ getEntitiesIds),
+/* harmony export */   "getEntity": () => (/* binding */ getEntity$1),
+/* harmony export */   "hasEntity": () => (/* binding */ hasEntity),
+/* harmony export */   "removeActiveIds": () => (/* binding */ removeActiveIds),
+/* harmony export */   "resetActiveId": () => (/* binding */ resetActiveId),
+/* harmony export */   "resetActiveIds": () => (/* binding */ resetActiveIds),
+/* harmony export */   "selectActiveEntities": () => (/* binding */ selectActiveEntities),
+/* harmony export */   "selectActiveEntity": () => (/* binding */ selectActiveEntity),
+/* harmony export */   "selectActiveId": () => (/* binding */ selectActiveId),
+/* harmony export */   "selectActiveIds": () => (/* binding */ selectActiveIds),
+/* harmony export */   "selectAllEntities": () => (/* binding */ selectAllEntities),
+/* harmony export */   "selectAllEntitiesApply": () => (/* binding */ selectAllEntitiesApply),
+/* harmony export */   "selectEntities": () => (/* binding */ selectEntities),
+/* harmony export */   "selectEntitiesCount": () => (/* binding */ selectEntitiesCount),
+/* harmony export */   "selectEntitiesCountByPredicate": () => (/* binding */ selectEntitiesCountByPredicate),
+/* harmony export */   "selectEntity": () => (/* binding */ selectEntity),
+/* harmony export */   "selectEntityByPredicate": () => (/* binding */ selectEntityByPredicate),
+/* harmony export */   "selectFirst": () => (/* binding */ selectFirst),
+/* harmony export */   "selectLast": () => (/* binding */ selectLast),
+/* harmony export */   "selectMany": () => (/* binding */ selectMany),
+/* harmony export */   "selectManyByPredicate": () => (/* binding */ selectManyByPredicate),
+/* harmony export */   "setActiveId": () => (/* binding */ setActiveId),
+/* harmony export */   "setActiveIds": () => (/* binding */ setActiveIds),
+/* harmony export */   "setEntities": () => (/* binding */ setEntities),
+/* harmony export */   "setEntitiesMap": () => (/* binding */ setEntitiesMap),
+/* harmony export */   "toggleActiveIds": () => (/* binding */ toggleActiveIds),
+/* harmony export */   "unionEntities": () => (/* binding */ unionEntities),
+/* harmony export */   "unionEntitiesAsMap": () => (/* binding */ unionEntitiesAsMap),
+/* harmony export */   "updateAllEntities": () => (/* binding */ updateAllEntities),
+/* harmony export */   "updateEntities": () => (/* binding */ updateEntities),
+/* harmony export */   "updateEntitiesByPredicate": () => (/* binding */ updateEntitiesByPredicate),
+/* harmony export */   "updateEntitiesIds": () => (/* binding */ updateEntitiesIds),
+/* harmony export */   "upsertEntities": () => (/* binding */ upsertEntities),
+/* harmony export */   "upsertEntitiesById": () => (/* binding */ upsertEntitiesById),
+/* harmony export */   "withActiveId": () => (/* binding */ withActiveId),
+/* harmony export */   "withActiveIds": () => (/* binding */ withActiveIds),
+/* harmony export */   "withEntities": () => (/* binding */ withEntities),
+/* harmony export */   "withUIEntities": () => (/* binding */ withUIEntities)
+/* harmony export */ });
+/* harmony import */ var _ngneat_elf__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @ngneat/elf */ 2435);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 9763);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ 3720);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ 3927);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ 9902);
+
+
+
+
+function buildEntities(entities, idKey) {
+  const asObject = {};
+  const ids = [];
+
+  for (const entity of entities) {
+    const id = entity[idKey];
+    ids.push(id);
+    asObject[id] = entity;
+  }
+
+  return {
+    ids,
+    asObject
+  };
+}
+function findIdsByPredicate(state, ref, predicate) {
+  const {
+    idsKey,
+    entitiesKey
+  } = ref;
+  const entities = state[entitiesKey];
+  return state[idsKey].filter(id => predicate(entities[id]));
+}
+function findEntityByPredicate(state, ref, predicate) {
+  const {
+    idsKey,
+    entitiesKey
+  } = ref;
+  const entities = state[entitiesKey];
+  const id = state[idsKey].find(id => {
+    return predicate(entities[id]);
+  });
+  return entities[id];
+}
+function checkPluck(entity, pluck) {
+  if (entity && pluck) {
+    return (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isFunction)(pluck) ? pluck(entity) : entity[pluck];
+  } else {
+    return entity;
+  }
+}
+
+function getIdKey(context, ref) {
+  return context.config[ref.idKeyRef];
+}
+class EntitiesRef {
+  constructor(config) {
+    this.idKeyRef = 'idKey';
+    this.entitiesKey = config.entitiesKey;
+    this.idsKey = config.idsKey;
+    this.idKeyRef = config.idKeyRef;
+  }
+
+}
+function entitiesPropsFactory(feature) {
+  const idKeyRef = feature ? `idKey${(0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.capitalize)(feature)}` : 'idKey';
+  const ref = new EntitiesRef({
+    entitiesKey: feature ? `${feature}Entities` : 'entities',
+    idsKey: feature ? `${feature}Ids` : 'ids',
+    idKeyRef: idKeyRef
+  });
+
+  function propsFactory(config) {
+    let entities = {};
+    let ids = [];
+    const idKey = (config == null ? void 0 : config.idKey) || 'id';
+
+    if (config != null && config.initialValue) {
+      ({
+        ids,
+        asObject: entities
+      } = buildEntities(config.initialValue, idKey));
+    }
+
+    return {
+      props: {
+        [ref.entitiesKey]: entities,
+        [ref.idsKey]: ids
+      },
+      config: {
+        [idKeyRef]: idKey
+      }
+    };
+  }
+
+  return {
+    [`${feature}EntitiesRef`]: ref,
+    [`with${(0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.capitalize)(feature)}Entities`]: propsFactory
+  };
+}
+const {
+  withEntities,
+  EntitiesRef: defaultEntitiesRef
+} = entitiesPropsFactory('');
+const {
+  UIEntitiesRef,
+  withUIEntities
+} = entitiesPropsFactory('UI');
+
+/**
+ *
+ * Remove entities
+ *
+ * @example
+ *
+ * store.update(deleteEntities(1))
+ *
+ * store.update(deleteEntities([1, 2, 3])
+ *
+ */
+
+function deleteEntities(ids, options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        idsKey,
+        entitiesKey
+      } = defaultEntitiesRef
+    } = options;
+    const idsToRemove = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(ids);
+    const newEntities = Object.assign({}, state[entitiesKey]);
+    const newIds = state[idsKey].filter(id => !idsToRemove.includes(id));
+
+    for (const id of idsToRemove) {
+      Reflect.deleteProperty(newEntities, id);
+    }
+
+    return Object.assign({}, state, {
+      [entitiesKey]: newEntities,
+      [idsKey]: newIds
+    });
+  };
+}
+/**
+ *
+ * Remove entities by predicate
+ *
+ * @example
+ *
+ * store.update(deleteEntitiesByPredicate(entity => entity.count === 0))
+ *
+ */
+
+function deleteEntitiesByPredicate(predicate, options = {}) {
+  return function reducer(state, context) {
+    const ids = findIdsByPredicate(state, options.ref || defaultEntitiesRef, predicate);
+
+    if (ids.length) {
+      return deleteEntities(ids, options)(state, context);
+    }
+
+    return state;
+  };
+}
+/**
+ *
+ * Remove all entities
+ *
+ * @example
+ *
+ * store.update(deleteAllEntities())
+ *
+ */
+
+function deleteAllEntities(options = {}) {
+  return function reducer(state) {
+    const {
+      ref: {
+        idsKey,
+        entitiesKey
+      } = defaultEntitiesRef
+    } = options;
+    return Object.assign({}, state, {
+      [entitiesKey]: {},
+      [idsKey]: []
+    });
+  };
+}
+
+/**
+ *
+ * Add entities
+ *
+ * @example
+ *
+ * store.update(addEntities(entity))
+ *
+ * store.update(addEntities([entity, entity]))
+ *
+ * store.update(addEntities([entity, entity]), { prepend: true })
+ *
+ */
+
+function addEntities(entities, options = {}) {
+  return function (state, context) {
+    const {
+      prepend = false,
+      ref = defaultEntitiesRef
+    } = options;
+    const {
+      entitiesKey,
+      idsKey
+    } = ref;
+    const idKey = getIdKey(context, ref);
+    const asArray = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(entities);
+    if (!asArray.length) return state;
+
+    if ((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isDev)()) {
+      throwIfEntityExists(asArray, idKey, state, entitiesKey);
+      throwIfDuplicateIdKey(asArray, idKey);
+    }
+
+    const {
+      ids,
+      asObject
+    } = buildEntities(asArray, idKey);
+    return Object.assign({}, state, {
+      [entitiesKey]: Object.assign({}, state[entitiesKey], asObject),
+      [idsKey]: prepend ? [...ids, ...state[idsKey]] : [...state[idsKey], ...ids]
+    });
+  };
+}
+/**
+ *
+ * Add entities using fifo
+ *
+ * @example
+ *
+ *
+ * store.update(addEntitiesFifo([entity, entity]), { limit: 3 })
+ *
+ */
+
+function addEntitiesFifo(entities, options) {
+  return function (state, context) {
+    const {
+      ref = defaultEntitiesRef,
+      limit
+    } = options;
+    const {
+      entitiesKey,
+      idsKey
+    } = ref;
+    const currentIds = state[idsKey];
+    let normalizedEntities = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(entities);
+    let newState = state;
+
+    if (normalizedEntities.length > limit) {
+      // Remove new entities that pass the limit
+      normalizedEntities = normalizedEntities.slice(normalizedEntities.length - limit);
+    }
+
+    const total = currentIds.length + normalizedEntities.length; // Remove exiting entities that passes the limit
+
+    if (total > limit) {
+      const idsRemove = currentIds.slice(0, total - limit);
+      newState = deleteEntities(idsRemove)(state, context);
+    }
+
+    const {
+      ids,
+      asObject
+    } = buildEntities(normalizedEntities, getIdKey(context, ref));
+    return Object.assign({}, state, {
+      [entitiesKey]: Object.assign({}, newState[entitiesKey], asObject),
+      [idsKey]: [...newState[idsKey], ...ids]
+    });
+  };
+}
+
+function throwIfEntityExists(entities, idKey, state, entitiesKey) {
+  entities.forEach(entity => {
+    const id = entity[idKey];
+
+    if (state[entitiesKey][id]) {
+      throw Error(`Entity already exists. ${idKey} ${id}`);
+    }
+  });
+}
+
+function throwIfDuplicateIdKey(entities, idKey) {
+  const check = new Set();
+  entities.forEach(entity => {
+    const id = entity[idKey];
+
+    if (check.has(id)) {
+      throw Error(`Duplicate entity id provided. ${idKey} ${id}`);
+    }
+
+    check.add(id);
+  });
+}
+
+/**
+ *
+ * Set entities
+ *
+ * @example
+ *
+ * store.update(setEntities([entity, entity]))
+ *
+ */
+
+function setEntities(entities, options = {}) {
+  return function (state, context) {
+    const {
+      ref = defaultEntitiesRef
+    } = options;
+    const {
+      entitiesKey,
+      idsKey
+    } = ref;
+    const {
+      ids,
+      asObject
+    } = buildEntities(entities, getIdKey(context, ref));
+    return Object.assign({}, state, {
+      [entitiesKey]: asObject,
+      [idsKey]: ids
+    });
+  };
+}
+function setEntitiesMap(entities, options = {}) {
+  return setEntities(Object.values(entities), options);
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+/**
+ *
+ * Get the entities collection
+ *
+ * @example
+ *
+ * store.query(getAllEntities())
+ *
+ */
+
+function getAllEntities(options = {}) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef
+  } = options;
+  return function (state) {
+    return state[idsKey].map(id => state[entitiesKey][id]);
+  };
+}
+/**
+ *
+ * Get the entities and apply filter/map
+ *
+ * @example
+ *
+ * store.query(getAllEntitiesApply())
+ *
+ */
+
+function getAllEntitiesApply(options) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef,
+    filterEntity = () => true,
+    mapEntity = e => e
+  } = options;
+  return function (state) {
+    const result = [];
+
+    for (const id of state[idsKey]) {
+      const entity = state[entitiesKey][id];
+
+      if (filterEntity(entity)) {
+        result.push(mapEntity(entity));
+      }
+    }
+
+    return result;
+  };
+}
+/**
+ *
+ * Get an entity
+ *
+ * @example
+ *
+ * store.query(getEntity(1))
+ *
+ */
+
+function getEntity$1(id, options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        entitiesKey
+      } = defaultEntitiesRef
+    } = options;
+    return state[entitiesKey][id];
+  };
+}
+/**
+ *
+ * Check whether the entity exist
+ *
+ * @example
+ *
+ * store.query(hasEntity(1))
+ *
+ */
+
+function hasEntity(id, options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        entitiesKey
+      } = defaultEntitiesRef
+    } = options;
+    return Reflect.has(state[entitiesKey], id);
+  };
+}
+/**
+ *
+ * Get the entities ids
+ *
+ * @example
+ *
+ * store.query(getEntitiesIds())
+ *
+ */
+
+function getEntitiesIds(options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        idsKey
+      } = defaultEntitiesRef
+    } = options;
+    return state[idsKey];
+  };
+}
+
+const _excluded = ["updater", "creator"];
+
+function toModel(updater, entity) {
+  if ((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isFunction)(updater)) {
+    return updater(entity);
+  }
+
+  return Object.assign({}, entity, updater);
+}
+/**
+ *
+ * Update entities
+ *
+ * @example
+ *
+ * store.update(updateEntities(id, { name }))
+ * store.update(updateEntities(id, entity => ({ ...entity, name })))
+ * store.update(updateEntities([id, id, id], { open: true }))
+ *
+ */
+
+
+function updateEntities(ids, updater, options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        entitiesKey
+      } = defaultEntitiesRef
+    } = options;
+    const updatedEntities = {};
+
+    for (const id of (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(ids)) {
+      updatedEntities[id] = toModel(updater, state[entitiesKey][id]);
+    }
+
+    return Object.assign({}, state, {
+      [entitiesKey]: Object.assign({}, state[entitiesKey], updatedEntities)
+    });
+  };
+}
+/**
+ *
+ * Update entities by predicate
+ *
+ * @example
+ *
+ * store.update(updateEntitiesByPredicate(entity => entity.count === 0))
+ *
+ */
+
+function updateEntitiesByPredicate(predicate, updater, options = {}) {
+  return function (state, context) {
+    const ids = findIdsByPredicate(state, options.ref || defaultEntitiesRef, predicate);
+
+    if (ids.length) {
+      return updateEntities(ids, updater, options)(state, context);
+    }
+
+    return state;
+  };
+}
+/**
+ *
+ * Update all entities
+ *
+ * @example
+ *
+ * store.update(updateAllEntities({ name }))
+ * store.update(updateAllEntities(entity => ({ ...entity, name })))
+ *
+ */
+
+function updateAllEntities(updater, options = {}) {
+  return function (state, context) {
+    const {
+      ref: {
+        idsKey
+      } = defaultEntitiesRef
+    } = options;
+    return updateEntities(state[idsKey], updater, options)(state, context);
+  };
+}
+/**
+ *
+ * Update entities that exists, add those who don't
+ *
+ * @example
+ *
+ */
+
+function upsertEntitiesById(ids, _ref) {
+  let {
+    updater,
+    creator
+  } = _ref,
+      options = _objectWithoutPropertiesLoose(_ref, _excluded);
+
+  return function (state, context) {
+    const updatedEntitiesIds = [];
+    const newEntities = [];
+    const asArray = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(ids);
+    if (!asArray.length) return state;
+
+    for (const id of asArray) {
+      if (hasEntity(id, options)(state)) {
+        updatedEntitiesIds.push(id);
+      } else {
+        let newEntity = creator(id);
+
+        if (options.mergeUpdaterWithCreator) {
+          newEntity = toModel(updater, newEntity);
+        }
+
+        newEntities.push(newEntity);
+      }
+    }
+
+    const newState = updateEntities(updatedEntitiesIds, updater, options)(state, context);
+    return addEntities(newEntities, options)(newState, context);
+  };
+}
+/**
+ *
+ * Merge entities that exists, add those who don't
+ * Make sure all entities have an id
+ *
+ * @example
+ *
+ * // single entity
+ * store.update(upsertEntities({ id: 1, completed: true }))
+ *
+ * // or multiple entities
+ * store.update(upsertEntities([{ id: 1, completed: true }, { id: 2, completed: true }]))
+ *
+ * // or using a custom ref
+ * store.update(upsertEntities([{ id: 1, open: true }], { ref: UIEntitiesRef }))
+ *
+ */
+
+function upsertEntities(entities, options = {}) {
+  return function (state, context) {
+    const {
+      prepend = false,
+      ref = defaultEntitiesRef
+    } = options;
+    const {
+      entitiesKey,
+      idsKey
+    } = ref;
+    const idKey = getIdKey(context, ref);
+    const asObject = {};
+    const ids = [];
+    const entitiesArray = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(entities);
+
+    if (!entitiesArray.length) {
+      return state;
+    }
+
+    for (const entity of entitiesArray) {
+      const id = entity[idKey]; // if entity exists, merge update, else add
+
+      if (hasEntity(id, options)(state)) {
+        asObject[id] = Object.assign({}, state[entitiesKey][id], entity);
+      } else {
+        ids.push(id);
+        asObject[id] = entity;
+      }
+    }
+
+    const updatedIds = !ids.length ? {} : {
+      [idsKey]: prepend ? [...ids, ...state[idsKey]] : [...state[idsKey], ...ids]
+    };
+    return Object.assign({}, state, updatedIds, {
+      [entitiesKey]: Object.assign({}, state[entitiesKey], asObject)
+    });
+  };
+}
+/**
+ * Update entities ids
+ *
+ * @example
+ *
+ * // Update a single entity id
+ * store.update(updateEntitiesIds(1, 2));
+ *
+ * // Update multiple entities ids
+ * store.update(updateEntitiesIds([1, 2], [10, 20]));
+ *
+ * // Update entity id using a custom ref
+ * store.update(updateEntitiesIds(1, 2, { ref: UIEntitiesRef }));
+ *
+ */
+
+function updateEntitiesIds(oldId, newId, options = {}) {
+  return function (state, context) {
+    const oldIds = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(oldId);
+    const newIds = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.coerceArray)(newId);
+
+    if (oldIds.length !== newIds.length) {
+      throw new Error('The number of old and new ids must be equal');
+    }
+
+    const {
+      ref = defaultEntitiesRef
+    } = options;
+    const idProp = getIdKey(context, ref);
+    const updatedEntities = Object.assign({}, state[ref.entitiesKey]);
+
+    for (let i = 0; i < oldIds.length; i++) {
+      const oldVal = oldIds[i];
+      const newVal = newIds[i];
+
+      if (state[ref.entitiesKey][newVal]) {
+        throw new Error(`Updating id "${oldVal}". The new id "${newVal}" already exists`);
+      }
+
+      const oldEntity = state[ref.entitiesKey][oldVal];
+      const updated = Object.assign({}, oldEntity, {
+        [idProp]: newVal
+      });
+      updatedEntities[newVal] = updated;
+      Reflect.deleteProperty(updatedEntities, oldVal);
+    }
+
+    const updatedStateIds = state[ref.idsKey].slice();
+    let processedIds = 0;
+
+    for (let i = 0; i < updatedStateIds.length; i++) {
+      const currentId = updatedStateIds[i];
+
+      for (let j = 0; j < oldIds.length; j++) {
+        const oldVal = oldIds[j];
+        const newVal = newIds[j];
+
+        if (currentId === oldVal) {
+          updatedStateIds[i] = newVal;
+          processedIds++;
+          break;
+        }
+      }
+
+      if (processedIds === oldIds.length) {
+        break;
+      }
+    }
+
+    return Object.assign({}, state, {
+      [ref.entitiesKey]: updatedEntities,
+      [ref.idsKey]: updatedStateIds
+    });
+  };
+}
+
+function untilEntitiesChanges(key) {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.distinctUntilChanged)((prev, current) => {
+    return prev[key] === current[key];
+  });
+}
+/**
+ *
+ * Observe entities
+ *
+ * @example
+ *
+ * store.pipe(selectAllEntities())
+ *
+ * store.pipe(selectAllEntities({ ref: UIEntitiesRef }))
+ *
+ */
+
+function selectAllEntities(options = {}) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef
+  } = options;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)(untilEntitiesChanges(entitiesKey), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(state => state[idsKey].map(id => state[entitiesKey][id])));
+}
+/**
+ *
+ * Observe entities object
+ *
+ * @example
+ *
+ * store.pipe(selectEntities())
+ *
+ * store.pipe(selectEntities({ ref: UIEntitiesRef }))
+ *
+ */
+
+function selectEntities(options = {}) {
+  const {
+    ref: {
+      entitiesKey
+    } = defaultEntitiesRef
+  } = options;
+  return (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => state[entitiesKey]);
+}
+/**
+ *
+ * Observe entities and apply filter/map
+ *
+ * @example
+ *
+ * store.pipe(selectAllEntitiesApply({
+ *   map: (entity) => new Todo(entity),
+ *   filter: entity => entity.completed
+ * }))
+ *
+ *
+ */
+
+function selectAllEntitiesApply(options) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef,
+    filterEntity = () => true,
+    mapEntity = e => e
+  } = options;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)(untilEntitiesChanges(entitiesKey), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(state => {
+    const result = [];
+
+    for (const id of state[idsKey]) {
+      const entity = state[entitiesKey][id];
+
+      if (filterEntity(entity)) {
+        result.push(mapEntity(entity));
+      }
+    }
+
+    return result;
+  }));
+}
+
+function selectEntity(id, options = {}) {
+  const {
+    ref: {
+      entitiesKey
+    } = defaultEntitiesRef,
+    pluck
+  } = options;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)(untilEntitiesChanges(entitiesKey), (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => getEntity(state[entitiesKey], id, pluck)));
+}
+function getEntity(entities, id, pluck) {
+  const entity = entities[id];
+
+  if ((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isUndefined)(entity)) {
+    return undefined;
+  }
+
+  if (!pluck) {
+    return entity;
+  }
+
+  return checkPluck(entity, pluck);
+}
+function selectEntityByPredicate(predicate, options) {
+  const {
+    ref = defaultEntitiesRef,
+    pluck,
+    idKey = 'id'
+  } = options || {};
+  const {
+    entitiesKey
+  } = ref;
+  let id;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => {
+    if ((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isUndefined)(id)) {
+      const entity = findEntityByPredicate(state, ref, predicate);
+      id = entity && entity[idKey];
+    }
+
+    return state[entitiesKey][id];
+  }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(entity => entity ? checkPluck(entity, pluck) : undefined), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.distinctUntilChanged)());
+}
+
+/**
+ *
+ * Observe the first entity
+ *
+ * @example
+ *
+ * store.pipe(selectFirst())
+ *
+ */
+
+function selectFirst(options = {}) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef
+  } = options;
+  return (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => state[entitiesKey][state[idsKey][0]]);
+}
+
+/**
+ *
+ * Observe the last entity
+ *
+ * @example
+ *
+ * store.pipe(selectLast())
+ *
+ */
+
+function selectLast(options = {}) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef
+  } = options;
+  return (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => state[entitiesKey][state[idsKey][state[idsKey].length - 1]]);
+}
+
+function selectMany(ids, options = {}) {
+  const {
+    ref: {
+      entitiesKey
+    } = defaultEntitiesRef,
+    pluck
+  } = options;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)((0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => state[entitiesKey]), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(entities => {
+    if (!ids.length) return [];
+    const filtered = [];
+
+    for (const id of ids) {
+      const entity = getEntity(entities, id, pluck);
+      if (!(0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.isUndefined)(entity)) filtered.push(entity);
+    }
+
+    return filtered;
+  }), (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.distinctUntilArrayItemChanged)());
+}
+function selectManyByPredicate(predicate, options) {
+  const {
+    ref: {
+      entitiesKey,
+      idsKey
+    } = defaultEntitiesRef,
+    pluck
+  } = options || {};
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)(untilEntitiesChanges(entitiesKey), (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => {
+    const filteredEntities = [];
+    state[idsKey].forEach((id, index) => {
+      const entity = state[entitiesKey][id];
+
+      if (predicate(entity, index)) {
+        filteredEntities.push(checkPluck(entity, pluck));
+      }
+    });
+    return filteredEntities;
+  }), (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.distinctUntilArrayItemChanged)());
+}
+
+/**
+ *
+ * Observe the entities collection size
+ *
+ * @example
+ *
+ * store.pipe(selectEntitiesCount())
+ *
+ */
+
+function selectEntitiesCount(options = {}) {
+  const {
+    ref: {
+      idsKey
+    } = defaultEntitiesRef
+  } = options;
+  return (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.select)(state => state[idsKey].length);
+}
+/**
+ *
+ * Observe the entities collection size  that pass the predicate
+ *
+ * @example
+ *
+ * store.pipe(selectEntitiesCountByPredicate(entity => entity.completed))
+ *
+ */
+
+function selectEntitiesCountByPredicate(predicate, options = {}) {
+  const ref = options.ref || defaultEntitiesRef;
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.pipe)(untilEntitiesChanges(ref.entitiesKey), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(state => findIdsByPredicate(state, ref, predicate).length), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.distinctUntilChanged)());
+}
+/**
+ *
+ * Return the entities collection size
+ *
+ * @example
+ *
+ * store.query(getEntitiesCount())
+ *
+ */
+
+function getEntitiesCount(options = {}) {
+  return function (state) {
+    const {
+      ref: {
+        idsKey
+      } = defaultEntitiesRef
+    } = options;
+    return state[idsKey].length;
+  };
+}
+/**
+ *
+ * Return the entities collection size that pass the predicate
+ *
+ * @example
+ *
+ * store.query(getEntitiesCountByPredicate(entity => entity.completed))
+ *
+ */
+
+function getEntitiesCountByPredicate(predicate, options = {}) {
+  return function (state) {
+    const ref = options.ref || defaultEntitiesRef;
+    return findIdsByPredicate(state, ref, predicate).length;
+  };
+}
+
+function unionEntities(idKey = 'id') {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(state => {
+    return state.entities.map(entity => {
+      return Object.assign({}, entity, state.UIEntities[entity[idKey]]);
+    });
+  });
+}
+
+function unionEntitiesAsMap(idKey = 'id') {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(state => {
+    return Object.fromEntries(state.entities.map(entity => {
+      return [entity[idKey], Object.assign({}, entity, state.UIEntities[entity[idKey]])];
+    }));
+  });
+}
+
+const {
+  selectActiveId,
+  setActiveId,
+  withActiveId,
+  resetActiveId,
+  getActiveId
+} = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.propsFactory)('activeId', {
+  initialValue: undefined
+});
+function selectActiveEntity(options = {}) {
+  const {
+    ref = defaultEntitiesRef
+  } = options;
+  return function (source) {
+    return source.pipe(selectActiveId()).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.switchMap)(id => source.pipe(selectEntity(id, {
+      ref
+    }))));
+  };
+}
+function getActiveEntity(options = {}) {
+  const {
+    ref: {
+      entitiesKey
+    } = defaultEntitiesRef
+  } = options;
+  return function (state) {
+    return state[entitiesKey][getActiveId(state)];
+  };
+}
+const {
+  setActiveIds,
+  resetActiveIds,
+  withActiveIds,
+  selectActiveIds,
+  toggleActiveIds,
+  removeActiveIds,
+  addActiveIds,
+  getActiveIds
+} = (0,_ngneat_elf__WEBPACK_IMPORTED_MODULE_0__.propsArrayFactory)('activeIds', {
+  initialValue: []
+});
+function selectActiveEntities(options = {}) {
+  const {
+    ref = defaultEntitiesRef
+  } = options;
+  return function (source) {
+    return source.pipe(selectActiveIds()).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.switchMap)(ids => source.pipe(selectMany(ids, {
+      ref
+    }))));
+  };
+}
+function getActiveEntities(options = {}) {
+  const {
+    ref: {
+      entitiesKey
+    } = defaultEntitiesRef
+  } = options;
+  return function (state) {
+    const result = [];
+
+    for (const id of getActiveIds(state)) {
+      const entity = state[entitiesKey][id];
+
+      if (entity) {
+        result.push(entity);
+      }
+    }
+
+    return result;
+  };
+}
+
+
+
+
+/***/ }),
+
+/***/ 2435:
+/*!***********************************************!*\
+  !*** ./node_modules/@ngneat/elf/index.esm.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Store": () => (/* binding */ Store),
+/* harmony export */   "asap": () => (/* binding */ asap),
+/* harmony export */   "capitalize": () => (/* binding */ capitalize),
+/* harmony export */   "coerceArray": () => (/* binding */ coerceArray),
+/* harmony export */   "createState": () => (/* binding */ createState),
+/* harmony export */   "createStore": () => (/* binding */ createStore),
+/* harmony export */   "deepFreeze": () => (/* binding */ deepFreeze),
+/* harmony export */   "distinctUntilArrayItemChanged": () => (/* binding */ distinctUntilArrayItemChanged),
+/* harmony export */   "elfHooks": () => (/* binding */ elfHooks),
+/* harmony export */   "emitOnce": () => (/* binding */ emitOnce),
+/* harmony export */   "enableElfProdMode": () => (/* binding */ enableElfProdMode),
+/* harmony export */   "filterNil": () => (/* binding */ filterNil),
+/* harmony export */   "getRegistry": () => (/* binding */ getRegistry),
+/* harmony export */   "getStore": () => (/* binding */ getStore),
+/* harmony export */   "getStoresSnapshot": () => (/* binding */ getStoresSnapshot),
+/* harmony export */   "head": () => (/* binding */ head),
+/* harmony export */   "isDev": () => (/* binding */ isDev),
+/* harmony export */   "isFunction": () => (/* binding */ isFunction),
+/* harmony export */   "isObject": () => (/* binding */ isObject),
+/* harmony export */   "isString": () => (/* binding */ isString),
+/* harmony export */   "isUndefined": () => (/* binding */ isUndefined),
+/* harmony export */   "propsArrayFactory": () => (/* binding */ propsArrayFactory),
+/* harmony export */   "propsFactory": () => (/* binding */ propsFactory),
+/* harmony export */   "registry$": () => (/* binding */ registry$),
+/* harmony export */   "select": () => (/* binding */ select),
+/* harmony export */   "setProp": () => (/* binding */ setProp),
+/* harmony export */   "setProps": () => (/* binding */ setProps),
+/* harmony export */   "withProps": () => (/* binding */ withProps)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs */ 6491);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 9441);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ 5160);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ 9763);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! rxjs */ 6317);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ 9170);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ 3466);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs/operators */ 3927);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ 3720);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! rxjs/operators */ 639);
+
+
+
+function createState(...propsFactories) {
+  const result = {
+    config: {},
+    state: {}
+  };
+
+  for (const {
+    config,
+    props
+  } of propsFactories) {
+    Object.assign(result.config, config);
+    Object.assign(result.state, props);
+  }
+
+  return result;
+}
+
+const batchInProgress = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(false);
+const batchDone$ = batchInProgress.asObservable().pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.filter)(inProgress => !inProgress), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.take)(1));
+function emitOnce(cb) {
+  batchInProgress.next(true);
+  const value = cb();
+  batchInProgress.next(false);
+  return value;
+}
+
+// this is internal object that's not exported to public API
+const elfHooksRegistry = {};
+
+class ElfHooks {
+  registerPreStoreUpdate(fn) {
+    elfHooksRegistry.preStoreUpdate = fn;
+  }
+
+}
+
+const elfHooks = new ElfHooks();
+
+const registry = new Map();
+const registryActions = new rxjs__WEBPACK_IMPORTED_MODULE_3__.Subject();
+const registry$ = registryActions.asObservable(); // @internal
+
+function addStore(store) {
+  registry.set(store.name, store);
+  registryActions.next({
+    type: 'add',
+    store
+  });
+} // @internal
+
+function removeStore(store) {
+  registry.delete(store.name);
+  registryActions.next({
+    type: 'remove',
+    store
+  });
+}
+function getStore(name) {
+  return registry.get(name);
+}
+function getRegistry() {
+  return registry;
+}
+function getStoresSnapshot() {
+  const stores = {};
+  registry.forEach((store, key) => {
+    stores[key] = store.getValue();
+  });
+  return stores;
+}
+
+class Store extends rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject {
+  constructor(storeDef) {
+    super(storeDef.state);
+    this.storeDef = storeDef;
+    this.batchInProgress = false;
+    this.context = {
+      config: this.getConfig()
+    };
+    this.state = storeDef.state;
+    this.initialState = this.getValue();
+    addStore(this);
+  }
+
+  get name() {
+    return this.storeDef.name;
+  }
+
+  getConfig() {
+    return this.storeDef.config;
+  }
+
+  query(selector) {
+    return selector(this.getValue());
+  }
+
+  update(...reducers) {
+    const currentState = this.getValue();
+    let nextState = reducers.reduce((value, reducer) => {
+      value = reducer(value, this.context);
+      return value;
+    }, currentState);
+
+    if (elfHooksRegistry.preStoreUpdate) {
+      nextState = elfHooksRegistry.preStoreUpdate(currentState, nextState, this.name);
+    }
+
+    if (nextState !== currentState) {
+      this.state = nextState;
+
+      if (batchInProgress.getValue()) {
+        if (!this.batchInProgress) {
+          this.batchInProgress = true;
+          batchDone$.subscribe(() => {
+            super.next(this.state);
+            this.batchInProgress = false;
+          });
+        }
+      } else {
+        super.next(this.state);
+      }
+    }
+  }
+
+  getValue() {
+    return this.state;
+  }
+
+  reset() {
+    this.update(() => this.initialState);
+  }
+
+  combine(observables) {
+    let hasChange = true;
+    const buffer = {};
+    return new rxjs__WEBPACK_IMPORTED_MODULE_4__.Observable(observer => {
+      for (const [key, query] of Object.entries(observables)) {
+        observer.add(query.subscribe(value => {
+          buffer[key] = value;
+          hasChange = true;
+        }));
+      }
+
+      return this.subscribe({
+        next() {
+          if (hasChange) {
+            observer.next(buffer);
+            hasChange = false;
+          }
+        },
+
+        error(e) {
+          observer.error(e);
+        },
+
+        complete() {
+          observer.complete();
+        }
+
+      });
+    });
+  }
+
+  destroy() {
+    removeStore(this);
+    this.reset();
+  }
+
+  next(value) {
+    this.update(() => value);
+  } // eslint-disable-next-line @typescript-eslint/no-empty-function
+
+
+  error() {} // eslint-disable-next-line @typescript-eslint/no-empty-function
+
+
+  complete() {}
+
+}
+
+function createStore(storeConfig, ...propsFactories) {
+  const {
+    state,
+    config
+  } = createState(...propsFactories);
+  const {
+    name
+  } = storeConfig;
+  return new Store({
+    name,
+    state,
+    config
+  });
+}
+
+function coerceArray(value) {
+  return Array.isArray(value) ? value : [value];
+}
+function isFunction(value) {
+  return typeof value === 'function';
+}
+function isUndefined(value) {
+  return value === undefined;
+}
+function isString(value) {
+  return typeof value === 'string';
+}
+function capitalize(key) {
+  return key.charAt(0).toUpperCase() + key.slice(1);
+}
+function isObject(item) {
+  return typeof item === 'object' && !Array.isArray(item) && item !== null;
+}
+function deepFreeze(o) {
+  Object.freeze(o);
+  const oIsFunction = typeof o === 'function';
+  const hasOwnProp = Object.prototype.hasOwnProperty;
+  Object.getOwnPropertyNames(o).forEach(function (prop) {
+    if (hasOwnProp.call(o, prop) && (oIsFunction ? prop !== 'caller' && prop !== 'callee' && prop !== 'arguments' : true) && o[prop] !== null && (typeof o[prop] === 'object' || typeof o[prop] === 'function') && !Object.isFrozen(o[prop])) {
+      deepFreeze(o[prop]);
+    }
+  });
+  return o;
+}
+
+/**
+ *
+ * Update a root property of the state
+ *
+ * @example
+ *
+ * store.update(setProp('foo', 'bar'))
+ *
+ * @example
+ *
+ * store.update(setProp('count', count => count + 1))
+ *
+ */
+
+function setProp(key, value) {
+  return function (state) {
+    return Object.assign({}, state, {
+      [key]: isFunction(value) ? value(state[key]) : value
+    });
+  };
+}
+/**
+ *
+ * Update a root property of the state
+ *
+ * @example
+ *
+ * store.update(setProps({ count: 1, bar: 'baz'}))
+ *
+ * @example
+ *
+ * store.update(setProps(state => ({
+ *   count: 1,
+ *   nested: {
+ *     ...state.nested,
+ *     foo: 'bar'
+ *   }
+ * })))
+ *
+ */
+
+function setProps(props) {
+  return function (state) {
+    return Object.assign({}, state, isFunction(props) ? props(state) : props);
+  };
+}
+
+function select(mapFn) {
+  return (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.pipe)((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_6__.map)(mapFn), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.distinctUntilChanged)());
+}
+function head() {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_6__.map)(arr => arr[0]);
+}
+function distinctUntilArrayItemChanged() {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.distinctUntilChanged)((prevCollection, currentCollection) => {
+    if (prevCollection === currentCollection) {
+      return true;
+    }
+
+    if (prevCollection.length !== currentCollection.length) {
+      return false;
+    }
+
+    const isOneOfItemReferenceChanged = currentCollection.some((item, i) => {
+      return prevCollection[i] !== item;
+    }); // return false means there is a change and we want to call next()
+
+    return !isOneOfItemReferenceChanged;
+  });
+}
+const asap = () => (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_8__.debounceTime)(0, rxjs__WEBPACK_IMPORTED_MODULE_9__.asapScheduler);
+function filterNil() {
+  return (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.filter)(value => value !== null && value !== undefined);
+}
+
+function propsFactory(key, {
+  initialValue: propsFactoryInitialValue,
+  config
+}) {
+  let initialValue = propsFactoryInitialValue;
+  const normalizedKey = capitalize(key);
+  return {
+    [`with${normalizedKey}`](value = initialValue) {
+      return {
+        props: {
+          [key]: value
+        },
+        config
+      };
+    },
+
+    [`set${normalizedKey}InitialValue`](value) {
+      initialValue = value;
+    },
+
+    [`set${normalizedKey}`](value) {
+      return function (state) {
+        const newVal = isFunction(value) ? value(state) : value;
+
+        if (newVal === state[key]) {
+          return state;
+        }
+
+        return Object.assign({}, state, {
+          [key]: newVal
+        });
+      };
+    },
+
+    [`update${normalizedKey}`](value) {
+      return function (state) {
+        const newVal = isFunction(value) ? value(state) : value;
+
+        if (newVal === state[key]) {
+          return state;
+        }
+
+        return Object.assign({}, state, {
+          [key]: isObject(newVal) ? Object.assign({}, state[key], newVal) : newVal
+        });
+      };
+    },
+
+    [`reset${normalizedKey}`]() {
+      return function (state) {
+        return Object.assign({}, state, {
+          [key]: initialValue
+        });
+      };
+    },
+
+    [`select${normalizedKey}`]() {
+      return select(state => state[key]);
+    },
+
+    [`get${normalizedKey}`](state) {
+      return state[key];
+    }
+
+  };
+}
+
+function propsArrayFactory(key, options) {
+  const normalizedKey = capitalize(key);
+  const base = propsFactory(key, options);
+  return Object.assign({}, base, {
+    [`add${normalizedKey}`](items) {
+      return function (state) {
+        return Object.assign({}, state, {
+          [key]: arrayAdd(state[key], items)
+        });
+      };
+    },
+
+    [`remove${normalizedKey}`](items) {
+      return function (state) {
+        return Object.assign({}, state, {
+          [key]: arrayRemove(state[key], items)
+        });
+      };
+    },
+
+    [`toggle${normalizedKey}`](items) {
+      return function (state) {
+        return Object.assign({}, state, {
+          [key]: arrayToggle(state[key], items)
+        });
+      };
+    },
+
+    [`update${normalizedKey}`](predicateOrIds, obj) {
+      return function (state) {
+        return Object.assign({}, state, {
+          [key]: arrayUpdate(state[key], predicateOrIds, obj)
+        });
+      };
+    },
+
+    [`in${normalizedKey}`](item) {
+      return state => inArray(state[key], item);
+    }
+
+  });
+}
+function arrayAdd(arr, items) {
+  return [...arr, ...coerceArray(items)];
+}
+function arrayRemove(arr, items) {
+  const toArray = coerceArray(items);
+  return arr.filter(current => !toArray.includes(current));
+}
+function arrayToggle(arr, items) {
+  const toArray = coerceArray(items);
+  const result = [...arr];
+  toArray.forEach(item => {
+    const i = result.indexOf(item);
+    i > -1 ? result.splice(i, 1) : result.push(item);
+  });
+  return result;
+}
+function inArray(arr, item) {
+  return arr.includes(item);
+}
+function arrayUpdate(arr, item, newItem) {
+  return arr.map(current => {
+    return current === item ? newItem : current;
+  });
+}
+
+function withProps(props) {
+  return {
+    props,
+    config: undefined
+  };
+}
+
+let __DEV__ = true;
+function enableElfProdMode() {
+  __DEV__ = false;
+} // @internal
+
+function isDev() {
+  return __DEV__;
+}
+
+
+
+
+/***/ }),
+
 /***/ 5602:
 /*!*************************************************************************************!*\
   !*** ./node_modules/ngx-cookie-service/__ivy_ngcc__/fesm2015/ngx-cookie-service.js ***!
@@ -67276,6 +68931,76 @@ class DebounceSubscriber extends _innerSubscribe__WEBPACK_IMPORTED_MODULE_0__.Si
             super._next(value);
         }
     }
+}
+
+
+/***/ }),
+
+/***/ 639:
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/_esm2015/internal/operators/debounceTime.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "debounceTime": () => (/* binding */ debounceTime)
+/* harmony export */ });
+/* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Subscriber */ 1003);
+/* harmony import */ var _scheduler_async__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/async */ 2606);
+
+
+function debounceTime(dueTime, scheduler = _scheduler_async__WEBPACK_IMPORTED_MODULE_0__.async) {
+    return (source) => source.lift(new DebounceTimeOperator(dueTime, scheduler));
+}
+class DebounceTimeOperator {
+    constructor(dueTime, scheduler) {
+        this.dueTime = dueTime;
+        this.scheduler = scheduler;
+    }
+    call(subscriber, source) {
+        return source.subscribe(new DebounceTimeSubscriber(subscriber, this.dueTime, this.scheduler));
+    }
+}
+class DebounceTimeSubscriber extends _Subscriber__WEBPACK_IMPORTED_MODULE_1__.Subscriber {
+    constructor(destination, dueTime, scheduler) {
+        super(destination);
+        this.dueTime = dueTime;
+        this.scheduler = scheduler;
+        this.debouncedSubscription = null;
+        this.lastValue = null;
+        this.hasValue = false;
+    }
+    _next(value) {
+        this.clearDebounce();
+        this.lastValue = value;
+        this.hasValue = true;
+        this.add(this.debouncedSubscription = this.scheduler.schedule(dispatchNext, this.dueTime, this));
+    }
+    _complete() {
+        this.debouncedNext();
+        this.destination.complete();
+    }
+    debouncedNext() {
+        this.clearDebounce();
+        if (this.hasValue) {
+            const { lastValue } = this;
+            this.lastValue = null;
+            this.hasValue = false;
+            this.destination.next(lastValue);
+        }
+    }
+    clearDebounce() {
+        const debouncedSubscription = this.debouncedSubscription;
+        if (debouncedSubscription !== null) {
+            this.remove(debouncedSubscription);
+            debouncedSubscription.unsubscribe();
+            this.debouncedSubscription = null;
+        }
+    }
+}
+function dispatchNext(subscriber) {
+    subscriber.debouncedNext();
 }
 
 
