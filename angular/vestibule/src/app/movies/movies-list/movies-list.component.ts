@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MoviesService } from "../movies.service";
 import { MovieInList } from "../interfaces/movie";
 import { PanelBackgroundService } from "../../panel/panel-background/panel-background.service";
 import { MoviesRepository } from "../movies.repository";
 import { FormControl } from "@angular/forms";
 import { debounceTime, map, startWith, switchMap, takeUntil, tap } from "rxjs/operators";
-import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from "rxjs";
 import { fadeInOutAnimation } from "../../shared/animations/fadeInOut";
 import { Router } from "@angular/router";
 
@@ -15,12 +15,16 @@ import { Router } from "@angular/router";
   styleUrls: ['./movies-list.component.scss'],
   animations: [fadeInOutAnimation]
 })
-export class MoviesListComponent implements OnInit {
-  noMovies = true
+export class MoviesListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>()
   searching = false
   subscribing = false
   filter = new FormControl()
-  movies$: Observable<MovieInList[]> = combineLatest([this.repo.$movies, this.filter.valueChanges.pipe(startWith(undefined))]).pipe(map(([movies, _]) => {
+  movies$: Observable<MovieInList[]> = combineLatest(
+    [
+      this.repo.$movies,
+      this.filter.valueChanges.pipe(startWith(undefined))
+    ]).pipe(map(([movies, _]) => {
     movies = movies || []
 
     if (!this.filter?.value) {
@@ -75,12 +79,19 @@ export class MoviesListComponent implements OnInit {
       return
     }
 
+    movie.subscribing = true
     this.subscribing = true
     this.moviesService.subscribeToMovie(movie.tmdb_id).subscribe(() => {
       this.subscribing = false
+      movie.subscribing = false
       this.router.navigate(['/movie', movie.tmdb_id])
     }, () => {
       this.subscribing = false
+      movie.subscribing = false
     })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
   }
 }

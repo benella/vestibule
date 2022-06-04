@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { fadeInOutAnimation } from "../animations/fadeInOut";
 
 @Component({
@@ -7,4 +7,6 @@ import { fadeInOutAnimation } from "../animations/fadeInOut";
   styleUrls: ['./loading-line.component.scss'],
   animations: [fadeInOutAnimation]
 })
-export class LoadingLineComponent {}
+export class LoadingLineComponent {
+  @Input() width = '14rem'
+}

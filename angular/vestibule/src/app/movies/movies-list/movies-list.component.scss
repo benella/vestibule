@@ -111,7 +111,8 @@
   &.unsubscribed {
     cursor: default;
 
-    &:hover {
+    &:hover,
+    &.subscribing {
       .data {
         background-color: $transparent-light-2;
 

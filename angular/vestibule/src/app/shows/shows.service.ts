@@ -60,7 +60,7 @@ export class ShowsService {
   }
 
   subscribeToShow(imdb_id: string): Observable<ShowSuccessfulSubscription> {
-    return this.http.post<ShowSuccessfulSubscription>(`api/shows/subscribe`, {imdb_id: imdb_id})
+    return this.http.post<ShowSuccessfulSubscription>(`api/shows/subscribe`, {imdb_id})
   }
 
   searchShowByTitle(searchTerm: string): Observable<ShowSearchResults> {

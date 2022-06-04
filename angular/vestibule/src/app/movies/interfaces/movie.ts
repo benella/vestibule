@@ -10,6 +10,7 @@ export interface MovieInList {
   status?: string
   poster_link: string
   palette_list: Palette
+  subscribing?: boolean
 }
 
 export interface Movie {

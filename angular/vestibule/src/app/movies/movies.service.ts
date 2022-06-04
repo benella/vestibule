@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { MovieInList, Movie } from "./interfaces/movie";
-import {MoviesRepository} from "./movies.repository";
-import {map, tap} from "rxjs/operators";
+import { MoviesRepository } from "./movies.repository";
+import { map, tap } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -28,5 +28,9 @@ export class MoviesService {
 
   subscribeToMovie(tmdb_id: string): Observable<{ tmdb_id: string }> {
     return this.http.post<{ tmdb_id: string }>(`api/movies/subscribe`, { tmdb_id })
+  }
+
+  unsubscribeFromMovie(tmdb_id: string): Observable<any> {
+    return this.http.delete<any>(`api/movies/${tmdb_id}`)
   }
 }

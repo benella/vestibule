@@ -25,16 +25,21 @@
     <vestibule-loading-line *ngIf="searching"></vestibule-loading-line>
 
     <div class="movie-list">
-      <div [@fadeInOutAnimation] *ngFor="let movie of unsubscribedMovies$ | async" class="movie unsubscribed" (mouseenter)="movieHover(movie)">
+      <div [@fadeInOutAnimation]
+           *ngFor="let movie of unsubscribedMovies$ | async" class="movie unsubscribed"
+           [ngClass]="{subscribing: movie.subscribing}"
+           (mouseenter)="movieHover(movie)"
+      >
         <div class="poster-wrap">
           <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
         </div>
         <div class="data">
           <p class="title">{{ movie.title }}</p>
-          <div class="unsubscribed-poster-strip"></div>
+          <div *ngIf="!movie.subscribing" class="unsubscribed-poster-strip"></div>
+          <vestibule-loading-line *ngIf="movie.subscribing" [width]="'6rem'"></vestibule-loading-line>
           <p class="release-date">{{ movie.release_date_text }}</p>
           <div class="subscribe" (click)="addMovie(movie)">
-            <p class="action">{{ subscribing ? 'Subscribing' : 'Subscribe'}}</p>
+            <p class="action">{{ movie.subscribing ? 'Subscribing' : 'Subscribe'}}</p>
           </div>
         </div>
       </div>
