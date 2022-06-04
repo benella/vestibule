@@ -5,12 +5,15 @@ import { PanelBackgroundService } from "../../panel/panel-background/panel-backg
 import { MoviesRepository } from "../movies.repository";
 import { FormControl } from "@angular/forms";
 import { debounceTime, map, startWith, switchMap, takeUntil, tap } from "rxjs/operators";
-import { combineLatest, Observable, of } from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, of} from "rxjs";
+import { fadeInOutAnimation } from "../../shared/animations/fadeInOut";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'vestibule-movies-list',
   templateUrl: './movies-list.component.html',
-  styleUrls: ['./movies-list.component.scss']
+  styleUrls: ['./movies-list.component.scss'],
+  animations: [fadeInOutAnimation]
 })
 export class MoviesListComponent implements OnInit {
   noMovies = true
@@ -31,25 +34,32 @@ export class MoviesListComponent implements OnInit {
     }
   }))
 
-  unsubscribedMovies$: Observable<MovieInList[]> = this.filter.valueChanges.pipe(debounceTime(400), switchMap(() => {
-    if (this.filter?.value && this.filter.value.length > 1) {
-      this.searching = true
-      return this.moviesService.searchMovie(this.filter.value)
-        .pipe(
-          takeUntil(this.filter.valueChanges),
-          tap(() => this.searching = false)
-        )
-    }
-
-    return of([])
-  }))
+  unsubscribedMovies$ = new BehaviorSubject<MovieInList[]>([])
 
   constructor(private moviesService: MoviesService,
               private panelBackgroundService: PanelBackgroundService,
-              public repo: MoviesRepository) { }
+              public repo: MoviesRepository,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.moviesService.listMovies().subscribe()
+    this.filter.valueChanges
+      .pipe(
+        debounceTime(400),
+        tap(() => this.unsubscribedMovies$.next([])),
+        switchMap(() => {
+          if (this.filter?.value && this.filter.value.length > 1) {
+            this.searching = true
+            return this.moviesService.searchMovie(this.filter.value)
+              .pipe(takeUntil(this.filter.valueChanges))
+          }
+          return of([])
+        })
+      )
+      .subscribe(movies => {
+        this.searching = false
+        this.unsubscribedMovies$.next(movies)
+      })
   }
 
   primaryColor(movie: MovieInList): string {
@@ -66,5 +76,11 @@ export class MoviesListComponent implements OnInit {
     }
 
     this.subscribing = true
+    this.moviesService.subscribeToMovie(movie.tmdb_id).subscribe(() => {
+      this.subscribing = false
+      this.router.navigate(['/movie', movie.tmdb_id])
+    }, () => {
+      this.subscribing = false
+    })
   }
 }

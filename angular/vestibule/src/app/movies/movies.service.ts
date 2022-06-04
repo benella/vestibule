@@ -25,4 +25,8 @@ export class MoviesService {
   searchMovie(searchTerm: string): Observable<MovieInList[]> {
     return this.http.get<{movies: MovieInList[]}>(`api/movies/search/${searchTerm}`).pipe(map(results => results.movies))
   }
+
+  subscribeToMovie(tmdb_id: string): Observable<{ tmdb_id: string }> {
+    return this.http.post<{ tmdb_id: string }>(`api/movies/subscribe`, { tmdb_id })
+  }
 }

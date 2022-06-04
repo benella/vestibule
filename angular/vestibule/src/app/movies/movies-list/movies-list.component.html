@@ -7,7 +7,7 @@
 
   <div class="lists">
     <div class="movie-list">
-      <a *ngFor="let movie of movies$ | async" class="movie" (mouseenter)="movieHover(movie)" [routerLink]="['/movie', movie.tmdb_id]">
+      <a [@fadeInOutAnimation] *ngFor="let movie of movies$ | async" class="movie" (mouseenter)="movieHover(movie)" [routerLink]="['/movie', movie.tmdb_id]">
         <div class="poster-wrap">
           <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
         </div>
@@ -22,10 +22,10 @@
       </a>
     </div>
 
-    <div *ngIf="searching" class="searching"><span>Searching New Movies</span></div>
+    <vestibule-loading-line *ngIf="searching"></vestibule-loading-line>
 
     <div class="movie-list">
-      <div *ngFor="let movie of unsubscribedMovies$ | async" class="movie unsubscribed" (mouseenter)="movieHover(movie)">
+      <div [@fadeInOutAnimation] *ngFor="let movie of unsubscribedMovies$ | async" class="movie unsubscribed" (mouseenter)="movieHover(movie)">
         <div class="poster-wrap">
           <div *ngIf="movie?.poster_link" class="poster" style="background-image: url('{{movie.poster_link}}')"></div>
         </div>

@@ -5,6 +5,8 @@ import { ShowTorrentComponent } from "./show-torrent/show-torrent.component";
 import { TorrentDownloadStatusComponent } from './torrent-download-status/torrent-download-status.component';
 import { PluralPipePipe } from "./pipes/plural-pipe.pipe";
 import { PosterStripComponent } from "./poster-strip/poster-strip.component";
+import { LoadingLineComponent } from './loading-line/loading-line.component';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 
 @NgModule({
@@ -13,17 +15,20 @@ import { PosterStripComponent } from "./poster-strip/poster-strip.component";
     LoadingButtonComponent,
     ShowTorrentComponent,
     TorrentDownloadStatusComponent,
-    PosterStripComponent
+    PosterStripComponent,
+    LoadingLineComponent,
   ],
     exports: [
       PluralPipePipe,
       LoadingButtonComponent,
       ShowTorrentComponent,
       TorrentDownloadStatusComponent,
-      PosterStripComponent
+      PosterStripComponent,
+      LoadingLineComponent,
     ],
   imports: [
-    CommonModule
+    CommonModule,
+    BrowserAnimationsModule
   ]
 })
 export class SharedModule { }

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from common import DEFAULT_EMPTY_POSTER
 
 from .models import Movie
-from .serializers import MovieListItemSerializer, MovieDetailsSerializer
+from .serializers import MovieListItemSerializer, MovieDetailsSerializer, MovieCreateSerializer
 
 
 class MovieList(generics.ListAPIView):
@@ -20,6 +20,11 @@ class MovieRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieDetailsSerializer
     lookup_field = "tmdb_id"
+
+
+class MovieSubscribe(generics.CreateAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieCreateSerializer
 
 
 def search_movie(request, title):

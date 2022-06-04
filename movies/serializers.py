@@ -32,3 +32,9 @@ class MovieDetailsSerializer(serializers.ModelSerializer):
             'crew',
             'runtime_text'
         ]
+
+
+class MovieCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ['tmdb_id']
