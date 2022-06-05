@@ -1,0 +1,34 @@
+<div [@fadeInOutAnimation] *ngIf="torrent" class="torrent">
+  <button class="download-action"
+       [style.backgroundColor]="primaryColor"
+       [style.opacity]="matchIndicationOpacity">
+    <ng-container *ngIf="!downloading else downloadProgress">
+      <svg height="1.6rem" [class.uploading]=uploading xmlns="http://www.w3.org/2000/svg" viewBox="0 0 166.59 210.63">
+        <g><path class="cls-1" d="M144.25,110.66l-46.06,46.06V5.45c0-3.01-2.44-5.45-5.45-5.45h-18.44c-3.01,0-5.45,2.44-5.45,5.45V156.72L22.35,110.22c-2.13-2.13-5.58-2.13-7.71,0L1.6,123.26c-2.13,2.13-2.13,5.58,0,7.71l78.06,78.06c2.13,2.13,5.58,2.13,7.71,0l77.62-77.62c2.13-2.13,2.13-5.58,0-7.71l-13.04-13.04c-2.13-2.13-5.58-2.13-7.71,0Z"/></g>
+      </svg>
+    </ng-container>
+    <ng-template #downloadProgress>
+      <svg class="progress-ring" width="32" height="32">
+       <circle
+          class="progress-ring__circle"
+          stroke="white"
+          stroke-width="3"
+          fill="transparent"
+          r="10"
+          cx="16"
+          cy="16"
+          [style.strokeDashoffset]="strokeDashoffset"
+       />
+      </svg>
+    </ng-template>
+  </button>
+  <div class="main" [ngClass]="{'not-match': !torrent.profile_match}">
+    <div class="tags">
+      <p class="tag">{{torrent.quality}}</p>
+    </div>
+    <p class="sources">
+      <span class="source">{{torrent.source_type}}</span><span class="bullet">•</span><span>{{torrent.feed}}</span>
+      <span class="publication-time">{{torrent.publication_time}}</span>
+    </p>
+  </div>
+</div>

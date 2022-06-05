@@ -112,12 +112,7 @@
     }
 
     .data {
-      background-color: #c9cac6;
-      //background-color: #c1c1c1;
-
-      .title, .release-date {
-        //color: white;
-      }
+      background-color: $light-gray;
 
       .subscribe {
         transition: 0.3s;

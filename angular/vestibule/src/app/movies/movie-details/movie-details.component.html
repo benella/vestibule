@@ -47,6 +47,31 @@
           </div>
         </div>
       </div>
+      <div class="torrents-main">
+        <div class="torrents">
+          <div class="torrents-list">
+            <vestibule-movie-torrent
+              *ngFor="let torrent of repo.activeTorrents$ | async"
+              [movieTorrent]="torrent"
+              [primaryColor]="primaryColor"
+            ></vestibule-movie-torrent>
+          </div>
+          <div class="torrents-list">
+            <vestibule-movie-torrent
+              *ngFor="let torrent of repo.matchingTorrents$ | async"
+              [movieTorrent]="torrent"
+              [primaryColor]="primaryColor"
+            ></vestibule-movie-torrent>
+          </div>
+          <div class="torrents-list">
+            <vestibule-movie-torrent
+              *ngFor="let torrent of repo.notMatchingTorrents$ | async"
+              [movieTorrent]="torrent"
+              [primaryColor]="primaryColor"
+            ></vestibule-movie-torrent>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </ng-container>

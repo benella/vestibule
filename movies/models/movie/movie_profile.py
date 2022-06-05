@@ -21,6 +21,15 @@ class MovieProfile(models.Model):
     quality = models.CharField(choices=Quality.QUALITY_CHOICES, default=Quality.QUALITY_1080P, max_length=10,
                                help_text="Movie video quality")
 
+    def save(self, *args, **kwargs):
+        super(MovieProfile, self).save(*args, **kwargs)
+        for movie in self.movie_set.all():
+            for torrent in movie.torrents.all():
+                profile_match, profile_match_score = self.get_torrent_match_score(torrent)
+                torrent.profile_match_score = profile_match_score
+                torrent.profile_match = profile_match
+                torrent.save()
+
     def should_wait(self, first_torrent_created_at: timezone) -> bool:
         return should_download_wait(wait_value=self.wait, first_torrent_created_at=first_torrent_created_at)
 

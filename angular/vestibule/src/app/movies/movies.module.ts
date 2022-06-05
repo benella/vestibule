@@ -7,6 +7,7 @@ import { SharedModule } from "../shared/shared.module";
 import { MovieDetailsComponent } from './movie-details/movie-details.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { TorrentsModule } from "../torrents/torrents.module";
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
     MoviesRoutingModule,
     SharedModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    TorrentsModule
   ]
 })
 export class MoviesModule { }
