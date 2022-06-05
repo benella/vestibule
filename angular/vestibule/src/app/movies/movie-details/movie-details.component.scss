@@ -132,6 +132,11 @@
     overflow: scroll;
   }
 
+  .torrents-list-title {
+    color: $unselected-dark;
+    margin-bottom: 1rem;
+  }
+
   .torrents-list {
     display: flex;
     flex-direction: row;

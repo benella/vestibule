@@ -48,28 +48,39 @@
         </div>
       </div>
       <div class="torrents-main">
-        <div class="torrents">
-          <div class="torrents-list">
-            <vestibule-movie-torrent
-              *ngFor="let torrent of repo.activeTorrents$ | async"
-              [movieTorrent]="torrent"
-              [primaryColor]="primaryColor"
-            ></vestibule-movie-torrent>
-          </div>
-          <div class="torrents-list">
-            <vestibule-movie-torrent
-              *ngFor="let torrent of repo.matchingTorrents$ | async"
-              [movieTorrent]="torrent"
-              [primaryColor]="primaryColor"
-            ></vestibule-movie-torrent>
-          </div>
-          <div class="torrents-list">
-            <vestibule-movie-torrent
-              *ngFor="let torrent of repo.notMatchingTorrents$ | async"
-              [movieTorrent]="torrent"
-              [primaryColor]="primaryColor"
-            ></vestibule-movie-torrent>
-          </div>
+        <div class="torrents" *ngIf="{active: repo.activeTorrents$ | async, matching: repo.matchingTorrents$ | async, notMatching: repo.notMatchingTorrents$ | async} as movieTorrents">
+          <ng-container *ngIf="movieTorrents.active.length">
+            <p class="torrents-list-title">Active</p>
+            <div class="torrents-list">
+                <vestibule-movie-torrent
+                  *ngFor="let torrent of movieTorrents.active"
+                  [movieTorrent]="torrent"
+                  [primaryColor]="primaryColor"
+                ></vestibule-movie-torrent>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="movieTorrents.matching.length">
+            <p class="torrents-list-title">Matching Profile</p>
+            <div class="torrents-list">
+              <vestibule-movie-torrent
+                *ngFor="let torrent of movieTorrents.matching"
+                [movieTorrent]="torrent"
+                [primaryColor]="primaryColor"
+              ></vestibule-movie-torrent>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="movieTorrents.notMatching.length">
+            <p class="torrents-list-title">Not Matching Profile</p>
+            <div class="torrents-list">
+              <vestibule-movie-torrent
+                *ngFor="let torrent of movieTorrents.notMatching"
+                [movieTorrent]="torrent"
+                [primaryColor]="primaryColor"
+              ></vestibule-movie-torrent>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
