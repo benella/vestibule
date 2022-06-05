@@ -6,7 +6,7 @@ from typing import List
 
 from django.utils.text import slugify
 from django.db import models
-from feeds.feet_item import FeedItem
+from feeds.feet_item import FeedItem, MovieFeedItem
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class Feed(models.Model):
     slug = models.SlugField(max_length=20, default="", editable=False)
     priority = models.IntegerField(default=0)
     has_subtitles = models.BooleanField(default=False)
+    movies_feed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -46,12 +47,13 @@ class Feed(models.Model):
 
         root = ET.fromstring(feed.text)
         feed_items = list()
+        feed_item_class = MovieFeedItem if self.movies_feed else FeedItem
 
         print(f"Reading {self.name} feed")
         for item in root[0].findall("item"):
 
             try:
-                feed_item = FeedItem(
+                feed_item = feed_item_class(
                     raw_title=item.find("title").text.replace(" ", "."),
                     link=item.find("link").text,
                     publication_time=self._formatted_publication_time(item.find("pubDate").text),

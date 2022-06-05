@@ -38,4 +38,12 @@ export class MoviesService {
   updateMovieInfo(tmdb_id: string): Observable<Movie> {
     return this.http.get<Movie>(`api/movies/update_info/${tmdb_id}`)
   }
+
+  getMovieTorrents(tmdb_id: string): Observable<any> {
+    return this.http.get<any>(`api/movies/torrents/${tmdb_id}`)
+  }
+
+  findMovieTorrents(tmdb_id: string): Observable<any> {
+    return this.http.get<any>(`api/movies/find_torrents/${tmdb_id}`)
+  }
 }

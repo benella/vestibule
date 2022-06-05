@@ -6,13 +6,17 @@ from datetime import datetime
 from typing import List
 
 from django.db import models
+from django.utils import timezone
 
 from .movie_profile import MovieProfile
 from movies.utils import generate_movie_lookup_names
 from torrents.models import MovieTorrent
+from feeds.models import Feed
+from feeds.feet_item import FeedItem
 from common import DEFAULT_POSTER
 from common.tmdb_client import TheMovieDBVestibuleClient
 from common.poster_main_colors_util import get_poster_main_colors
+from api_feeds import search_feeds_by_imdb_id
 
 logger = logging.getLogger(__name__)
 
@@ -154,8 +158,58 @@ class Movie(models.Model):
         formatted_aliases = generate_movie_lookup_names(title=self.title, year=self.year, tmdb_id=self.tmdb_id)
         self.lookup_names = "\n".join(formatted_aliases)
 
+    def get_lookup_names_list(self) -> List[str]:
+        """
+        Returns the lookup names as a list of strings
+        """
+        return self.lookup_names.split("\n") + self.custom_lookup_names.lower().split("\n")
+
     def extract_palette(self):
         if not self.poster_link:
             return
         main_colors = get_poster_main_colors(self.poster_link)
         self.palette = str([color.raw for color in main_colors])
+
+    def find_torrents(self):
+        torrents = list()
+
+        for feed in Feed.objects.filter(movies_feed=True):
+            torrents += feed.read_feed()
+
+        torrents += search_feeds_by_imdb_id(self.formatted_imdb_id, movie=True)
+
+        relevant_items = list()
+        lookup_names = self.get_lookup_names_list()
+
+        for item in torrents:
+            if item.parsed_values.movie_title.lower() in lookup_names:
+                relevant_items.append(item)
+
+        print("[{}] Found {} torrents for movie {}".format(
+            timezone.now().strftime("%d/%b/%Y %H:%M:%S"), len(relevant_items), self.title))
+
+        self.add_torrents_from_feed(relevant_items)
+
+    def add_torrents_from_feed(self, feed_list: List[FeedItem]):
+        for feed_item in feed_list:
+            try:
+                existing_torrent = self.torrents.all().get(title=feed_item.raw_title, feed=feed_item.feed)
+                print(f"Torrent titled '{existing_torrent.title}' from {existing_torrent.feed} is not new")
+                continue
+            except MovieTorrent.DoesNotExist:
+                pass
+
+            torrent = MovieTorrent()
+            torrent.title = feed_item.raw_title
+            torrent.quality = feed_item.parsed_values.video_quality
+            torrent.source_type = feed_item.parsed_values.source
+            torrent.link = feed_item.link
+            torrent.publication_time = feed_item.publication_time
+            torrent.feed = feed_item.feed
+            torrent.movie = self
+            torrent.save()
+
+            profile_match, profile_match_score = self.profile.get_torrent_match_score(torrent)
+            torrent.profile_match_score = profile_match_score
+            torrent.profile_match = profile_match
+            torrent.save()

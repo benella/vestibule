@@ -6,7 +6,7 @@ from common import DEFAULT_EMPTY_POSTER
 from rest_framework.response import Response
 
 from .models import Movie
-from .serializers import MovieListItemSerializer, MovieDetailsSerializer, MovieCreateSerializer
+from .serializers import MovieListItemSerializer, MovieDetailsSerializer, MovieCreateSerializer, MovieTorrentsSerializer
 
 
 class MovieList(generics.ListAPIView):
@@ -38,6 +38,24 @@ class MovieUpdateInfo(generics.RetrieveAPIView):
 class MovieSubscribe(generics.CreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieCreateSerializer
+
+
+class MovieTorrentsRetrieve(generics.RetrieveAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieTorrentsSerializer
+    lookup_field = "tmdb_id"
+
+
+class MovieFindTorrents(generics.RetrieveAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieTorrentsSerializer
+    lookup_field = "tmdb_id"
+
+    def retrieve(self, request, *args, **kwargs):
+        movie = self.get_object()
+        movie.find_torrents()
+        serializer = self.get_serializer(movie)
+        return Response(serializer.data)
 
 
 def search_movie(request, title):

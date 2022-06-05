@@ -129,3 +129,11 @@ class MovieTorrent(TorrentBase):
 
     class Meta:
         ordering = ('-profile_match_score', 'feed')
+
+    def __str__(self):
+        return "{movie} ({quality}) ({source}) ({feed})".format(
+            movie=self.movie.title,
+            quality=self.quality,
+            source=self.source_type,
+            feed=self.feed.name
+        )

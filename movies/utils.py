@@ -16,7 +16,7 @@ def generate_movie_lookup_names(title: str, year: str, tmdb_id: int):
 
     for name in aliases:
         formatted_name = re.sub("\([\w\s]+\)", "", name.strip())
-        formatted_name = re.sub("[-_\s,]", ".", formatted_name.strip())
+        formatted_name = re.sub("[_\s,]", ".", formatted_name.strip())
         formatted_name = re.sub("[:(),'?!]", "", formatted_name).lower()
         formatted_name = re.sub("\.+", ".", formatted_name.strip())
         formatted_aliases.append(formatted_name)

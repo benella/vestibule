@@ -14,6 +14,7 @@ export class MovieDetailsComponent implements OnInit {
   movie: Movie
   primaryColor: string;
   loading = false
+  torrents: any[]
 
   constructor(
     private route: ActivatedRoute,
@@ -41,6 +42,18 @@ export class MovieDetailsComponent implements OnInit {
     this.moviesService.updateMovieInfo(this.movie.tmdb_id).subscribe(movie => {
       this.loading = false
       this.movie = movie
+    })
+  }
+
+  findTorrents(): void {
+    if (this.loading) {
+      return
+    }
+
+    this.loading = true
+    this.moviesService.findMovieTorrents(this.movie.tmdb_id).subscribe(torrents => {
+      this.loading = false
+      this.torrents = torrents
     })
   }
 

@@ -381,7 +381,6 @@ class Show(models.Model):
                         print(f"It has no torrents {saved_episode.torrents.all()}, deleting it")
                         saved_episode.delete()
 
-
     def find_show_torrents(self, request=None, torrents: List[FeedItem] = None):
         """
         Read or get Feeds, find and add torrents matching the show
@@ -403,14 +402,12 @@ class Show(models.Model):
         print("[{}] Found {} torrents for show {}".format(
             timezone.now().strftime("%d/%b/%Y %H:%M:%S"), len(relevant_items), self.title))
 
-        self.add_torrents_from_feed(relevant_items, request)
+        self.add_torrents_from_feed(relevant_items)
 
-    def add_torrents_from_feed(self, feed_list: List[FeedItem], request=None):
+    def add_torrents_from_feed(self, feed_list: List[FeedItem]):
         """
         Add show torrents from given filtered list
         """
-        new_torrents = list()
-
         for feed_item in feed_list:
 
             try:
@@ -436,17 +433,6 @@ class Show(models.Model):
             torrent.profile_match_score = profile_match_score
             torrent.profile_match = profile_match
             torrent.save()
-
-            new_torrents.append(torrent)
-
-        if request is not None:
-            if new_torrents:
-                messages.add_message(request, messages.SUCCESS,
-                                     f"{len(new_torrents)} new torrents found for {self}")
-
-            else:
-                messages.add_message(request, messages.INFO, f"No new Torrents found for {self}")
-
 
     def update_show_downloads(self):
         """

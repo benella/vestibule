@@ -37,6 +37,19 @@ class ShowTorrentValues:
         return ""
 
 
+@dataclass
+class MovieTorrentValues:
+    movie_title: Optional[str] = None
+    video_quality: Optional[str] = None
+    source: Optional[str] = None
+    other: Optional[str] = None
+
+    def has_expected_keys(self) -> bool:
+        return self.movie_title is not None \
+               and self.source is not None \
+               and self.video_quality is not None
+
+
 class FeedItem:
 
     SHOW_TORRENT_RE = re.compile(
@@ -98,3 +111,41 @@ class FeedItem:
             "has_subtitles": self.feed.has_subtitles,
             "full_season": self.parsed_values.is_full_season,
         }
+
+
+class MovieFeedItem:
+    MOVIE_TORRENT_RE = re.compile(
+        r"(?P<title>[\w.-]+(.(?P<year>\d{4})))(.(?P<version>[\w]+))?.(?P<quality>\d{3,4}p).(?P<source>[\w\.-]+)-(?P<encoder>[\w]+)")
+
+    def __init__(self, raw_title: str, link: str, publication_time: str, feed: 'Feed'):
+        self.raw_title = raw_title
+        self.link = link
+        self.publication_time = publication_time
+        self.feed = feed
+        self.parsed_values: Optional[MovieTorrentValues] = None
+
+    def has_expected_keys(self) -> bool:
+        """
+        Return True if Torrent values were parsed as expected, and has minimal values
+        """
+        if self.parsed_values is None:
+            return False
+        return self.parsed_values.has_expected_keys()
+
+    def parse_title(self):
+        """
+        Matches raw title to Movie patten, and parses values accordingly
+        """
+        match = MovieFeedItem.MOVIE_TORRENT_RE.search(self.raw_title)
+        if match is not None:
+            self._parse_movie_title(match)
+
+    def _parse_movie_title(self, match: re.Match):
+        self.parsed_values = MovieTorrentValues()
+
+        self.parsed_values.movie_title = match.group('title').strip()
+        self.parsed_values.video_quality = Quality.parse_quality_form_phrase(
+            phrase=match.group('quality').replace(".", " ").strip())
+
+        self.parsed_values.other = match.group('source').replace(".", " ").strip()
+        self.parsed_values.source = Source.pare_source_from_phrase(phrase=self.parsed_values.other)

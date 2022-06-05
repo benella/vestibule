@@ -4,7 +4,7 @@ import logging
 
 from typing import List, Callable
 from api_feeds.api_feed import TorrentsAPIFeed
-from feeds.feet_item import FeedItem
+from feeds.feet_item import FeedItem, MovieFeedItem
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class RarbgTorrentsAPIFeed(TorrentsAPIFeed):
         self._last_api_request = time.time()
         return result
 
-    def search_by_imdb_id(self, imdb_id: str) -> List[FeedItem]:
+    def search_by_imdb_id(self, imdb_id: str, movie: bool = False) -> List[FeedItem]:
         print(f"Searching {self.name} with {imdb_id}")
         arguments = {"search_imdb": imdb_id, "extended_response": True}
         try:
@@ -61,21 +61,22 @@ class RarbgTorrentsAPIFeed(TorrentsAPIFeed):
         except Exception as e:
             print(f"Failed to get torrents ({e})")
             torrents = []
-        return self._convert_api_torrents_to_feed_items(api_torrents=torrents)
+        return self._convert_api_torrents_to_feed_items(api_torrents=torrents, movie=movie)
 
     def search_by_string(self, string_term: str) -> List[FeedItem]:
         arguments = {"search_string": string_term, "extended_response": True}
         torrents = self._api_request(method=self._client.search, arguments=arguments)
         return self._convert_api_torrents_to_feed_items(api_torrents=torrents)
 
-    def _convert_api_torrents_to_feed_items(self, api_torrents: List[rarbgapi.Torrent]) -> List[FeedItem]:
+    def _convert_api_torrents_to_feed_items(self, api_torrents: List[rarbgapi.Torrent], movie: bool = False) -> List[FeedItem]:
         """
         Converting a list of rarbgapi.Torrent to a list of FeedItem
         """
         feed_items = list()
+        feed_item_class = MovieFeedItem if movie else FeedItem
 
         for torrent in api_torrents:
-            feed_item = FeedItem(
+            feed_item = feed_item_class(
                 raw_title=torrent.title,
                 link=torrent.download,
                 publication_time=self._formatted_publication_time(raw_publication_time=torrent.pubdate),
