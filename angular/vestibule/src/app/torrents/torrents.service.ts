@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { TorrentDownloadResponse, Torrent } from "./torrent";
+import { MovieTorrentDownloadResponse, TorrentDownloadResponse } from "./torrent";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -10,7 +10,11 @@ export class TorrentsService {
 
   constructor(private http: HttpClient) { }
 
-  downloadShowTorrent(torrentID: number): Observable<TorrentDownloadResponse> {
+  downloadTorrent(torrentID: number): Observable<TorrentDownloadResponse> {
     return this.http.get<TorrentDownloadResponse>(`api/torrents/download/${torrentID}`)
+  }
+
+  downloadMovieTorrent(torrentID: number): Observable<MovieTorrentDownloadResponse> {
+    return this.http.get<MovieTorrentDownloadResponse>(`api/torrents/download-movie/${torrentID}`)
   }
 }

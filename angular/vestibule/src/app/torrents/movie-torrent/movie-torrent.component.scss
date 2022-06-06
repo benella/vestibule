@@ -7,6 +7,7 @@
   background-color: #c9cac6;
   margin: 0 1rem 1rem 0;
   display: flex;
+  cursor: default;
 
   .download-action {
     background-color: $value-true-hover;
@@ -17,6 +18,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 
     svg {
       fill: #c9cac6;
@@ -47,8 +49,10 @@
     &.not-match {
       opacity: 0.4;
     }
+  }
 
-    &:hover {
+  &:hover {
+    .main {
       opacity: 1;
     }
   }

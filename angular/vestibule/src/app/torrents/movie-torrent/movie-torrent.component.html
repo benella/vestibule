@@ -1,7 +1,10 @@
 <div [@fadeInOutAnimation] *ngIf="torrent" class="torrent">
-  <button class="download-action"
-       [style.backgroundColor]="primaryColor"
-       [style.opacity]="matchIndicationOpacity">
+  <button
+    class="download-action"
+    [style.backgroundColor]="primaryColor"
+    [style.opacity]="matchIndicationOpacity"
+    (click)="download()"
+  >
     <ng-container *ngIf="!downloading else downloadProgress">
       <svg height="1.6rem" [class.uploading]=uploading xmlns="http://www.w3.org/2000/svg" viewBox="0 0 166.59 210.63">
         <g><path class="cls-1" d="M144.25,110.66l-46.06,46.06V5.45c0-3.01-2.44-5.45-5.45-5.45h-18.44c-3.01,0-5.45,2.44-5.45,5.45V156.72L22.35,110.22c-2.13-2.13-5.58-2.13-7.71,0L1.6,123.26c-2.13,2.13-2.13,5.58,0,7.71l78.06,78.06c2.13,2.13,5.58,2.13,7.71,0l77.62-77.62c2.13-2.13,2.13-5.58,0-7.71l-13.04-13.04c-2.13-2.13-5.58-2.13-7.71,0Z"/></g>

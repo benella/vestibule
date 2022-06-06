@@ -69,7 +69,7 @@ export class TorrentDownloadStatusComponent implements OnInit {
     }
 
     if (!this.torrent.isStandaloneTorrent) {
-      this.torrentsService.downloadShowTorrent(this.torrent.torrentId).subscribe(
+      this.torrentsService.downloadTorrent(this.torrent.torrentId).subscribe(
       data => {
         this.torrentChanged = true
         this.torrent.downloadStatus = data.torrent.download_status

@@ -1,3 +1,5 @@
+import { MovieTorrent } from "../movies/interfaces/movie-torrent";
+
 export class TorrentDownloadStatus {
   public static NEVER_STARTED = 'Never Started'
   public static DOWNLOADING = 'Downloading'
@@ -39,6 +41,12 @@ export interface Torrent {
 
 export interface TorrentDownloadResponse {
   torrent: Torrent
+  message: string
+  successful: boolean
+}
+
+export interface MovieTorrentDownloadResponse {
+  torrent: MovieTorrent
   message: string
   successful: boolean
 }

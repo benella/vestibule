@@ -2,7 +2,7 @@ from django.views import generic
 from rest_framework import generics
 from rest_framework.response import Response
 
-from .models import Torrent
+from .models import Torrent, MovieTorrent
 from .serializers import TorrentSerializer
 from shows.models import Show
 from torrents_manager.transmission_client import TransmissionClient
@@ -32,6 +32,34 @@ class TorrentList(generic.TemplateView):
 
 class DownloadTorrent(generics.RetrieveAPIView):
     queryset = Torrent.objects.all()
+    serializer_class = TorrentSerializer
+    lookup_field = "id"
+
+    def retrieve(self, request, *args, **kwargs):
+        torrent = self.get_object()
+
+        if torrent.download_status != torrent.DOWNLOADING:
+
+            with TransmissionClient() as transmission:
+                if transmission.is_up:
+                    successful, message = transmission.download_torrent(torrent)
+                else:
+                    successful = False
+                    message = "Transmission client seems to be down"
+        else:
+            successful = False
+            message = f"{torrent} is already downloading"
+
+        serializer = self.get_serializer(torrent)
+        return Response(dict(
+            torrent=serializer.data,
+            successful=successful,
+            message=message)
+        )
+
+
+class DownloadMovieTorrent(generics.RetrieveAPIView):
+    queryset = MovieTorrent.objects.all()
     serializer_class = TorrentSerializer
     lookup_field = "id"
 

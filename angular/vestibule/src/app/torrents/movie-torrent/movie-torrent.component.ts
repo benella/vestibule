@@ -1,7 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import { MovieTorrent } from "../../movies/interfaces/movie-torrent";
 import { fadeInOutAnimation } from "../../shared/animations/fadeInOut";
-import {TorrentDownloadStatus} from "../torrent";
+import { TorrentDownloadStatus } from "../torrent";
+import { TorrentsService } from "../torrents.service";
+
+const circleLength = 62.83
 
 @Component({
   selector: 'vestibule-movie-torrent',
@@ -9,27 +12,42 @@ import {TorrentDownloadStatus} from "../torrent";
   styleUrls: ['./movie-torrent.component.scss'],
   animations: [fadeInOutAnimation]
 })
-export class MovieTorrentComponent implements OnInit {
+export class MovieTorrentComponent {
   @Input() set movieTorrent(torrent: MovieTorrent) {
     this.torrent = torrent
     this.matchIndicationOpacity = torrent.profile_match ? 1 : torrent.profile_match_score / 300
     this.downloading = torrent.download_status === TorrentDownloadStatus.DOWNLOADING
     this.uploading = torrent.download_status === TorrentDownloadStatus.READY
-    this.strokeDashoffset = 62.83 - torrent.percent_done / 100 * 62.83
+    this.strokeDashoffset = circleLength - torrent.percent_done / 100 * circleLength
   }
 
   @Input() primaryColor: string
+  @Output() torrentDownloadedStarted = new EventEmitter<void>()
 
   torrent: MovieTorrent
   strokeDashoffset: any
-  downloading: boolean
-  uploading: boolean
+  downloading = false
+  loading = false
+  uploading = false
   color: string
   matchIndicationOpacity: number
 
-  constructor() { }
+  constructor(private torrentsService: TorrentsService) { }
 
-  ngOnInit(): void {
+  download(): void {
+    if (this.loading || this.downloading) {
+      return
+    }
+
+    this.loading = true
+    this.torrentsService.downloadMovieTorrent(this.torrent.id).subscribe(result => {
+      this.loading = false
+      this.torrentDownloadedStarted.emit()
+
+      if (result.successful) {
+        this.downloading = true
+        this.movieTorrent = result.torrent
+      }
+    })
   }
-
 }

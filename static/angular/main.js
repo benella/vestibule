@@ -2561,7 +2561,7 @@ class TorrentDownloadStatusComponent {
             return;
         }
         if (!this.torrent.isStandaloneTorrent) {
-            this.torrentsService.downloadShowTorrent(this.torrent.torrentId).subscribe(data => {
+            this.torrentsService.downloadTorrent(this.torrent.torrentId).subscribe(data => {
                 this.torrentChanged = true;
                 this.torrent.downloadStatus = data.torrent.download_status;
                 this.torrent.percentDone = data.torrent.percent_done;
@@ -3955,104 +3955,128 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "MovieTorrentComponent": () => (/* binding */ MovieTorrentComponent)
 /* harmony export */ });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 2316);
 /* harmony import */ var _shared_animations_fadeInOut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../shared/animations/fadeInOut */ 196);
 /* harmony import */ var _torrent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../torrent */ 3150);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ 2316);
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common */ 4364);
+/* harmony import */ var _torrents_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../torrents.service */ 6009);
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ 4364);
+
+
 
 
 
 
 function MovieTorrentComponent_div_0_ng_container_2_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementContainerStart"](0);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵnamespaceSVG"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](1, "svg", 12);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](2, "g");
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelement"](3, "path", 13);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementContainerEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementContainerStart"](0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnamespaceSVG"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](1, "svg", 12);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](2, "g");
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelement"](3, "path", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementContainerEnd"]();
 } if (rf & 2) {
-    const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵnextContext"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵclassProp"]("uploading", ctx_r1.uploading);
+    const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵclassProp"]("uploading", ctx_r1.uploading);
 } }
 function MovieTorrentComponent_div_0_ng_template_3_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵnamespaceSVG"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](0, "svg", 14);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelement"](1, "circle", 15);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnamespaceSVG"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](0, "svg", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelement"](1, "circle", 15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
 } if (rf & 2) {
-    const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵnextContext"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵstyleProp"]("stroke-dashoffset", ctx_r3.strokeDashoffset);
+    const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵstyleProp"]("stroke-dashoffset", ctx_r3.strokeDashoffset);
 } }
 const _c0 = function (a0) { return { "not-match": a0 }; };
 function MovieTorrentComponent_div_0_Template(rf, ctx) { if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](0, "div", 1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](1, "button", 2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtemplate"](2, MovieTorrentComponent_div_0_ng_container_2_Template, 4, 2, "ng-container", 3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtemplate"](3, MovieTorrentComponent_div_0_ng_template_3_Template, 2, 2, "ng-template", null, 4, _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtemplateRefExtractor"]);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](5, "div", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](6, "div", 6);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](7, "p", 7);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtext"](8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](9, "p", 8);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](10, "span", 9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtext"](11);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](12, "span", 10);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtext"](13, "\u2022");
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](14, "span");
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtext"](15);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementStart"](16, "span", 11);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtext"](17);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵelementEnd"]();
+    const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](0, "div", 1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](1, "button", 2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵlistener"]("click", function MovieTorrentComponent_div_0_Template_button_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵrestoreView"](_r5); const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"](); return ctx_r4.download(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](2, MovieTorrentComponent_div_0_ng_container_2_Template, 4, 2, "ng-container", 3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](3, MovieTorrentComponent_div_0_ng_template_3_Template, 2, 2, "ng-template", null, 4, _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplateRefExtractor"]);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](5, "div", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](6, "div", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](7, "p", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](9, "p", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](10, "span", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](11);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](12, "span", 10);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](13, "\u2022");
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](14, "span");
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](16, "span", 11);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](17);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
 } if (rf & 2) {
-    const _r2 = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵreference"](4);
-    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵnextContext"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵproperty"]("@fadeInOutAnimation", undefined);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵstyleProp"]("background-color", ctx_r0.primaryColor)("opacity", ctx_r0.matchIndicationOpacity);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵproperty"]("ngIf", !ctx_r0.downloading)("ngIfElse", _r2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵpureFunction1"](12, _c0, !ctx_r0.torrent.profile_match));
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtextInterpolate"](ctx_r0.torrent.quality);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtextInterpolate"](ctx_r0.torrent.source_type);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](4);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtextInterpolate"](ctx_r0.torrent.feed);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵadvance"](2);
-    _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtextInterpolate"](ctx_r0.torrent.publication_time);
+    const _r2 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵreference"](4);
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("@fadeInOutAnimation", undefined);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵstyleProp"]("background-color", ctx_r0.primaryColor)("opacity", ctx_r0.matchIndicationOpacity);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("ngIf", !ctx_r0.downloading)("ngIfElse", _r2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("ngClass", _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵpureFunction1"](12, _c0, !ctx_r0.torrent.profile_match));
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx_r0.torrent.quality);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx_r0.torrent.source_type);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx_r0.torrent.feed);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx_r0.torrent.publication_time);
 } }
+const circleLength = 62.83;
 class MovieTorrentComponent {
-    constructor() { }
+    constructor(torrentsService) {
+        this.torrentsService = torrentsService;
+        this.torrentDownloadedStarted = new _angular_core__WEBPACK_IMPORTED_MODULE_3__.EventEmitter();
+        this.downloading = false;
+        this.loading = false;
+        this.uploading = false;
+    }
     set movieTorrent(torrent) {
         this.torrent = torrent;
         this.matchIndicationOpacity = torrent.profile_match ? 1 : torrent.profile_match_score / 300;
         this.downloading = torrent.download_status === _torrent__WEBPACK_IMPORTED_MODULE_1__.TorrentDownloadStatus.DOWNLOADING;
         this.uploading = torrent.download_status === _torrent__WEBPACK_IMPORTED_MODULE_1__.TorrentDownloadStatus.READY;
-        this.strokeDashoffset = 62.83 - torrent.percent_done / 100 * 62.83;
+        this.strokeDashoffset = circleLength - torrent.percent_done / 100 * circleLength;
     }
-    ngOnInit() {
+    download() {
+        if (this.loading || this.downloading) {
+            return;
+        }
+        this.loading = true;
+        this.torrentsService.downloadMovieTorrent(this.torrent.id).subscribe(result => {
+            this.loading = false;
+            this.torrentDownloadedStarted.emit();
+            if (result.successful) {
+                this.downloading = true;
+                this.movieTorrent = result.torrent;
+            }
+        });
     }
 }
-MovieTorrentComponent.ɵfac = function MovieTorrentComponent_Factory(t) { return new (t || MovieTorrentComponent)(); };
-MovieTorrentComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineComponent"]({ type: MovieTorrentComponent, selectors: [["vestibule-movie-torrent"]], inputs: { movieTorrent: "movieTorrent", primaryColor: "primaryColor" }, decls: 1, vars: 1, consts: [["class", "torrent", 4, "ngIf"], [1, "torrent"], [1, "download-action"], [4, "ngIf", "ngIfElse"], ["downloadProgress", ""], [1, "main", 3, "ngClass"], [1, "tags"], [1, "tag"], [1, "sources"], [1, "source"], [1, "bullet"], [1, "publication-time"], ["height", "1.6rem", "xmlns", "http://www.w3.org/2000/svg", "viewBox", "0 0 166.59 210.63"], ["d", "M144.25,110.66l-46.06,46.06V5.45c0-3.01-2.44-5.45-5.45-5.45h-18.44c-3.01,0-5.45,2.44-5.45,5.45V156.72L22.35,110.22c-2.13-2.13-5.58-2.13-7.71,0L1.6,123.26c-2.13,2.13-2.13,5.58,0,7.71l78.06,78.06c2.13,2.13,5.58,2.13,7.71,0l77.62-77.62c2.13-2.13,2.13-5.58,0-7.71l-13.04-13.04c-2.13-2.13-5.58-2.13-7.71,0Z", 1, "cls-1"], ["width", "32", "height", "32", 1, "progress-ring"], ["stroke", "white", "stroke-width", "3", "fill", "transparent", "r", "10", "cx", "16", "cy", "16", 1, "progress-ring__circle"]], template: function MovieTorrentComponent_Template(rf, ctx) { if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵtemplate"](0, MovieTorrentComponent_div_0_Template, 18, 14, "div", 0);
+MovieTorrentComponent.ɵfac = function MovieTorrentComponent_Factory(t) { return new (t || MovieTorrentComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_torrents_service__WEBPACK_IMPORTED_MODULE_2__.TorrentsService)); };
+MovieTorrentComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({ type: MovieTorrentComponent, selectors: [["vestibule-movie-torrent"]], inputs: { movieTorrent: "movieTorrent", primaryColor: "primaryColor" }, outputs: { torrentDownloadedStarted: "torrentDownloadedStarted" }, decls: 1, vars: 1, consts: [["class", "torrent", 4, "ngIf"], [1, "torrent"], [1, "download-action", 3, "click"], [4, "ngIf", "ngIfElse"], ["downloadProgress", ""], [1, "main", 3, "ngClass"], [1, "tags"], [1, "tag"], [1, "sources"], [1, "source"], [1, "bullet"], [1, "publication-time"], ["height", "1.6rem", "xmlns", "http://www.w3.org/2000/svg", "viewBox", "0 0 166.59 210.63"], ["d", "M144.25,110.66l-46.06,46.06V5.45c0-3.01-2.44-5.45-5.45-5.45h-18.44c-3.01,0-5.45,2.44-5.45,5.45V156.72L22.35,110.22c-2.13-2.13-5.58-2.13-7.71,0L1.6,123.26c-2.13,2.13-2.13,5.58,0,7.71l78.06,78.06c2.13,2.13,5.58,2.13,7.71,0l77.62-77.62c2.13-2.13,2.13-5.58,0-7.71l-13.04-13.04c-2.13-2.13-5.58-2.13-7.71,0Z", 1, "cls-1"], ["width", "32", "height", "32", 1, "progress-ring"], ["stroke", "white", "stroke-width", "3", "fill", "transparent", "r", "10", "cx", "16", "cy", "16", 1, "progress-ring__circle"]], template: function MovieTorrentComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](0, MovieTorrentComponent_div_0_Template, 18, 14, "div", 0);
     } if (rf & 2) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵproperty"]("ngIf", ctx.torrent);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_3__.NgIf, _angular_common__WEBPACK_IMPORTED_MODULE_3__.NgClass], styles: [".torrent[_ngcontent-%COMP%] {\n  width: 24rem;\n  height: 5rem;\n  border-radius: 0.2rem;\n  background-color: #c9cac6;\n  margin: 0 1rem 1rem 0;\n  display: flex;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%] {\n  background-color: #206f38;\n  width: 3rem;\n  margin: 1rem 0 1rem 1rem;\n  border-radius: 0.2rem;\n  border: none;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg[_ngcontent-%COMP%] {\n  fill: #c9cac6;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg[_ngcontent-%COMP%]   circle[_ngcontent-%COMP%] {\n  stroke: #c9cac6;\n  stroke-dasharray: 62.83 62.83;\n  transition: stroke-dashoffset 0.35s;\n  transform: rotate(-90deg);\n  transform-origin: 50% 50%;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg.uploading[_ngcontent-%COMP%] {\n  transform: rotate(180deg);\n}\n.torrent[_ngcontent-%COMP%]   .match-indication[_ngcontent-%COMP%] {\n  height: 3px;\n  width: 100%;\n}\n.torrent[_ngcontent-%COMP%]   .main[_ngcontent-%COMP%] {\n  padding: 1rem;\n  transition: 0.3s;\n}\n.torrent[_ngcontent-%COMP%]   .main.not-match[_ngcontent-%COMP%] {\n  opacity: 0.4;\n}\n.torrent[_ngcontent-%COMP%]   .main[_ngcontent-%COMP%]:hover {\n  opacity: 1;\n}\n.torrent[_ngcontent-%COMP%]   .tag[_ngcontent-%COMP%] {\n  color: #333;\n  border: 1px solid;\n  border-radius: 0.2rem;\n  width: -moz-fit-content;\n  width: fit-content;\n  padding: 0.2rem 0.5rem 0.25rem;\n  line-height: 1rem;\n  font-weight: 300;\n  margin-right: 1rem;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%] {\n  margin-top: 0.3rem;\n  color: #747470;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .source[_ngcontent-%COMP%], .torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .publication-time[_ngcontent-%COMP%], .torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  color: inherit;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .publication-time[_ngcontent-%COMP%] {\n  font-weight: 200;\n  margin-left: 1rem;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1vdmllLXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCIuLi8uLi8uLi9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UsWUFBQTtFQUNBLFlBQUE7RUFDQSxxQkFBQTtFQUNBLHlCQUFBO0VBQ0EscUJBQUE7RUFDQSxhQUFBO0FBREY7QUFHRTtFQUNFLHlCQ0hlO0VESWYsV0FBQTtFQUNBLHdCQUFBO0VBQ0EscUJBQUE7RUFDQSxZQUFBO0VBQ0EsYUFBQTtFQUNBLHVCQUFBO0VBQ0EsbUJBQUE7QUFESjtBQUdJO0VBQ0UsYUFBQTtBQUROO0FBR007RUFDRSxlQUFBO0VBQ0EsNkJBQUE7RUFDQSxtQ0FBQTtFQUNBLHlCQUFBO0VBQ0EseUJBQUE7QUFEUjtBQUlNO0VBQ0UseUJBQUE7QUFGUjtBQU9FO0VBQ0UsV0FBQTtFQUNBLFdBQUE7QUFMSjtBQVFFO0VBQ0UsYUFBQTtFQUNBLGdCQUFBO0FBTko7QUFRSTtFQUNFLFlBQUE7QUFOTjtBQVNJO0VBQ0UsVUFBQTtBQVBOO0FBV0U7RUFDRSxXQ3BDSTtFRHFDSixpQkFBQTtFQUNBLHFCQUFBO0VBQ0EsdUJBQUE7RUFBQSxrQkFBQTtFQUNBLDhCQUFBO0VBQ0EsaUJBQUE7RUFDQSxnQkFBQTtFQUNBLGtCQUFBO0FBVEo7QUFZRTtFQUNFLGtCQUFBO0VBQ0EsY0NuRGM7QUR5Q2xCO0FBWUk7RUFDRSxjQUFBO0FBVk47QUFhSTtFQUNFLGdCQUFBO0VBQ0EsaUJBQUE7QUFYTiIsImZpbGUiOiJtb3ZpZS10b3JyZW50LmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiQGltcG9ydCBcIi4uLy4uLy4uL3N0eWxpbmcvdmFyaWFibGVzXCI7XG5cbi50b3JyZW50IHtcbiAgd2lkdGg6IDI0cmVtO1xuICBoZWlnaHQ6IDVyZW07XG4gIGJvcmRlci1yYWRpdXM6IDAuMnJlbTtcbiAgYmFja2dyb3VuZC1jb2xvcjogI2M5Y2FjNjtcbiAgbWFyZ2luOiAwIDFyZW0gMXJlbSAwO1xuICBkaXNwbGF5OiBmbGV4O1xuXG4gIC5kb3dubG9hZC1hY3Rpb24ge1xuICAgIGJhY2tncm91bmQtY29sb3I6ICR2YWx1ZS10cnVlLWhvdmVyO1xuICAgIHdpZHRoOiAzcmVtO1xuICAgIG1hcmdpbjogMXJlbSAwIDFyZW0gMXJlbTtcbiAgICBib3JkZXItcmFkaXVzOiAwLjJyZW07XG4gICAgYm9yZGVyOiBub25lO1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG4gICAgYWxpZ24taXRlbXM6IGNlbnRlcjtcblxuICAgIHN2ZyB7XG4gICAgICBmaWxsOiAjYzljYWM2O1xuXG4gICAgICBjaXJjbGUge1xuICAgICAgICBzdHJva2U6ICNjOWNhYzY7XG4gICAgICAgIHN0cm9rZS1kYXNoYXJyYXk6IDYyLjgzIDYyLjgzO1xuICAgICAgICB0cmFuc2l0aW9uOiBzdHJva2UtZGFzaG9mZnNldCAwLjM1cztcbiAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoLTkwZGVnKTtcbiAgICAgICAgdHJhbnNmb3JtLW9yaWdpbjogNTAlIDUwJTtcbiAgICAgIH1cblxuICAgICAgJi51cGxvYWRpbmcge1xuICAgICAgICB0cmFuc2Zvcm06IHJvdGF0ZSgxODBkZWcpO1xuICAgICAgfVxuICAgIH1cbiAgfVxuXG4gIC5tYXRjaC1pbmRpY2F0aW9uIHtcbiAgICBoZWlnaHQ6IDNweDtcbiAgICB3aWR0aDogMTAwJTtcbiAgfVxuXG4gIC5tYWluIHtcbiAgICBwYWRkaW5nOiAxcmVtO1xuICAgIHRyYW5zaXRpb246IDAuM3M7XG5cbiAgICAmLm5vdC1tYXRjaCB7XG4gICAgICBvcGFjaXR5OiAwLjQ7XG4gICAgfVxuXG4gICAgJjpob3ZlciB7XG4gICAgICBvcGFjaXR5OiAxO1xuICAgIH1cbiAgfVxuXG4gIC50YWcge1xuICAgIGNvbG9yOiAkYmxhY2s7XG4gICAgYm9yZGVyOiAxcHggc29saWQ7XG4gICAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuICAgIHdpZHRoOiBmaXQtY29udGVudDtcbiAgICBwYWRkaW5nOiAwLjJyZW0gMC41cmVtIDAuMjVyZW07XG4gICAgbGluZS1oZWlnaHQ6IDFyZW07XG4gICAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgICBtYXJnaW4tcmlnaHQ6IDFyZW07XG4gIH1cblxuICAuc291cmNlcyB7XG4gICAgbWFyZ2luLXRvcDogMC4zcmVtO1xuICAgIGNvbG9yOiAkdW5zZWxlY3RlZC1kYXJrO1xuXG4gICAgLnNvdXJjZSwgLnB1YmxpY2F0aW9uLXRpbWUsIHNwYW4ge1xuICAgICAgY29sb3I6IGluaGVyaXQ7XG4gICAgfVxuXG4gICAgLnB1YmxpY2F0aW9uLXRpbWUge1xuICAgICAgZm9udC13ZWlnaHQ6IDIwMDtcbiAgICAgIG1hcmdpbi1sZWZ0OiAxcmVtO1xuICAgIH1cbiAgfVxufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtbGlnaHQtMjogI2QyZDNjNzc1O1xuJGxpZ2h0LWdyYXk6ICNjOWNhYzY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"], data: { animation: [_shared_animations_fadeInOut__WEBPACK_IMPORTED_MODULE_0__.fadeInOutAnimation] } });
+        _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("ngIf", ctx.torrent);
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_4__.NgIf, _angular_common__WEBPACK_IMPORTED_MODULE_4__.NgClass], styles: [".torrent[_ngcontent-%COMP%] {\n  width: 24rem;\n  height: 5rem;\n  border-radius: 0.2rem;\n  background-color: #c9cac6;\n  margin: 0 1rem 1rem 0;\n  display: flex;\n  cursor: default;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%] {\n  background-color: #206f38;\n  width: 3rem;\n  margin: 1rem 0 1rem 1rem;\n  border-radius: 0.2rem;\n  border: none;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  cursor: pointer;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg[_ngcontent-%COMP%] {\n  fill: #c9cac6;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg[_ngcontent-%COMP%]   circle[_ngcontent-%COMP%] {\n  stroke: #c9cac6;\n  stroke-dasharray: 62.83 62.83;\n  transition: stroke-dashoffset 0.35s;\n  transform: rotate(-90deg);\n  transform-origin: 50% 50%;\n}\n.torrent[_ngcontent-%COMP%]   .download-action[_ngcontent-%COMP%]   svg.uploading[_ngcontent-%COMP%] {\n  transform: rotate(180deg);\n}\n.torrent[_ngcontent-%COMP%]   .match-indication[_ngcontent-%COMP%] {\n  height: 3px;\n  width: 100%;\n}\n.torrent[_ngcontent-%COMP%]   .main[_ngcontent-%COMP%] {\n  padding: 1rem;\n  transition: 0.3s;\n}\n.torrent[_ngcontent-%COMP%]   .main.not-match[_ngcontent-%COMP%] {\n  opacity: 0.4;\n}\n.torrent[_ngcontent-%COMP%]:hover   .main[_ngcontent-%COMP%] {\n  opacity: 1;\n}\n.torrent[_ngcontent-%COMP%]   .tag[_ngcontent-%COMP%] {\n  color: #333;\n  border: 1px solid;\n  border-radius: 0.2rem;\n  width: -moz-fit-content;\n  width: fit-content;\n  padding: 0.2rem 0.5rem 0.25rem;\n  line-height: 1rem;\n  font-weight: 300;\n  margin-right: 1rem;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%] {\n  margin-top: 0.3rem;\n  color: #747470;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .source[_ngcontent-%COMP%], .torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .publication-time[_ngcontent-%COMP%], .torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  color: inherit;\n}\n.torrent[_ngcontent-%COMP%]   .sources[_ngcontent-%COMP%]   .publication-time[_ngcontent-%COMP%] {\n  font-weight: 200;\n  margin-left: 1rem;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1vdmllLXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCIuLi8uLi8uLi9zdHlsaW5nL3ZhcmlhYmxlcy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0VBQ0UsWUFBQTtFQUNBLFlBQUE7RUFDQSxxQkFBQTtFQUNBLHlCQUFBO0VBQ0EscUJBQUE7RUFDQSxhQUFBO0VBQ0EsZUFBQTtBQURGO0FBR0U7RUFDRSx5QkNKZTtFREtmLFdBQUE7RUFDQSx3QkFBQTtFQUNBLHFCQUFBO0VBQ0EsWUFBQTtFQUNBLGFBQUE7RUFDQSx1QkFBQTtFQUNBLG1CQUFBO0VBQ0EsZUFBQTtBQURKO0FBR0k7RUFDRSxhQUFBO0FBRE47QUFHTTtFQUNFLGVBQUE7RUFDQSw2QkFBQTtFQUNBLG1DQUFBO0VBQ0EseUJBQUE7RUFDQSx5QkFBQTtBQURSO0FBSU07RUFDRSx5QkFBQTtBQUZSO0FBT0U7RUFDRSxXQUFBO0VBQ0EsV0FBQTtBQUxKO0FBUUU7RUFDRSxhQUFBO0VBQ0EsZ0JBQUE7QUFOSjtBQVFJO0VBQ0UsWUFBQTtBQU5OO0FBV0k7RUFDRSxVQUFBO0FBVE47QUFhRTtFQUNFLFdDeENJO0VEeUNKLGlCQUFBO0VBQ0EscUJBQUE7RUFDQSx1QkFBQTtFQUFBLGtCQUFBO0VBQ0EsOEJBQUE7RUFDQSxpQkFBQTtFQUNBLGdCQUFBO0VBQ0Esa0JBQUE7QUFYSjtBQWNFO0VBQ0Usa0JBQUE7RUFDQSxjQ3ZEYztBRDJDbEI7QUFjSTtFQUNFLGNBQUE7QUFaTjtBQWVJO0VBQ0UsZ0JBQUE7RUFDQSxpQkFBQTtBQWJOIiwiZmlsZSI6Im1vdmllLXRvcnJlbnQuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyJAaW1wb3J0IFwiLi4vLi4vLi4vc3R5bGluZy92YXJpYWJsZXNcIjtcblxuLnRvcnJlbnQge1xuICB3aWR0aDogMjRyZW07XG4gIGhlaWdodDogNXJlbTtcbiAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjYzljYWM2O1xuICBtYXJnaW46IDAgMXJlbSAxcmVtIDA7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGN1cnNvcjogZGVmYXVsdDtcblxuICAuZG93bmxvYWQtYWN0aW9uIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAkdmFsdWUtdHJ1ZS1ob3ZlcjtcbiAgICB3aWR0aDogM3JlbTtcbiAgICBtYXJnaW46IDFyZW0gMCAxcmVtIDFyZW07XG4gICAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuICAgIGJvcmRlcjogbm9uZTtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gICAgY3Vyc29yOiBwb2ludGVyO1xuXG4gICAgc3ZnIHtcbiAgICAgIGZpbGw6ICNjOWNhYzY7XG5cbiAgICAgIGNpcmNsZSB7XG4gICAgICAgIHN0cm9rZTogI2M5Y2FjNjtcbiAgICAgICAgc3Ryb2tlLWRhc2hhcnJheTogNjIuODMgNjIuODM7XG4gICAgICAgIHRyYW5zaXRpb246IHN0cm9rZS1kYXNob2Zmc2V0IDAuMzVzO1xuICAgICAgICB0cmFuc2Zvcm06IHJvdGF0ZSgtOTBkZWcpO1xuICAgICAgICB0cmFuc2Zvcm0tb3JpZ2luOiA1MCUgNTAlO1xuICAgICAgfVxuXG4gICAgICAmLnVwbG9hZGluZyB7XG4gICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDE4MGRlZyk7XG4gICAgICB9XG4gICAgfVxuICB9XG5cbiAgLm1hdGNoLWluZGljYXRpb24ge1xuICAgIGhlaWdodDogM3B4O1xuICAgIHdpZHRoOiAxMDAlO1xuICB9XG5cbiAgLm1haW4ge1xuICAgIHBhZGRpbmc6IDFyZW07XG4gICAgdHJhbnNpdGlvbjogMC4zcztcblxuICAgICYubm90LW1hdGNoIHtcbiAgICAgIG9wYWNpdHk6IDAuNDtcbiAgICB9XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICAubWFpbiB7XG4gICAgICBvcGFjaXR5OiAxO1xuICAgIH1cbiAgfVxuXG4gIC50YWcge1xuICAgIGNvbG9yOiAkYmxhY2s7XG4gICAgYm9yZGVyOiAxcHggc29saWQ7XG4gICAgYm9yZGVyLXJhZGl1czogMC4ycmVtO1xuICAgIHdpZHRoOiBmaXQtY29udGVudDtcbiAgICBwYWRkaW5nOiAwLjJyZW0gMC41cmVtIDAuMjVyZW07XG4gICAgbGluZS1oZWlnaHQ6IDFyZW07XG4gICAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgICBtYXJnaW4tcmlnaHQ6IDFyZW07XG4gIH1cblxuICAuc291cmNlcyB7XG4gICAgbWFyZ2luLXRvcDogMC4zcmVtO1xuICAgIGNvbG9yOiAkdW5zZWxlY3RlZC1kYXJrO1xuXG4gICAgLnNvdXJjZSwgLnB1YmxpY2F0aW9uLXRpbWUsIHNwYW4ge1xuICAgICAgY29sb3I6IGluaGVyaXQ7XG4gICAgfVxuXG4gICAgLnB1YmxpY2F0aW9uLXRpbWUge1xuICAgICAgZm9udC13ZWlnaHQ6IDIwMDtcbiAgICAgIG1hcmdpbi1sZWZ0OiAxcmVtO1xuICAgIH1cbiAgfVxufVxuIiwiJG1haW4tY29sb3I6ICNlM2U0ZGI7XG4kc2Vjb25kYXJ5LWNvbG9yOiAjQzhDOUMwO1xuJHRyYW5zcGFyZW50LWxpZ2h0OiAjZTFlMmQ2NjY7XG4kdHJhbnNwYXJlbnQtbGlnaHQtMjogI2QyZDNjNzc1O1xuJGxpZ2h0LWdyYXk6ICNjOWNhYzY7XG4kdHJhbnNwYXJlbnQtc2VtaS1saWdodDogcmdiYSgyMjUsIDIyNiwgMjE0LCAwLjY1KTtcbiR0b3JyZW50LWdyZWVuOiAjNTBhZDZmO1xuJHRvcnJlbnQtZ3JlZW4taG92ZXI6ICMyZTcyNDM7XG4kdmFsdWUtdHJ1ZS1ob3ZlcjogIzIwNmYzODtcbiR2YWx1ZS10cnVlOiAjM2Y5MzU5O1xuJHZhbHVlLWZhbHNlOiAjQUY0RjY4O1xuJHZhbHVlLWZhbHNlLWhvdmVyOiAjOTcyOTQ1O1xuJHZhbHVlLW5ldXRyYWw6ICMwMDcxYmM7XG4kbWFpbi1iYWNrOiAjZTNlNGRiO1xuJG1haW4tYmFjay1kYXJrOiAjYmZiZmI4O1xuJG1haW4tYmFjay1kYXJrLXRyYW5zcGFyZW50OiByZ2JhKDE5MSwgMTkxLCAxODQsIDAuNSk7XG4kdW5zZWxlY3RlZDogI2E0YTVhMDtcbiR1bnNlbGVjdGVkLWRhcms6ICM3NDc0NzA7XG4kdW5zZWxlY3RlZC10cmFuc3BhcmVudDogcmdiYSgxNjQsIDE2NSwgMTYwLCAwLjIpO1xuJHNraXA6ICNlZGJmM2I7XG4kYmxhY2s6ICMzMzM7XG4kbGlnaHQtdGV4dDogI2QyZDNjNztcbiJdfQ== */"], data: { animation: [_shared_animations_fadeInOut__WEBPACK_IMPORTED_MODULE_0__.fadeInOutAnimation] } });
 
 
 /***/ }),
@@ -4161,8 +4185,11 @@ class TorrentsService {
     constructor(http) {
         this.http = http;
     }
-    downloadShowTorrent(torrentID) {
+    downloadTorrent(torrentID) {
         return this.http.get(`api/torrents/download/${torrentID}`);
+    }
+    downloadMovieTorrent(torrentID) {
+        return this.http.get(`api/torrents/download-movie/${torrentID}`);
     }
 }
 TorrentsService.ɵfac = function TorrentsService_Factory(t) { return new (t || TorrentsService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpClient)); };

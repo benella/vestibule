@@ -79,7 +79,7 @@ class TransmissionClient:
             stats = self.client.session.stats()
             return stats.result == TransmissionClient.ACTION_SUCCESS
 
-        except ConnectionError as e:
+        except (ConnectionError, AttributeError) as e:
             print(f"Transmission is down - {e}")
             return False
 
