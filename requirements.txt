@@ -1,4 +1,4 @@
-Django==3.2
+Django==3.2.17
 djangorestframework==3.12.4
 IMDbPY==2021.4.18
 requests==2.23.0
